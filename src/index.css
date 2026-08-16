@@ -1,0 +1,78 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Design tokens — nguồn chân lý duy nhất về màu sắc / font của dự án.
+   Quy tắc: KHÔNG hardcode mã màu trong className, luôn dùng token.
+   Ví dụ: bg-primary, text-ink-muted, bg-surface
+------------------------------------------------------------------- */
+@theme {
+  /* Xanh lá organic — màu thương hiệu chính */
+  --color-primary: #7fad39;
+  --color-primary-dark: #6a9130;
+  --color-primary-light: #a3cc63;
+  --color-primary-soft: #eef5e2;
+
+  /* Cam — badge giảm giá, giá khuyến mãi, CTA phụ */
+  --color-accent: #f5871f;
+  --color-accent-dark: #d9740f;
+  --color-accent-soft: #fdf0e2;
+
+  /* Nền */
+  --color-surface: #faf8f2;
+  --color-surface-alt: #f2f4ec;
+
+  /* Chữ */
+  --color-ink: #2b2b2b;
+  --color-ink-muted: #7a7a7a;
+  --color-ink-light: #a8a8a8;
+
+  /* Viền */
+  --color-line: #e6e6e6;
+
+  /* Trạng thái */
+  --color-success: #4caf50;
+  --color-danger: #e53935;
+
+  /* Font */
+  --font-heading: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Bo góc mặc định cho card */
+  --radius-card: 0.75rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-bold text-ink;
+  }
+
+  /* Ẩn mũi tên spinner của input[type=number] (dùng cho QuantityPicker) */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  /* Container chuẩn dùng chung cho mọi section */
+  .container-app {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
+  }
+}

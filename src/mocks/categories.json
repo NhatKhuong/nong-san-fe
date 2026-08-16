@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "slug": "rau-cu",
+    "name": "Rau củ hữu cơ",
+    "description": "Rau xanh, củ quả canh tác hữu cơ, thu hoạch trong ngày.",
+    "image": "https://picsum.photos/seed/nss-rau-cu/600/600",
+    "parentId": null
+  },
+  {
+    "id": 2,
+    "slug": "trai-cay-hat",
+    "name": "Trái cây & hạt",
+    "description": "Trái cây theo mùa và các loại hạt dinh dưỡng.",
+    "image": "https://picsum.photos/seed/nss-trai-cay/600/600",
+    "parentId": null
+  },
+  {
+    "id": 3,
+    "slug": "thit-huu-co",
+    "name": "Thịt hữu cơ",
+    "description": "Thịt từ vật nuôi thả tự nhiên, không kháng sinh.",
+    "image": "https://picsum.photos/seed/nss-thit/600/600",
+    "parentId": null
+  },
+  {
+    "id": 4,
+    "slug": "bo-trung",
+    "name": "Bơ & trứng",
+    "description": "Bơ tự nhiên và trứng gà thả vườn.",
+    "image": "https://picsum.photos/seed/nss-bo-trung/600/600",
+    "parentId": null
+  },
+  {
+    "id": 5,
+    "slug": "thuc-pham-sach",
+    "name": "Thực phẩm sạch",
+    "description": "Hải sản, ngũ cốc và thực phẩm khô đạt chuẩn an toàn.",
+    "image": "https://picsum.photos/seed/nss-thuc-pham/600/600",
+    "parentId": null
+  },
+  {
+    "id": 6,
+    "slug": "sua-kem",
+    "name": "Sữa & kem",
+    "description": "Sữa tươi thanh trùng và các chế phẩm từ sữa.",
+    "image": "https://picsum.photos/seed/nss-sua/600/600",
+    "parentId": null
+  },
+  {
+    "id": 7,
+    "slug": "nuoc-ep",
+    "name": "Nước ép hữu cơ",
+    "description": "Nước ép nguyên chất, không đường, không chất bảo quản.",
+    "image": "https://picsum.photos/seed/nss-nuoc-ep/600/600",
+    "parentId": null
+  },
+  {
+    "id": 101,
+    "slug": "rau-an-la",
+    "name": "Rau ăn lá",
+    "description": "Cải, xà lách, rau thơm các loại.",
+    "image": "https://picsum.photos/seed/nss-rau-la/600/600",
+    "parentId": 1
+  },
+  {
+    "id": 102,
+    "slug": "cu-qua",
+    "name": "Củ quả",
+    "description": "Cà rốt, khoai, bí, hành tỏi.",
+    "image": "https://picsum.photos/seed/nss-cu-qua/600/600",
+    "parentId": 1
+  },
+  {
+    "id": 201,
+    "slug": "trai-cay-tuoi",
+    "name": "Trái cây tươi",
+    "description": "Trái cây theo mùa, hái chín tự nhiên.",
+    "image": "https://picsum.photos/seed/nss-tc-tuoi/600/600",
+    "parentId": 2
+  },
+  {
+    "id": 202,
+    "slug": "hat-dinh-duong",
+    "name": "Hạt dinh dưỡng",
+    "description": "Hạnh nhân, óc chó, macca, hạt chia.",
+    "image": "https://picsum.photos/seed/nss-hat/600/600",
+    "parentId": 2
+  }
+]
