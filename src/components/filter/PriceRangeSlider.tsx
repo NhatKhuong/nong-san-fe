@@ -23,7 +23,15 @@ const THUMB_CLASSES = cn(
   '[&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full',
   '[&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white',
   '[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-grab',
+  /*
+   * Tắt outline mặc định của trình duyệt vì nó bao quanh CẢ thanh trượt (rộng hết
+   * chiều ngang) chứ không quanh tay cầm, nhìn rất khó hiểu. Nhưng phải thay bằng
+   * ring trên chính tay cầm — trước Giai đoạn 9 chỗ này chỉ có `outline-none` và
+   * không có gì thay thế, nên người dùng bàn phím không thấy mình đang ở tay cầm nào.
+   */
   'focus-visible:outline-none',
+  '[&:focus-visible::-webkit-slider-thumb]:ring-4 [&:focus-visible::-webkit-slider-thumb]:ring-primary/40',
+  '[&:focus-visible::-moz-range-thumb]:ring-4 [&:focus-visible::-moz-range-thumb]:ring-primary/40',
 )
 
 export default function PriceRangeSlider({

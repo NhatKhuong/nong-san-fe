@@ -4,7 +4,7 @@
     "slug": "rau-cu",
     "name": "Rau củ hữu cơ",
     "description": "Rau xanh, củ quả canh tác hữu cơ, thu hoạch trong ngày.",
-    "image": "https://images.unsplash.com/photo-1579113800032-c38bd7635818?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/rau-cu.jpg",
     "parentId": null
   },
   {
@@ -12,7 +12,7 @@
     "slug": "trai-cay-hat",
     "name": "Trái cây & hạt",
     "description": "Trái cây theo mùa và các loại hạt dinh dưỡng.",
-    "image": "https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/trai-cay-hat.jpg",
     "parentId": null
   },
   {
@@ -20,7 +20,7 @@
     "slug": "thit-huu-co",
     "name": "Thịt hữu cơ",
     "description": "Thịt từ vật nuôi thả tự nhiên, không kháng sinh.",
-    "image": "https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/thit-huu-co.jpg",
     "parentId": null
   },
   {
@@ -28,7 +28,7 @@
     "slug": "bo-trung",
     "name": "Bơ & trứng",
     "description": "Bơ tự nhiên và trứng gà thả vườn.",
-    "image": "https://images.unsplash.com/photo-1590912710024-6d51a6771abd?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/bo-trung.jpg",
     "parentId": null
   },
   {
@@ -36,7 +36,7 @@
     "slug": "thuc-pham-sach",
     "name": "Thực phẩm sạch",
     "description": "Hải sản, ngũ cốc và thực phẩm khô đạt chuẩn an toàn.",
-    "image": "https://images.unsplash.com/photo-1624938655931-ce0f87bb3557?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/thuc-pham-sach.jpg",
     "parentId": null
   },
   {
@@ -44,7 +44,7 @@
     "slug": "sua-kem",
     "name": "Sữa & kem",
     "description": "Sữa tươi thanh trùng và các chế phẩm từ sữa.",
-    "image": "https://images.unsplash.com/photo-1639151082235-406d8eb262b9?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/sua-kem.jpg",
     "parentId": null
   },
   {
@@ -52,7 +52,7 @@
     "slug": "nuoc-ep",
     "name": "Nước ép hữu cơ",
     "description": "Nước ép nguyên chất, không đường, không chất bảo quản.",
-    "image": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/nuoc-ep.jpg",
     "parentId": null
   },
   {
@@ -60,7 +60,7 @@
     "slug": "rau-an-la",
     "name": "Rau ăn lá",
     "description": "Cải, xà lách, rau thơm các loại.",
-    "image": "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/rau-an-la.jpg",
     "parentId": 1
   },
   {
@@ -68,7 +68,7 @@
     "slug": "cu-qua",
     "name": "Củ quả",
     "description": "Cà rốt, khoai, bí, hành tỏi.",
-    "image": "https://images.unsplash.com/photo-1566055803687-0665ef48df90?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/cu-qua.jpg",
     "parentId": 1
   },
   {
@@ -76,7 +76,7 @@
     "slug": "trai-cay-tuoi",
     "name": "Trái cây tươi",
     "description": "Trái cây theo mùa, hái chín tự nhiên.",
-    "image": "https://images.unsplash.com/photo-1588931929796-8f0ea6da0faa?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/trai-cay-tuoi.jpg",
     "parentId": 2
   },
   {
@@ -84,7 +84,7 @@
     "slug": "hat-dinh-duong",
     "name": "Hạt dinh dưỡng",
     "description": "Hạnh nhân, óc chó, macca, hạt chia.",
-    "image": "https://images.unsplash.com/photo-1524593000379-d4729b2c4f99?w=600&h=600&fit=crop&q=80",
+    "image": "/images/categories/hat-dinh-duong.jpg",
     "parentId": 2
   }
 ]

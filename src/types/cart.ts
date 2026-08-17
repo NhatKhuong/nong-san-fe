@@ -26,6 +26,23 @@ export interface CartSummary {
   itemCount: number
 }
 
+/**
+ * Vấn đề phát hiện khi đối chiếu giỏ hàng với dữ liệu mới nhất.
+ * `out_of_stock` và `insufficient_stock` là lỗi chặn — không cho đặt hàng.
+ * `price_changed` chỉ là cảnh báo.
+ */
+export interface CartIssue {
+  productId: number
+  name: string
+  type: 'out_of_stock' | 'insufficient_stock' | 'price_changed'
+  /** Tồn kho thực tế, có ở `insufficient_stock`. */
+  availableStock?: number
+  /** Giá mới, có ở `price_changed`. */
+  currentPrice?: number
+  /** Giá đang lưu trong giỏ, có ở `price_changed`. */
+  cartPrice?: number
+}
+
 export interface Coupon {
   code: string
   /** 'percent' giảm theo %, 'fixed' giảm số tiền cố định. */

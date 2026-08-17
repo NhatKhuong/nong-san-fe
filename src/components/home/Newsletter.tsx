@@ -49,7 +49,13 @@ export default function Newsletter() {
                 placeholder="Nhập email của bạn"
                 aria-label="Email nhận bản tin"
                 aria-invalid={error ? true : undefined}
-                className="h-12 flex-1 rounded-full border border-line bg-white px-5 text-sm outline-none transition placeholder:text-ink-light focus:border-primary"
+                /*
+                  `sm:flex-1` chứ không phải `flex-1`: form là `flex-col` trên
+                  mobile, nên `flex-1` sẽ điều khiển CHIỀU CAO và đè lên `h-12` —
+                  ô nhập co lại còn 19px, gần như không bấm trúng. Chỉ từ `sm:`
+                  trở lên form mới thành hàng ngang, lúc đó `flex-1` mới đúng nghĩa.
+                */
+                className="h-12 rounded-full border border-line bg-white px-5 text-sm outline-none transition placeholder:text-ink-light focus:border-primary sm:flex-1"
               />
               <Button type="submit" size="md" isLoading={isPending} className="h-12">
                 Đăng ký

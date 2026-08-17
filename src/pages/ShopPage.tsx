@@ -17,6 +17,7 @@ import { useProducts } from '@/hooks/useProducts'
 import { useCategories } from '@/hooks/useCategories'
 import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import SeoMeta from '@/components/ui/SeoMeta'
 import type { Product, ProductSort } from '@/types'
 
 const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
@@ -49,10 +50,9 @@ export default function ShopPage() {
 
   return (
     <>
-      <title>Cửa hàng — Nông Sản Sạch</title>
-      <meta
-        name="description"
-        content="Toàn bộ nông sản hữu cơ: rau củ, trái cây, thịt cá, sữa và nước ép. Lọc theo danh mục, giá và đánh giá."
+      <SeoMeta
+        title="Cửa hàng"
+        description="Rau củ, trái cây, thịt và thực phẩm hữu cơ đạt chuẩn — lọc theo danh mục, giá và đánh giá."
       />
 
       <Breadcrumb
@@ -82,7 +82,9 @@ export default function ShopPage() {
                 Bộ lọc
               </Button>
 
-              <p className="text-sm text-ink-muted">
+              {/* Dùng <div> chứ không phải <p>: `Skeleton` render ra <div>, mà <div>
+                  lồng trong <p> là HTML không hợp lệ và React sẽ báo lỗi ra console. */}
+              <div className="text-sm text-ink-muted">
                 {isLoading ? (
                   <Skeleton className="inline-block h-4 w-28 align-middle" />
                 ) : (
@@ -90,7 +92,7 @@ export default function ShopPage() {
                     Tìm thấy <strong className="text-ink">{data?.total ?? 0}</strong> sản phẩm
                   </>
                 )}
-              </p>
+              </div>
 
               <div className="ml-auto flex items-center gap-3">
                 <Select
@@ -124,6 +126,14 @@ export default function ShopPage() {
               onRemove={clearFilter}
               onClearAll={clearAll}
             />
+
+            {/*
+              Tên sản phẩm trong thẻ là `<h3>`. Không có `<h2>` ở giữa thì thứ tự
+              tiêu đề nhảy từ `<h1>` xuống thẳng `<h3>`, trình đọc màn hình sẽ báo
+              thiếu một cấp. Tiêu đề này ẩn về mặt thị giác vì phần trên đã nói rõ
+              đang xem gì.
+            */}
+            <h2 className="sr-only">Danh sách sản phẩm</h2>
 
             {error ? (
               <ErrorState message={error.message} onRetry={() => refetch()} />

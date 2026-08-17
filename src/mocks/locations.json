@@ -1,0 +1,89 @@
+[
+  {
+    "code": "79",
+    "name": "TP. Hồ Chí Minh",
+    "districts": [
+      { "code": "760", "name": "Quận 1", "wards": ["Phường Bến Nghé", "Phường Bến Thành", "Phường Đa Kao", "Phường Nguyễn Thái Bình", "Phường Cầu Kho"] },
+      { "code": "764", "name": "Quận Gò Vấp", "wards": ["Phường 1", "Phường 3", "Phường 10", "Phường 12", "Phường 17"] },
+      { "code": "765", "name": "Quận Bình Thạnh", "wards": ["Phường 11", "Phường 13", "Phường 22", "Phường 25", "Phường 26"] },
+      { "code": "768", "name": "Quận 7", "wards": ["Phường Tân Thuận Đông", "Phường Tân Phong", "Phường Tân Phú", "Phường Phú Mỹ"] },
+      { "code": "769", "name": "TP. Thủ Đức", "wards": ["Phường Linh Trung", "Phường Hiệp Bình Chánh", "Phường An Phú", "Phường Thảo Điền"] }
+    ]
+  },
+  {
+    "code": "01",
+    "name": "TP. Hà Nội",
+    "districts": [
+      { "code": "001", "name": "Quận Ba Đình", "wards": ["Phường Phúc Xá", "Phường Trúc Bạch", "Phường Ngọc Hà", "Phường Kim Mã"] },
+      { "code": "002", "name": "Quận Hoàn Kiếm", "wards": ["Phường Hàng Bạc", "Phường Hàng Bồ", "Phường Cửa Nam", "Phường Tràng Tiền"] },
+      { "code": "003", "name": "Quận Cầu Giấy", "wards": ["Phường Dịch Vọng", "Phường Mai Dịch", "Phường Nghĩa Đô", "Phường Yên Hoà"] },
+      { "code": "004", "name": "Quận Đống Đa", "wards": ["Phường Láng Hạ", "Phường Khương Thượng", "Phường Ô Chợ Dừa", "Phường Trung Liệt"] }
+    ]
+  },
+  {
+    "code": "48",
+    "name": "TP. Đà Nẵng",
+    "districts": [
+      { "code": "490", "name": "Quận Hải Châu", "wards": ["Phường Thạch Thang", "Phường Hải Châu I", "Phường Nam Dương", "Phường Bình Thuận"] },
+      { "code": "491", "name": "Quận Thanh Khê", "wards": ["Phường Tam Thuận", "Phường Xuân Hà", "Phường An Khê", "Phường Hoà Khê"] },
+      { "code": "492", "name": "Quận Sơn Trà", "wards": ["Phường An Hải Bắc", "Phường Mân Thái", "Phường Phước Mỹ", "Phường Thọ Quang"] }
+    ]
+  },
+  {
+    "code": "68",
+    "name": "Lâm Đồng",
+    "districts": [
+      { "code": "672", "name": "TP. Đà Lạt", "wards": ["Phường 1", "Phường 2", "Phường 4", "Phường 8", "Xã Xuân Thọ"] },
+      { "code": "673", "name": "TP. Bảo Lộc", "wards": ["Phường Lộc Phát", "Phường Lộc Tiến", "Phường B'Lao", "Xã Đại Lào"] },
+      { "code": "674", "name": "Huyện Đơn Dương", "wards": ["Thị trấn Thạnh Mỹ", "Thị trấn D'Ran", "Xã Lạc Xuân", "Xã Ka Đô"] }
+    ]
+  },
+  {
+    "code": "31",
+    "name": "TP. Hải Phòng",
+    "districts": [
+      { "code": "303", "name": "Quận Hồng Bàng", "wards": ["Phường Quán Toan", "Phường Hùng Vương", "Phường Sở Dầu", "Phường Thượng Lý"] },
+      { "code": "304", "name": "Quận Ngô Quyền", "wards": ["Phường Máy Chai", "Phường Máy Tơ", "Phường Vạn Mỹ", "Phường Lạc Viên"] }
+    ]
+  },
+  {
+    "code": "92",
+    "name": "TP. Cần Thơ",
+    "districts": [
+      { "code": "916", "name": "Quận Ninh Kiều", "wards": ["Phường Cái Khế", "Phường An Hoà", "Phường Tân An", "Phường Xuân Khánh"] },
+      { "code": "917", "name": "Quận Bình Thuỷ", "wards": ["Phường Bình Thuỷ", "Phường Trà An", "Phường Long Hoà", "Phường An Thới"] }
+    ]
+  },
+  {
+    "code": "75",
+    "name": "Đồng Nai",
+    "districts": [
+      { "code": "731", "name": "TP. Biên Hoà", "wards": ["Phường Trảng Dài", "Phường Tân Phong", "Phường Quyết Thắng", "Phường Long Bình"] },
+      { "code": "734", "name": "Huyện Long Thành", "wards": ["Thị trấn Long Thành", "Xã An Phước", "Xã Bình Sơn", "Xã Lộc An"] }
+    ]
+  },
+  {
+    "code": "74",
+    "name": "Bình Dương",
+    "districts": [
+      { "code": "718", "name": "TP. Thủ Dầu Một", "wards": ["Phường Hiệp Thành", "Phường Phú Lợi", "Phường Chánh Nghĩa", "Phường Phú Cường"] },
+      { "code": "721", "name": "TP. Dĩ An", "wards": ["Phường Dĩ An", "Phường Tân Bình", "Phường Đông Hoà", "Phường An Bình"] }
+    ]
+  },
+  {
+    "code": "56",
+    "name": "Khánh Hoà",
+    "districts": [
+      { "code": "568", "name": "TP. Nha Trang", "wards": ["Phường Lộc Thọ", "Phường Vĩnh Hải", "Phường Phước Long", "Phường Vạn Thắng"] },
+      { "code": "569", "name": "TP. Cam Ranh", "wards": ["Phường Cam Nghĩa", "Phường Cam Phúc Bắc", "Phường Ba Ngòi", "Xã Cam Thành Nam"] }
+    ]
+  },
+  {
+    "code": "82",
+    "name": "Tiền Giang",
+    "districts": [
+      { "code": "815", "name": "TP. Mỹ Tho", "wards": ["Phường 1", "Phường 4", "Phường 6", "Xã Mỹ Phong"] },
+      { "code": "818", "name": "Huyện Cái Bè", "wards": ["Thị trấn Cái Bè", "Xã Hoà Khánh", "Xã Đông Hoà Hiệp", "Xã Tân Thanh"] }
+    ]
+  }
+]

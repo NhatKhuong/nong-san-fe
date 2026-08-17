@@ -13,6 +13,17 @@ export interface Brand {
   logo: string
 }
 
+/** Banner khuyến mãi ở trang chủ. */
+export interface PromoBanner {
+  id: number
+  eyebrow: string
+  title: string
+  image: string
+  path: string
+  /** Banner lớn chiếm 2 cột ở desktop. */
+  wide: boolean
+}
+
 /** Slide của hero banner trang chủ. */
 export interface HeroSlide {
   id: number

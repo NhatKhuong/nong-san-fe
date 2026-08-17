@@ -20,3 +20,14 @@ export function useMediaQuery(query: string): boolean {
 export function useIsDesktop(): boolean {
   return useMediaQuery('(min-width: 1024px)')
 }
+
+/**
+ * Người dùng đã bật "giảm chuyển động" trong cài đặt hệ điều hành chưa.
+ *
+ * CSS đã tự xử lý phần cuộn mượt, nhưng carousel tự chạy là hành vi JavaScript —
+ * `@media` không tắt được. Chuyển động tự phát ngoài tầm kiểm soát là thứ gây khó
+ * chịu nhất với người nhạy cảm tiền đình, nên phải tắt autoplay theo cài đặt này.
+ */
+export function usePrefersReducedMotion(): boolean {
+  return useMediaQuery('(prefers-reduced-motion: reduce)')
+}

@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Clock, Phone } from 'lucide-react'
 import { ROUTES, STORE_INFO } from '@/lib/constants'
+import { useCurrentUser } from '@/hooks/useAuth'
 
 /** Thanh thông tin mảnh phía trên cùng, ẩn trên mobile để tiết kiệm không gian. */
 export default function TopBar() {
+  const { user, isAuthenticated } = useCurrentUser()
+
   return (
     <div className="hidden bg-primary-dark text-white lg:block">
       <div className="container-app flex h-10 items-center justify-between text-xs">
@@ -31,9 +34,15 @@ export default function TopBar() {
           <span className="text-white/40" aria-hidden="true">
             |
           </span>
-          <Link to={ROUTES.LOGIN} className="transition hover:text-primary-light">
-            Đăng nhập
-          </Link>
+          {isAuthenticated ? (
+            <Link to={ROUTES.ACCOUNT} className="transition hover:text-primary-light">
+              Chào {user?.fullName}
+            </Link>
+          ) : (
+            <Link to={ROUTES.LOGIN} className="transition hover:text-primary-light">
+              Đăng nhập
+            </Link>
+          )}
         </div>
       </div>
     </div>

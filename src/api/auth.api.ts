@@ -1,6 +1,12 @@
 import { delay } from '@/lib/utils'
-import { clearAuthToken, setAuthToken } from './client'
-import type { AuthResponse, LoginPayload, RegisterPayload, User } from '@/types'
+import { clearAuthToken, getAuthToken, setAuthToken } from './client'
+import type {
+  AuthResponse,
+  ChangePasswordPayload,
+  LoginPayload,
+  RegisterPayload,
+  User,
+} from '@/types'
 
 const MOCK_USERS_KEY = 'nss_mock_users'
 
@@ -19,14 +25,23 @@ const DEMO_USER: StoredUser = {
   password: '123456',
 }
 
+/**
+ * Đọc danh sách user, gieo sẵn tài khoản demo vào localStorage ở lần đọc đầu tiên.
+ *
+ * Trước đây hàm này trả về `[DEMO_USER, ...stored]` — demo không nằm trong
+ * localStorage nên mọi thay đổi lên nó (sửa hồ sơ, đổi mật khẩu) đều biến mất
+ * sau khi tải lại trang. Gieo một lần rồi chỉ đọc từ localStorage thì tài khoản
+ * demo hành xử y hệt tài khoản do người dùng đăng ký.
+ */
 function readUsers(): StoredUser[] {
   try {
     const raw = localStorage.getItem(MOCK_USERS_KEY)
-    const stored = raw ? (JSON.parse(raw) as StoredUser[]) : []
-    return [DEMO_USER, ...stored]
+    if (raw) return JSON.parse(raw) as StoredUser[]
   } catch {
-    return [DEMO_USER]
+    // Dữ liệu hỏng thì gieo lại từ đầu bên dưới.
   }
+  writeUsers([DEMO_USER])
+  return [DEMO_USER]
 }
 
 function writeUsers(users: StoredUser[]): void {
@@ -40,6 +55,24 @@ function toPublicUser({ password: _password, ...user }: StoredUser): User {
 
 function issueToken(user: User): string {
   return `mock-jwt.${btoa(String(user.id))}.${Date.now()}`
+}
+
+/**
+ * Id của tài khoản đang đăng nhập, giải ra từ token.
+ *
+ * Backend thật lấy id từ JWT chứ không nhận từ client, nên mock cũng phải vậy —
+ * đó là lý do `CreateOrderPayload` không có trường `userId`. Trả `null` khi chưa
+ * đăng nhập (khách vãng lai vẫn đặt hàng được).
+ */
+export function getCurrentUserId(): number | null {
+  const token = getAuthToken()
+  if (!token) return null
+  try {
+    const id = Number(atob(token.split('.')[1] ?? ''))
+    return Number.isInteger(id) ? id : null
+  } catch {
+    return null
+  }
 }
 
 /**
@@ -81,8 +114,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
     avatar: null,
     password: payload.password,
   }
-  // Bỏ DEMO_USER ra khi ghi lại, vì nó không thuộc dữ liệu người dùng tạo.
-  writeUsers([...users.filter((user) => user.id !== DEMO_USER.id), newUser])
+  writeUsers([...users, newUser])
 
   const user = toPublicUser(newUser)
   const token = issueToken(user)
@@ -114,16 +146,42 @@ export async function forgotPassword(email: string): Promise<void> {
  */
 export async function updateProfile(payload: Partial<User> & { id: number }): Promise<User> {
   await delay(500)
-  const users = readUsers().filter((user) => user.id !== DEMO_USER.id)
+  const users = readUsers()
   const index = users.findIndex((user) => user.id === payload.id)
+  if (index === -1) throw new Error('Không tìm thấy tài khoản.')
 
-  if (index === -1) {
-    // Tài khoản demo không lưu trong localStorage, chỉ trả về bản đã ghép.
-    return { ...toPublicUser(DEMO_USER), ...payload }
-  }
+  const isEmailTaken = users.some(
+    (user) =>
+      user.id !== payload.id &&
+      user.email.toLowerCase() === (payload.email ?? '').trim().toLowerCase(),
+  )
+  if (isEmailTaken) throw new Error('Email này đã được tài khoản khác sử dụng.')
 
-  const updated: StoredUser = { ...users[index], ...payload }
+  // `id` và `password` không được phép ghi đè từ payload.
+  const updated: StoredUser = { ...users[index], ...payload, id: users[index].id }
   users[index] = updated
   writeUsers(users)
   return toPublicUser(updated)
+}
+
+/**
+ * Đổi mật khẩu của tài khoản đang đăng nhập.
+ * Khi có backend: `await client.put('/auth/password', payload)`
+ */
+export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
+  await delay(600)
+
+  const userId = getCurrentUserId()
+  if (userId === null) throw new Error('Vui lòng đăng nhập lại.')
+
+  const users = readUsers()
+  const index = users.findIndex((user) => user.id === userId)
+  if (index === -1) throw new Error('Không tìm thấy tài khoản.')
+
+  if (users[index].password !== payload.currentPassword) {
+    throw new Error('Mật khẩu hiện tại không đúng.')
+  }
+
+  users[index] = { ...users[index], password: payload.newPassword }
+  writeUsers(users)
 }

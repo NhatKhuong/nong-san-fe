@@ -4,19 +4,15 @@ interface UIState {
   isMiniCartOpen: boolean
   openMiniCart: () => void
   closeMiniCart: () => void
-
-  isFilterDrawerOpen: boolean
-  openFilterDrawer: () => void
-  closeFilterDrawer: () => void
 }
 
-/** Trạng thái UI thuần tuý — không lưu localStorage vì không cần sống qua reload. */
+/**
+ * Trạng thái UI thuần tuý — không lưu localStorage vì không cần sống qua reload.
+ * Bộ lọc trang cửa hàng KHÔNG nằm ở đây: nó thuộc về URL (xem `useProductFilters`),
+ * còn việc mở/đóng drawer lọc do `ShopPage` tự quản bằng state cục bộ.
+ */
 export const useUIStore = create<UIState>((set) => ({
   isMiniCartOpen: false,
   openMiniCart: () => set({ isMiniCartOpen: true }),
   closeMiniCart: () => set({ isMiniCartOpen: false }),
-
-  isFilterDrawerOpen: false,
-  openFilterDrawer: () => set({ isFilterDrawerOpen: true }),
-  closeFilterDrawer: () => set({ isFilterDrawerOpen: false }),
 }))

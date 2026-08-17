@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80" role="img" aria-label="Meat Master">
+  <circle cx="26" cy="40" r="17" fill="#4a7c2a"/>
+  <text x="26" y="40" fill="#ffffff" font-family="Quicksand, ui-sans-serif, sans-serif" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central">M</text>
+  <text x="52" y="40" fill="#5c5c5c" font-family="Quicksand, ui-sans-serif, sans-serif" font-size="16" font-weight="600" dominant-baseline="central">Meat Master</text>
+</svg>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 interface DrawerProps {
   isOpen: boolean
@@ -21,6 +22,8 @@ export default function Drawer({
   children,
   footer,
 }: DrawerProps) {
+  const panelRef = useFocusTrap<HTMLElement>(isOpen)
+
   useEffect(() => {
     if (!isOpen) return
 
@@ -50,9 +53,11 @@ export default function Drawer({
       />
 
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        tabIndex={-1}
         // Drawer đóng chỉ bị dịch ra ngoài màn hình chứ không ẩn hẳn, nên nếu không
         // đánh dấu `inert` thì người dùng vẫn Tab được vào các nút bên trong.
         inert={!isOpen}

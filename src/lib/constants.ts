@@ -12,6 +12,7 @@ export const ROUTES = {
   ACCOUNT: '/tai-khoan',
   ACCOUNT_ORDERS: '/tai-khoan/don-hang',
   ACCOUNT_ADDRESSES: '/tai-khoan/dia-chi',
+  ACCOUNT_PASSWORD: '/tai-khoan/doi-mat-khau',
   WISHLIST: '/yeu-thich',
   BLOG: '/tin-tuc',
   BLOG_DETAIL: '/tin-tuc/:slug',

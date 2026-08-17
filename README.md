@@ -25,6 +25,17 @@ npm run lint       # oxlint
 npx tsc --noEmit   # chỉ kiểm tra type
 ```
 
+## Ảnh
+
+Toàn bộ ảnh nằm trong [`public/images/`](public/images/) — **không tải từ bên thứ ba**. Dữ liệu chỉ lưu đường dẫn tương đối (`/images/rau-cu/ca-rot-huu-co-1.jpg`), đúng dạng backend sẽ trả về sau này.
+
+```bash
+node scripts/download-images.mjs      # tải ảnh mới về (bỏ qua file đã có)
+node scripts/generate-brand-logos.mjs # sinh lại logo thương hiệu dạng SVG
+```
+
+Khi đưa ảnh lên S3/CDN: đặt `VITE_IMAGE_BASE_URL` trong `.env` (xem [`.env.example`](.env.example)) — không phải sửa dữ liệu hay code.
+
 ## Cấu trúc thư mục
 
 ```

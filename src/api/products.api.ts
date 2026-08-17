@@ -3,9 +3,15 @@ import categoriesJson from '@/mocks/categories.json'
 import { PRODUCTS_PER_PAGE } from '@/lib/constants'
 import { delay } from '@/lib/utils'
 import { effectivePrice } from '@/lib/format'
+import { imageUrl } from '@/lib/image'
 import type { Paginated, Product, ProductQuery } from '@/types'
 
-const products = productsJson as Product[]
+// Giải đường dẫn ảnh một lần lúc nạp module — mọi hàm bên dưới trả về lát cắt
+// của mảng này nên không hàm nào phải tự nhớ gọi imageUrl().
+const products = (productsJson as Product[]).map((product) => ({
+  ...product,
+  images: product.images.map(imageUrl),
+}))
 const categories = categoriesJson as { id: number; slug: string; parentId: number | null }[]
 
 /** Danh mục cha kèm toàn bộ id danh mục con, để lọc "Rau củ" ra cả rau ăn lá và củ quả. */
@@ -121,6 +127,22 @@ export async function getProductBySlug(slug: string): Promise<Product> {
   const product = products.find((item) => item.slug === slug)
   if (!product) throw new Error(`Không tìm thấy sản phẩm "${slug}"`)
   return product
+}
+
+/**
+ * Lấy nhiều sản phẩm theo danh sách id — dùng cho trang yêu thích.
+ *
+ * Giữ đúng thứ tự id truyền vào và **bỏ qua id không còn tồn tại**: sản phẩm có
+ * thể đã bị gỡ khỏi catalog trong lúc id vẫn nằm trong localStorage của khách.
+ *
+ * Khi có backend: `const { data } = await client.get('/products', { params: { ids: ids.join(',') } }); return data`
+ */
+export async function getProductsByIds(ids: number[]): Promise<Product[]> {
+  await delay(250)
+  if (ids.length === 0) return []
+  return ids
+    .map((id) => products.find((product) => product.id === id))
+    .filter((product): product is Product => product !== undefined)
 }
 
 /**

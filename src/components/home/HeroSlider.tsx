@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { ArrowRight } from 'lucide-react'
 import Skeleton from '@/components/ui/Skeleton'
 import { buttonStyles } from '@/components/ui/buttonStyles'
+import { usePrefersReducedMotion } from '@/hooks/useMediaQuery'
 import { useHeroSlides } from '@/hooks/useMarketing'
 
 import 'swiper/css'
@@ -15,6 +16,9 @@ import 'swiper/css/pagination'
  */
 export default function HeroSlider() {
   const { data: slides, isLoading } = useHeroSlides()
+  // Slide tự chạy là chuyển động ngoài tầm kiểm soát của người xem — tôn trọng
+  // cài đặt giảm chuyển động của hệ điều hành. Chấm tròn điều hướng vẫn dùng được.
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   if (isLoading) return <Skeleton className="h-[380px] rounded-none sm:h-[460px] lg:h-[540px]" />
   if (!slides || slides.length === 0) return null
@@ -22,9 +26,9 @@ export default function HeroSlider() {
   return (
     <section aria-label="Giới thiệu nổi bật">
       <Swiper
-        modules={[Autoplay, Pagination]}
+        modules={prefersReducedMotion ? [Pagination] : [Autoplay, Pagination]}
         loop
-        autoplay={{ delay: 5500, disableOnInteraction: false }}
+        autoplay={prefersReducedMotion ? false : { delay: 5500, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         className="hero-swiper"
       >
@@ -46,9 +50,15 @@ export default function HeroSlider() {
                     <p className="text-sm font-semibold tracking-wider text-primary-light uppercase">
                       {slide.eyebrow}
                     </p>
-                    <h1 className="mt-3 font-heading text-3xl leading-tight font-bold text-white sm:text-4xl lg:text-5xl">
+                    {/*
+                      Cố ý KHÔNG dùng thẻ tiêu đề: mỗi slide sẽ thành một `<h1>`
+                      riêng, mà `loop` của Swiper còn nhân bản slide nên trang có
+                      tới bốn `<h1>`. Tiêu đề thật của trang chủ là thẻ `<h1>`
+                      dành cho trình đọc màn hình trong `HomePage.tsx`.
+                    */}
+                    <p className="mt-3 font-heading text-3xl leading-tight font-bold text-white sm:text-4xl lg:text-5xl">
                       {slide.title}
-                    </h1>
+                    </p>
                     <p className="mt-4 text-base text-white/90 sm:text-lg">
                       {slide.description}
                     </p>

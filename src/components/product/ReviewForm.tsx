@@ -52,7 +52,8 @@ export default function ReviewForm({ productId }: { productId: number }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl bg-surface p-5">
+    // `noValidate`: xem ghi chú cùng lý do trong CheckoutPage.tsx
+    <form noValidate onSubmit={handleSubmit(onSubmit)} className="rounded-xl bg-surface p-5">
       <h3 className="text-base">Viết đánh giá của bạn</h3>
 
       <div className="mt-4">

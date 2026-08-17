@@ -6,8 +6,8 @@
     "price": 32000,
     "salePrice": 26000,
     "images": [
-      "https://images.unsplash.com/photo-1533321942807-08e4008b2025?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/cai-ngot-huu-co-1.jpg",
+      "/images/products/rau-cu/cai-ngot-huu-co-2.jpg"
     ],
     "categoryId": 101,
     "brandId": 1,
@@ -30,8 +30,8 @@
     "price": 55000,
     "salePrice": 47000,
     "images": [
-      "https://images.unsplash.com/photo-1651172915092-4389b362b25d?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1584701830110-c2ecf0a5f2a1?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/cai-tim-huu-co-1.jpg",
+      "/images/products/rau-cu/cai-tim-huu-co-2.jpg"
     ],
     "categoryId": 101,
     "brandId": 1,
@@ -54,8 +54,8 @@
     "price": 45000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1617884638394-d9eef1b0f40e?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1556801712-76c8eb07bbc9?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/xa-lach-romaine-1.jpg",
+      "/images/products/rau-cu/xa-lach-romaine-2.jpg"
     ],
     "categoryId": 101,
     "brandId": 1,
@@ -78,8 +78,8 @@
     "price": 22000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1549736624-81a2ca809ad7?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/rau-muong-huu-co-1.jpg",
+      "/images/products/rau-cu/rau-muong-huu-co-2.jpg"
     ],
     "categoryId": 101,
     "brandId": 2,
@@ -102,8 +102,8 @@
     "price": 48000,
     "salePrice": 39000,
     "images": [
-      "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1590868309235-ea34bed7bd7f?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/ca-rot-huu-co-1.jpg",
+      "/images/products/rau-cu/ca-rot-huu-co-2.jpg"
     ],
     "categoryId": 102,
     "brandId": 1,
@@ -126,8 +126,8 @@
     "price": 42000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1603048719539-9ecb4aa395e3?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/khoai-tay-huu-co-1.jpg",
+      "/images/products/rau-cu/khoai-tay-huu-co-2.jpg"
     ],
     "categoryId": 102,
     "brandId": 1,
@@ -150,8 +150,8 @@
     "price": 68000,
     "salePrice": 55000,
     "images": [
-      "https://images.unsplash.com/photo-1588613000160-2b766dd44779?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1601238499791-3d1d28636122?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/hanh-tim-huu-co-1.jpg",
+      "/images/products/rau-cu/hanh-tim-huu-co-2.jpg"
     ],
     "categoryId": 102,
     "brandId": 2,
@@ -174,8 +174,8 @@
     "price": 35000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1459260216545-994dda21d51a?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/bi-do-huu-co-1.jpg",
+      "/images/products/rau-cu/bi-do-huu-co-2.jpg"
     ],
     "categoryId": 102,
     "brandId": 2,
@@ -198,8 +198,8 @@
     "price": 58000,
     "salePrice": 49000,
     "images": [
-      "https://images.unsplash.com/photo-1524593166156-312f362cada0?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/ca-chua-bi-huu-co-1.jpg",
+      "/images/products/rau-cu/ca-chua-bi-huu-co-2.jpg"
     ],
     "categoryId": 102,
     "brandId": 1,
@@ -222,8 +222,8 @@
     "price": 28000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1652860213441-6622f9fec77f?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1591586007768-40725cc562a1?w=700&h=700&fit=crop&q=80"
+      "/images/products/rau-cu/bap-cai-trang-huu-co-1.jpg",
+      "/images/products/rau-cu/bap-cai-trang-huu-co-2.jpg"
     ],
     "categoryId": 101,
     "brandId": 2,
@@ -246,8 +246,8 @@
     "price": 89000,
     "salePrice": 72000,
     "images": [
-      "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/cam-sanh-huu-co-1.jpg",
+      "/images/products/trai-cay-hat/cam-sanh-huu-co-2.jpg"
     ],
     "categoryId": 201,
     "brandId": 3,
@@ -270,8 +270,8 @@
     "price": 45000,
     "salePrice": 37000,
     "images": [
-      "https://images.unsplash.com/photo-1587132137056-bfbf0166836e?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1528825871115-3581a5387919?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/chuoi-gia-huu-co-1.jpg",
+      "/images/products/trai-cay-hat/chuoi-gia-huu-co-2.jpg"
     ],
     "categoryId": 201,
     "brandId": 3,
@@ -294,8 +294,8 @@
     "price": 120000,
     "salePrice": 85000,
     "images": [
-      "https://images.unsplash.com/photo-1640258941842-87fcb2d0999c?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1622704430673-59c152a9991c?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/bo-034-huu-co-1.jpg",
+      "/images/products/trai-cay-hat/bo-034-huu-co-2.jpg"
     ],
     "categoryId": 201,
     "brandId": 3,
@@ -318,8 +318,8 @@
     "price": 65000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1563114773-84221bd62daa?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/dua-hau-khong-hat-1.jpg",
+      "/images/products/trai-cay-hat/dua-hau-khong-hat-2.jpg"
     ],
     "categoryId": 201,
     "brandId": 3,
@@ -342,8 +342,8 @@
     "price": 145000,
     "salePrice": 119000,
     "images": [
-      "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1553279768-865429fa0078?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/xoai-cat-hoa-loc-1.jpg",
+      "/images/products/trai-cay-hat/xoai-cat-hoa-loc-2.jpg"
     ],
     "categoryId": 201,
     "brandId": 3,
@@ -366,8 +366,8 @@
     "price": 72000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1635843110565-cb35d1c03d86?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1514517315590-0ea51442327c?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/thanh-long-ruot-do-1.jpg",
+      "/images/products/trai-cay-hat/thanh-long-ruot-do-2.jpg"
     ],
     "categoryId": 201,
     "brandId": 3,
@@ -390,8 +390,8 @@
     "price": 320000,
     "salePrice": 265000,
     "images": [
-      "https://images.unsplash.com/photo-1524593000379-d4729b2c4f99?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1605024344839-e6e41aea6b23?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/hat-oc-cho-my-1.jpg",
+      "/images/products/trai-cay-hat/hat-oc-cho-my-2.jpg"
     ],
     "categoryId": 202,
     "brandId": 4,
@@ -414,8 +414,8 @@
     "price": 285000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1693812879904-b8161644ce5a?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1708874493509-7bdef1abf750?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/hanh-nhan-rang-bo-1.jpg",
+      "/images/products/trai-cay-hat/hanh-nhan-rang-bo-2.jpg"
     ],
     "categoryId": 202,
     "brandId": 4,
@@ -438,8 +438,8 @@
     "price": 175000,
     "salePrice": 149000,
     "images": [
-      "https://images.unsplash.com/photo-1604768802835-899055f0e245?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1642497393633-a19e9231fb92?w=700&h=700&fit=crop&q=80"
+      "/images/products/trai-cay-hat/hat-chia-uc-1.jpg",
+      "/images/products/trai-cay-hat/hat-chia-uc-2.jpg"
     ],
     "categoryId": 202,
     "brandId": 4,
@@ -462,8 +462,8 @@
     "price": 485000,
     "salePrice": 399000,
     "images": [
-      "https://images.unsplash.com/photo-1723893905879-0e309c2a8e06?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1690983325551-b922137727be?w=700&h=700&fit=crop&q=80"
+      "/images/products/thit-huu-co/thit-bo-uc-huu-co-1.jpg",
+      "/images/products/thit-huu-co/thit-bo-uc-huu-co-2.jpg"
     ],
     "categoryId": 3,
     "brandId": 5,
@@ -486,8 +486,8 @@
     "price": 185000,
     "salePrice": 159000,
     "images": [
-      "https://images.unsplash.com/photo-1672787153655-0c19308dcc60?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=700&h=700&fit=crop&q=80"
+      "/images/products/thit-huu-co/ga-ta-tha-vuon-1.jpg",
+      "/images/products/thit-huu-co/ga-ta-tha-vuon-2.jpg"
     ],
     "categoryId": 3,
     "brandId": 5,
@@ -510,8 +510,8 @@
     "price": 215000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1623047437095-27418540c288?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1611059263765-f57653f3bba3?w=700&h=700&fit=crop&q=80"
+      "/images/products/thit-huu-co/thit-heo-huu-co-1.jpg",
+      "/images/products/thit-huu-co/thit-heo-huu-co-2.jpg"
     ],
     "categoryId": 3,
     "brandId": 5,
@@ -534,8 +534,8 @@
     "price": 265000,
     "salePrice": 229000,
     "images": [
-      "https://images.unsplash.com/photo-1560883389-3bd36d16d021?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1612156502174-bbbad9882af2?w=700&h=700&fit=crop&q=80"
+      "/images/products/thit-huu-co/suon-non-heo-huu-co-1.jpg",
+      "/images/products/thit-huu-co/suon-non-heo-huu-co-2.jpg"
     ],
     "categoryId": 3,
     "brandId": 5,
@@ -558,8 +558,8 @@
     "price": 145000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1682991136736-a2b44623eeba?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1633096013004-e2cb4023b560?w=700&h=700&fit=crop&q=80"
+      "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+      "/images/products/thit-huu-co/uc-ga-phi-le-2.jpg"
     ],
     "categoryId": 3,
     "brandId": 5,
@@ -582,8 +582,8 @@
     "price": 395000,
     "salePrice": 329000,
     "images": [
-      "https://images.unsplash.com/photo-1690983323238-0b91789e1b5a?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1690983330536-3b0089d07cf9?w=700&h=700&fit=crop&q=80"
+      "/images/products/thit-huu-co/bo-my-thai-lat-1.jpg",
+      "/images/products/thit-huu-co/bo-my-thai-lat-2.jpg"
     ],
     "categoryId": 3,
     "brandId": 5,
@@ -606,8 +606,8 @@
     "price": 62000,
     "salePrice": 52000,
     "images": [
-      "https://images.unsplash.com/photo-1639194335563-d56b83f0060c?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=700&h=700&fit=crop&q=80"
+      "/images/products/bo-trung/trung-ga-tha-vuon-1.jpg",
+      "/images/products/bo-trung/trung-ga-tha-vuon-2.jpg"
     ],
     "categoryId": 4,
     "brandId": 6,
@@ -630,8 +630,8 @@
     "price": 58000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1588467850695-a898367ce465?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1589431974314-4c9ab65e6673?w=700&h=700&fit=crop&q=80"
+      "/images/products/bo-trung/trung-vit-lon-huu-co-1.jpg",
+      "/images/products/bo-trung/trung-vit-lon-huu-co-2.jpg"
     ],
     "categoryId": 4,
     "brandId": 6,
@@ -654,8 +654,8 @@
     "price": 165000,
     "salePrice": 139000,
     "images": [
-      "https://images.unsplash.com/photo-1590912710024-6d51a6771abd?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1615844374583-c79a039a10e0?w=700&h=700&fit=crop&q=80"
+      "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+      "/images/products/bo-trung/bo-lat-huu-co-2.jpg"
     ],
     "categoryId": 4,
     "brandId": 6,
@@ -678,8 +678,8 @@
     "price": 195000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1683314573422-649a3c6ad784?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1589881133595-a3c085cb731d?w=700&h=700&fit=crop&q=80"
+      "/images/products/bo-trung/pho-mai-cheddar-1.jpg",
+      "/images/products/bo-trung/pho-mai-cheddar-2.jpg"
     ],
     "categoryId": 4,
     "brandId": 6,
@@ -702,8 +702,8 @@
     "price": 98000,
     "salePrice": 82000,
     "images": [
-      "https://images.unsplash.com/photo-1536153635972-1fc2e818f642?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1673158190671-cd4e3baffbec?w=700&h=700&fit=crop&q=80"
+      "/images/products/thuc-pham-sach/gao-lut-huu-co-1.jpg",
+      "/images/products/thuc-pham-sach/gao-lut-huu-co-2.jpg"
     ],
     "categoryId": 5,
     "brandId": 7,
@@ -726,8 +726,8 @@
     "price": 340000,
     "salePrice": 289000,
     "images": [
-      "https://images.unsplash.com/photo-1578069744397-2f3942a02a7b?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1677643612263-49e89efd5345?w=700&h=700&fit=crop&q=80"
+      "/images/products/thuc-pham-sach/tom-the-tuoi-1.jpg",
+      "/images/products/thuc-pham-sach/tom-the-tuoi-2.jpg"
     ],
     "categoryId": 5,
     "brandId": 7,
@@ -750,8 +750,8 @@
     "price": 620000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1499125562588-29fb8a56b5d5?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1559058789-672da06263d8?w=700&h=700&fit=crop&q=80"
+      "/images/products/thuc-pham-sach/ca-hoi-nauy-phi-le-1.jpg",
+      "/images/products/thuc-pham-sach/ca-hoi-nauy-phi-le-2.jpg"
     ],
     "categoryId": 5,
     "brandId": 7,
@@ -774,8 +774,8 @@
     "price": 285000,
     "salePrice": 245000,
     "images": [
-      "https://images.unsplash.com/photo-1652282556241-0ce13285d00f?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1629240811918-d92da93a93ad?w=700&h=700&fit=crop&q=80"
+      "/images/products/thuc-pham-sach/mat-ong-rung-1.jpg",
+      "/images/products/thuc-pham-sach/mat-ong-rung-2.jpg"
     ],
     "categoryId": 5,
     "brandId": 7,
@@ -798,8 +798,8 @@
     "price": 375000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1610547939489-73202bc6afda?w=700&h=700&fit=crop&q=80"
+      "/images/products/thuc-pham-sach/dau-oliu-extra-virgin-1.jpg",
+      "/images/products/thuc-pham-sach/dau-oliu-extra-virgin-2.jpg"
     ],
     "categoryId": 5,
     "brandId": 7,
@@ -822,8 +822,8 @@
     "price": 42000,
     "salePrice": 35000,
     "images": [
-      "https://images.unsplash.com/photo-1639151082235-406d8eb262b9?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1585083969600-495ee7e3604b?w=700&h=700&fit=crop&q=80"
+      "/images/products/sua-kem/sua-tuoi-thanh-trung-1.jpg",
+      "/images/products/sua-kem/sua-tuoi-thanh-trung-2.jpg"
     ],
     "categoryId": 6,
     "brandId": 8,
@@ -846,8 +846,8 @@
     "price": 68000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1612182062572-e29c5dfb5eb4?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1552320764-9fc870798a3f?w=700&h=700&fit=crop&q=80"
+      "/images/products/sua-kem/sua-chua-hy-lap-1.jpg",
+      "/images/products/sua-kem/sua-chua-hy-lap-2.jpg"
     ],
     "categoryId": 6,
     "brandId": 8,
@@ -870,8 +870,8 @@
     "price": 115000,
     "salePrice": 95000,
     "images": [
-      "https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1576186726115-4d51596775d1?w=700&h=700&fit=crop&q=80"
+      "/images/products/sua-kem/kem-tuoi-whipping-1.jpg",
+      "/images/products/sua-kem/kem-tuoi-whipping-2.jpg"
     ],
     "categoryId": 6,
     "brandId": 8,
@@ -894,8 +894,8 @@
     "price": 78000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1523473827533-2a64d0d36748?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1550630997-aea8d3d982ed?w=700&h=700&fit=crop&q=80"
+      "/images/products/sua-kem/sua-hanh-nhan-1.jpg",
+      "/images/products/sua-kem/sua-hanh-nhan-2.jpg"
     ],
     "categoryId": 6,
     "brandId": 8,
@@ -918,8 +918,8 @@
     "price": 95000,
     "salePrice": 79000,
     "images": [
-      "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1640213505284-21352ee0d76b?w=700&h=700&fit=crop&q=80"
+      "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-1.jpg",
+      "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-2.jpg"
     ],
     "categoryId": 7,
     "brandId": 9,
@@ -942,8 +942,8 @@
     "price": 89000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1650547001322-145ff2c0bed7?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1650547002496-e7ed9df4bf3c?w=700&h=700&fit=crop&q=80"
+      "/images/products/nuoc-ep/nuoc-ep-ca-rot-tao-1.jpg",
+      "/images/products/nuoc-ep/nuoc-ep-ca-rot-tao-2.jpg"
     ],
     "categoryId": 7,
     "brandId": 9,
@@ -966,8 +966,8 @@
     "price": 105000,
     "salePrice": 88000,
     "images": [
-      "https://images.unsplash.com/photo-1695634237630-f99602661946?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1621506289894-c3a62d6be8f3?w=700&h=700&fit=crop&q=80"
+      "/images/products/nuoc-ep/nuoc-ep-can-tay-1.jpg",
+      "/images/products/nuoc-ep/nuoc-ep-can-tay-2.jpg"
     ],
     "categoryId": 7,
     "brandId": 9,
@@ -990,8 +990,8 @@
     "price": 85000,
     "salePrice": null,
     "images": [
-      "https://images.unsplash.com/photo-1640213505284-21352ee0d76b?w=700&h=700&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=700&h=700&fit=crop&q=80"
+      "/images/products/nuoc-ep/nuoc-ep-dua-hau-bac-ha-1.jpg",
+      "/images/products/nuoc-ep/nuoc-ep-dua-hau-bac-ha-2.jpg"
     ],
     "categoryId": 7,
     "brandId": 9,

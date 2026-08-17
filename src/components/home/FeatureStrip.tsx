@@ -26,6 +26,10 @@ const FEATURES = [
 export default function FeatureStrip() {
   return (
     <section className="border-b border-line bg-white py-10">
+      {/* Tiêu đề cấp hai cho section — không có nó thì thứ tự tiêu đề nhảy từ
+          `<h1>` của trang xuống thẳng `<h3>` của từng ưu điểm. */}
+      <h2 className="sr-only">Vì sao chọn Nông Sản Sạch</h2>
+
       <div className="container-app grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {FEATURES.map(({ icon: Icon, title, description }) => (
           <div key={title} className="flex items-start gap-4">

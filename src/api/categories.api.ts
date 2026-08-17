@@ -1,6 +1,7 @@
 import categoriesJson from '@/mocks/categories.json'
 import productsJson from '@/mocks/products.json'
 import { delay } from '@/lib/utils'
+import { imageUrl } from '@/lib/image'
 import type { Category, Product } from '@/types'
 
 /** Dữ liệu thô trong JSON chưa có `productCount` — số này được tính tại đây để không bị lệch. */
@@ -19,6 +20,7 @@ function countProducts(category: RawCategory): number {
 
 const categories: Category[] = rawCategories.map((category) => ({
   ...category,
+  image: imageUrl(category.image),
   productCount: countProducts(category),
 }))
 

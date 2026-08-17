@@ -4,6 +4,8 @@ import { X } from 'lucide-react'
 import Logo from './Logo'
 import { MAIN_NAV, ROUTES, STORE_INFO } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import { useCurrentUser, useLogout } from '@/hooks/useAuth'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -12,6 +14,10 @@ interface MobileMenuProps {
 
 /** Menu điều hướng dạng drawer trượt từ trái, chỉ dùng ở màn hình < lg. */
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+  const { isAuthenticated } = useCurrentUser()
+  const { mutate: logout } = useLogout()
+  const panelRef = useFocusTrap<HTMLDivElement>(isOpen)
+
   // Khoá cuộn trang nền và cho phép đóng bằng phím Esc.
   useEffect(() => {
     if (!isOpen) return
@@ -42,9 +48,11 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       />
 
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Menu điều hướng"
+        tabIndex={-1}
         // Cùng lý do như Drawer: menu đóng vẫn nằm trong DOM nên phải chặn focus.
         inert={!isOpen}
         className={cn(
@@ -84,13 +92,35 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         </nav>
 
         <div className="border-t border-line p-4 text-sm">
-          <NavLink
-            to={ROUTES.LOGIN}
-            onClick={onClose}
-            className="block rounded-full bg-primary py-2.5 text-center font-semibold text-white transition hover:bg-primary-dark"
-          >
-            Đăng nhập
-          </NavLink>
+          {isAuthenticated ? (
+            <>
+              <NavLink
+                to={ROUTES.ACCOUNT}
+                onClick={onClose}
+                className="block rounded-full bg-primary py-2.5 text-center font-semibold text-white transition hover:bg-primary-dark"
+              >
+                Tài khoản của tôi
+              </NavLink>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose()
+                  logout()
+                }}
+                className="mt-3 block w-full py-1 text-center font-medium text-danger"
+              >
+                Đăng xuất
+              </button>
+            </>
+          ) : (
+            <NavLink
+              to={ROUTES.LOGIN}
+              onClick={onClose}
+              className="block rounded-full bg-primary py-2.5 text-center font-semibold text-white transition hover:bg-primary-dark"
+            >
+              Đăng nhập
+            </NavLink>
+          )}
           <p className="mt-4 text-ink-muted">
             Hotline: <span className="font-semibold text-primary">{STORE_INFO.hotline}</span>
           </p>

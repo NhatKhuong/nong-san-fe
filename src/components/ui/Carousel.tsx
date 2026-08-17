@@ -2,6 +2,7 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePrefersReducedMotion } from '@/hooks/useMediaQuery'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
@@ -44,8 +45,12 @@ export default function Carousel<T>({
   spaceBetween = 20,
   className,
 }: CarouselProps<T>) {
+  // Tắt tự chạy khi người dùng đã bật "giảm chuyển động" — nút điều hướng vẫn dùng được.
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const isAutoplayOn = Boolean(autoplayMs) && !prefersReducedMotion
+
   const modules = [Navigation, Pagination]
-  if (autoplayMs) modules.push(Autoplay)
+  if (isAutoplayOn) modules.push(Autoplay)
 
   return (
     <div className={cn('group/carousel relative', className)}>
@@ -59,7 +64,7 @@ export default function Carousel<T>({
           1024: { slidesPerView: perView.lg ?? perView.md ?? perView.base },
           1280: { slidesPerView: perView.xl ?? perView.lg ?? perView.base },
         }}
-        autoplay={autoplayMs ? { delay: autoplayMs, disableOnInteraction: false } : false}
+        autoplay={isAutoplayOn ? { delay: autoplayMs, disableOnInteraction: false } : false}
         navigation={
           showNavigation
             ? { prevEl: '.carousel-prev', nextEl: '.carousel-next' }

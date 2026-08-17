@@ -25,6 +25,7 @@ export const queryKeys = {
   },
   marketing: {
     heroSlides: ['marketing', 'hero-slides'] as const,
+    promoBanners: ['marketing', 'promo-banners'] as const,
     testimonials: ['marketing', 'testimonials'] as const,
     brands: ['marketing', 'brands'] as const,
   },
@@ -35,9 +36,30 @@ export const queryKeys = {
   },
   orders: {
     all: ['orders'] as const,
+    mine: ['orders', 'mine'] as const,
     detail: (code: string) => ['orders', 'detail', code] as const,
+  },
+  addresses: {
+    all: ['addresses'] as const,
+  },
+  wishlist: {
+    /** Khoá gắn với danh sách id nên bỏ tim một sản phẩm là tự tải lại. */
+    products: (ids: number[]) => ['wishlist', 'products', ids.join(',')] as const,
+  },
+  about: {
+    content: ['about', 'content'] as const,
   },
   coupons: {
     active: ['coupons', 'active'] as const,
+    validate: (code: string, subtotal: number) =>
+      ['coupons', 'validate', code, subtotal] as const,
+  },
+  cart: {
+    validate: (fingerprint: string) => ['cart', 'validate', fingerprint] as const,
+  },
+  locations: {
+    provinces: ['locations', 'provinces'] as const,
+    districts: (provinceCode: string) => ['locations', 'districts', provinceCode] as const,
+    wards: (districtCode: string) => ['locations', 'wards', districtCode] as const,
   },
 } as const

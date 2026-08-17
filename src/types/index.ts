@@ -8,9 +8,17 @@ export type {
   CreateReviewPayload,
   ReviewSummary,
 } from './product'
-export type { Post, PostQuery } from './post'
-export type { CartItem, CartSummary, Coupon } from './cart'
-export type { User, Address, LoginPayload, RegisterPayload, AuthResponse } from './user'
+export type { Post, PostCategory, PostQuery } from './post'
+export type { CartItem, CartSummary, CartIssue, Coupon } from './cart'
+export type {
+  User,
+  Address,
+  AddressPayload,
+  LoginPayload,
+  RegisterPayload,
+  ChangePasswordPayload,
+  AuthResponse,
+} from './user'
 export type {
   Order,
   OrderStatus,
@@ -18,4 +26,7 @@ export type {
   ShippingInfo,
   CreateOrderPayload,
 } from './order'
-export type { Testimonial, Brand, HeroSlide } from './marketing'
+export type { Testimonial, Brand, HeroSlide, PromoBanner } from './marketing'
+export type { Province, District, Ward } from './location'
+export type { AboutContent, AboutStat, Commitment, Milestone } from './about'
+export type { ContactMessage, ContactPayload } from './contact'

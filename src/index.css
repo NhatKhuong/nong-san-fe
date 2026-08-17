@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Font tự host — sinh bởi `node scripts/download-fonts.mjs`, đừng sửa tay. */
+@import './styles/fonts.css';
+
 /* ------------------------------------------------------------------
    Design tokens — nguồn chân lý duy nhất về màu sắc / font của dự án.
    Quy tắc: KHÔNG hardcode mã màu trong className, luôn dùng token.
@@ -44,8 +47,24 @@
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
+  /* Chỉ cuộn mượt khi người dùng không yêu cầu giảm chuyển động. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /*
+   * Ring focus dùng chung cho MỌI phần tử tương tác.
+   *
+   * Trước Giai đoạn 9 chỉ `Button` có ring riêng, còn link, ô nhập và các nút
+   * chỉ có icon đều phụ thuộc outline mặc định của trình duyệt — mảnh và dễ chìm
+   * trên nền trắng. `:focus-visible` nên chuột bấm không hiện ring, chỉ bàn phím mới.
+   */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 
   body {

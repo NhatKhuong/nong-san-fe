@@ -1,0 +1,66 @@
+{
+  "heroImage": "/images/about/hero-2.jpg",
+  "heroTitle": "Đưa nông sản sạch từ nông trại đến bàn ăn",
+  "heroDescription": "Chúng tôi làm việc trực tiếp với các nông trại đạt chuẩn hữu cơ, rút ngắn quãng đường từ luống rau đến bữa cơm của bạn xuống còn chưa đầy 24 giờ.",
+  "storyTitle": "Câu chuyện của chúng tôi",
+  "storyParagraphs": [
+    "Nông Sản Sạch bắt đầu từ một câu hỏi rất đời thường: vì sao mua rau ở thành phố lại khó biết được nó đến từ đâu. Cùng một bó cải, người bán nói hữu cơ, người bán nói rau nhà trồng, còn người mua thì chỉ biết tin.",
+    "Chúng tôi chọn cách trả lời bằng việc đi ngược lại chuỗi cung ứng: đến tận nơi, xem nhật ký đồng ruộng, lấy mẫu kiểm nghiệm độc lập, rồi mới ký hợp đồng. Nông trại nào không cho lấy mẫu thì chúng tôi dừng lại ở đó.",
+    "Hôm nay, mỗi lô hàng bán ra đều truy được ngày gieo, ngày thu hoạch và người phụ trách. Đó không phải là một tính năng để quảng cáo, mà là điều kiện tối thiểu để chúng tôi dám gọi sản phẩm của mình là sạch."
+  ],
+  "storyImage": "/images/about/cau-chuyen-2.jpg",
+  "stats": [
+    {
+      "value": "5",
+      "label": "Nông trại đối tác đạt chuẩn hữu cơ"
+    },
+    {
+      "value": "42",
+      "label": "Sản phẩm trong danh mục"
+    },
+    {
+      "value": "24h",
+      "label": "Từ lúc thu hoạch đến khi giao"
+    },
+    {
+      "value": "12.000+",
+      "label": "Khách hàng đã tin dùng"
+    }
+  ],
+  "milestones": [
+    {
+      "year": "2023",
+      "title": "Những luống rau đầu tiên",
+      "description": "Bắt đầu với một nông trại ở Đà Lạt và đúng bảy loại rau ăn lá, giao trong nội thành."
+    },
+    {
+      "year": "2024",
+      "title": "Chuỗi làm mát",
+      "description": "Đầu tư phòng làm mát tại nông trại. Đây là thay đổi kỹ thuật giúp rau giữ được độ tươi qua quãng đường dài."
+    },
+    {
+      "year": "2025",
+      "title": "Mở rộng danh mục",
+      "description": "Thêm trái cây, thịt và thực phẩm chế biến từ các nông trại đối tác cùng tiêu chuẩn kiểm định."
+    },
+    {
+      "year": "2026",
+      "title": "Truy xuất tận luống",
+      "description": "Mỗi lô hàng gắn với nhật ký đồng ruộng, tra được ngày gieo và người phụ trách."
+    }
+  ],
+  "commitments": [
+    {
+      "title": "Kiểm định độc lập",
+      "description": "Mẫu được lấy ngẫu nhiên và gửi tới đơn vị kiểm nghiệm do chúng tôi chọn, chi phí chúng tôi trả. Đối tác đã ký hợp đồng vẫn được kiểm tra lại mỗi sáu tháng."
+    },
+    {
+      "title": "Giá minh bạch",
+      "description": "Không có giá niêm yết ảo rồi giảm sâu. Giá hiển thị là giá bạn trả, phí vận chuyển nói rõ trước khi đặt hàng."
+    },
+    {
+      "title": "Đổi trả trong 24 giờ",
+      "description": "Nếu độ tươi không đúng như mô tả, chúng tôi hoàn tiền mà không cần bạn gửi hàng trả lại."
+    }
+  ]
+}

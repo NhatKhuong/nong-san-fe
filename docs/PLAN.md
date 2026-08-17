@@ -177,33 +177,113 @@ Dựng 12 section theo đúng thứ tự site mẫu, mỗi section là 1 compone
   - Tồn kho chặn đúng, gửi đánh giá hiện ngay, slug sai không trắng trang
   - Mobile 375px: drawer bộ lọc chạy, không cuộn ngang, 0 lỗi console
 
-### ⬜ Giai đoạn 6 — Giỏ hàng & Thanh toán
-- [x] `cart.store.ts` (Zustand + middleware `persist` → localStorage): add, remove, updateQty, clear, selector tính tổng tiền — _đã làm sớm ở Giai đoạn 3_
-- [ ] Mini-cart drawer trượt từ phải khi bấm icon giỏ hàng
-- [ ] Trang giỏ hàng: bảng sản phẩm, cập nhật số lượng, mã giảm giá, tóm tắt đơn
-- [ ] Checkout: form React Hook Form + Zod (họ tên, SĐT, email, địa chỉ, ghi chú), chọn phương thức thanh toán (COD / chuyển khoản), tóm tắt đơn hàng
-- [ ] Trang đặt hàng thành công
-- **Kết quả:** thêm sản phẩm → F5 giỏ hàng vẫn còn → đặt hàng ra trang thành công
+### ✅ Giai đoạn 5.5 — Nội bộ hoá ảnh (phát sinh, không có trong kế hoạch gốc)
+Trước khi sang Giai đoạn 6, toàn bộ ảnh đang tải từ bên thứ ba được đưa về local:
+- [x] `scripts/download-images.mjs` — tải 112 ảnh về `public/images/`, chia thư mục theo danh mục gốc; ghi lại dữ liệu với đường dẫn tương đối
+- [x] `scripts/generate-brand-logos.mjs` — sinh 9 logo SVG wordmark thay ảnh chụp ngẫu nhiên từ picsum
+- [x] `src/lib/image.ts` — hàm `imageUrl()` + biến `VITE_IMAGE_BASE_URL`, gọi ở **lớp API** nên 11 component render ảnh không phải sửa gì
+- [x] Dời dữ liệu promo banner khỏi `PromoBanners.tsx` vào `marketing.api.ts` (component đang giữ dữ liệu là trái quy tắc)
+- [x] `docs/IMAGE-CREDITS.md` — bảng ánh xạ file local ↔ ảnh gốc
+- **Kết quả:** 121 file trong `public/images/` (9.6 MB), khớp đúng 121 tham chiếu. **Chặn toàn bộ mạng ngoài trong trình duyệt → mọi ảnh vẫn hiển thị, 0 ảnh hỏng.** Build với `VITE_IMAGE_BASE_URL=https://cdn.example.com` → ảnh tự có tiền tố CDN, chứng minh đường chuyển S3 hoạt động. 11 tiêu chí Giai đoạn 5 vẫn đạt.
 
-### ⬜ Giai đoạn 7 — Tài khoản & Wishlist
-- [ ] Đăng nhập / Đăng ký / Quên mật khẩu (validate đầy đủ, mock auth trả về token giả)
-- [ ] `auth.store.ts` giữ user + token, `ProtectedRoute` chặn trang cần đăng nhập
-- [ ] Trang tài khoản: thông tin cá nhân, lịch sử đơn hàng, sổ địa chỉ, đổi mật khẩu
+### ✅ Giai đoạn 6 — Giỏ hàng & Thanh toán
+- [x] `cart.store.ts` (Zustand + middleware `persist` → localStorage): add, remove, updateQty, clear, selector tính tổng tiền — _đã làm sớm ở Giai đoạn 3_; bổ sung `couponCode`, `applyCoupon`, `removeCoupon`, `syncItem`
+- [x] Mini-cart drawer — **sửa lỗi tồn đọng**: `openMiniCart()` đang được gọi ở 4 chỗ nhưng chưa có UI nào lắng nghe
+- [x] Trang giỏ hàng: danh sách SP, đổi số lượng, xoá, mã giảm giá, thanh tiến trình miễn phí ship, tóm tắt đơn
+- [x] **Kiểm tra lại giỏ** (`validateCart`): phát hiện hết hàng / vượt tồn / đổi giá, khoá thanh toán và có nút cập nhật giỏ
+- [x] Địa chỉ 3 cấp phụ thuộc: `mocks/locations.json` (10 tỉnh) + `locations.api.ts` + `useLocations.ts`
+- [x] Checkout: form RHF + Zod (validate SĐT theo đầu số VN), 4 phương thức thanh toán (COD / chuyển khoản / MoMo / VNPay), tóm tắt đơn
+- [x] Trang đặt hàng thành công — nhận mã đơn qua `?code=` nên **F5 vẫn xem lại được**
+- [x] Dọn `ui.store.ts`: xoá `isFilterDrawerOpen`/`openFilterDrawer`/`closeFilterDrawer` không nơi nào dùng
+
+- **Kết quả:** bộ kiểm thử tự động 12 nhóm tiêu chí trên trình duyệt thật, tất cả đạt, 0 lỗi console:
+  - Thêm giỏ → mini-cart mở, badge header 0 → 1
+  - Giỏ hàng: đổi số lượng 78.000 → 117.000 ₫, xoá hết → empty state
+  - Phí ship: dưới ngưỡng nhắc "mua thêm", vượt ngưỡng miễn phí
+  - Mã `CHAOBAN10` áp được; mã sai và mã chưa đủ tối thiểu báo đúng lý do
+  - Sản phẩm hết hàng → cảnh báo + khoá thanh toán; bấm cập nhật giỏ thì đặt được
+  - Giỏ trống vào `/thanh-toan` → chuyển về giỏ hàng
+  - Form trống → 7 lỗi; SĐT sai → báo lỗi; chọn tỉnh → 5 quận → 4 phường
+  - Đặt hàng → mã `NSS-20260817-0001`, giỏ rỗng, F5 vẫn hiện đơn, ví điện tử hiện QR
+  - Mã đơn sai → thông báo thân thiện, không trắng trang
+  - Mobile 375px: không cuộn ngang
+
+> **Hai lỗi thật phát hiện khi kiểm thử:** (1) thuộc tính `required` khiến trình duyệt tự validate và **chặn luôn sự kiện submit** nên React Hook Form không bao giờ chạy — sửa bằng `noValidate` ở cấp form; (2) `clearCart()` làm giỏ rỗng khiến guard "giỏ trống" bắn trước khi `navigate()` kịp chạy, đặt hàng xong lại bị ném về giỏ hàng — sửa bằng cờ `orderPlacedRef`.
+
+### ✅ Giai đoạn 7 — Tài khoản & Wishlist
+- [x] Đăng nhập / Đăng ký / Quên mật khẩu (RHF + Zod, khung chung `AuthCard`, `PasswordInput` có nút hiện/ẩn)
+- [x] `auth.store.ts` giữ user (token vẫn do `client.ts` quản), `ProtectedRoute` chặn `/tai-khoan/*` và nhớ đường dẫn định vào
+- [x] Trang tài khoản 4 mục: thông tin cá nhân, lịch sử đơn hàng, sổ địa chỉ, đổi mật khẩu — dùng route lồng dưới `AccountLayout`
+- [x] **Sổ địa chỉ CRUD đầy đủ** (`addresses.api.ts` + `useAddresses.ts`) + đặt mặc định, nối vào trang thanh toán
+- [x] **Gắn đơn hàng với người dùng**: thêm `userId` vào `Order`, `getMyOrders()` lọc theo tài khoản đang đăng nhập
 - [x] `wishlist.store.ts` (persist localStorage) — _đã làm sớm ở Giai đoạn 3_
-- [ ] Trang Wishlist hiển thị danh sách sản phẩm đã lưu
-- **Kết quả:** đăng nhập → vào được `/tai-khoan`, chưa đăng nhập bị redirect
+- [x] Trang Wishlist hiển thị danh sách sản phẩm đã lưu, kèm "Thêm tất cả vào giỏ"
+- [x] Header / TopBar / MobileMenu đổi theo trạng thái đăng nhập (`AccountMenu` dạng thả xuống)
 
-### ⬜ Giai đoạn 8 — Nội dung
-- [ ] Blog: danh sách (phân trang, lọc theo danh mục) + chi tiết bài viết + bài liên quan
-- [ ] Giới thiệu, Liên hệ (form + bản đồ nhúng), 404
-- **Kết quả:** đủ toàn bộ menu điều hướng của site mẫu
+- **Kết quả:** bộ kiểm thử tự động 15 nhóm tiêu chí trên trình duyệt thật, tất cả đạt, 0 lỗi console, 0 request hỏng:
+  - Chưa đăng nhập vào `/tai-khoan` → chuyển sang `/dang-nhap`, đăng nhập xong **quay lại đúng trang định vào**
+  - Sai mật khẩu báo đúng lý do; form trống hiện đủ lỗi
+  - Đăng ký: email trùng và mật khẩu xác nhận lệch đều báo lỗi; đăng ký mới thì tự đăng nhập
+  - F5 vẫn giữ phiên; **xoá `nss_auth_token` bằng tay rồi F5 → tự đăng xuất** (token là nguồn chân lý)
+  - Sửa hồ sơ và đổi mật khẩu đều sống qua F5, đăng nhập lại bằng mật khẩu mới được
+  - Sổ địa chỉ: thêm 2, đổi mặc định thì cái cũ bỏ cờ, sửa, xoá
+  - **Mở form sửa địa chỉ vẫn giữ đúng quận và phường** (xem sự cố #11)
+  - Đặt hàng khi đã đăng nhập → đơn hiện trong lịch sử; đơn khách vãng lai **không** hiện nhưng tra bằng mã đơn vẫn thấy
+  - Thanh toán khi đã đăng nhập → tự điền hồ sơ + địa chỉ mặc định, chọn địa chỉ khác thì form đổi theo
+  - Wishlist: thêm 3 → bỏ 1 còn 2 → "Thêm tất cả vào giỏ" đúng số lượng → xoá hết ra empty state
+  - Đăng xuất: bị chặn khỏi `/tai-khoan`, **giỏ hàng và wishlist vẫn còn nguyên**
+  - Mobile 375px: 5 trang mới không cuộn ngang
 
-### ⬜ Giai đoạn 9 — Hoàn thiện
-- [ ] Rà soát responsive toàn bộ (mobile 375px, tablet 768px, desktop 1280px+); mobile menu dạng drawer
-- [ ] Skeleton loading thay vì spinner; empty state (giỏ trống, không tìm thấy sản phẩm); error boundary
-- [ ] SEO: `react-helmet-async` cho title/meta/OG mỗi trang
-- [ ] A11y: alt ảnh, aria-label cho icon button, focus ring, điều hướng bàn phím
-- [ ] Tối ưu: lazy load ảnh, `React.lazy` cho route nặng, `vite build` kiểm tra bundle size
+> **Hai lỗi thật phát hiện khi kiểm thử:** (1) `<select>` không điều khiển khiến quận/phường điền sẵn bị rơi mất — form vẫn giữ giá trị bên trong nên đơn đặt được với một quận người dùng không hề thấy mình chọn (sự cố #11); (2) `<Skeleton>` (render ra `<div>`) đặt trong `<p>` ở trang cửa hàng là HTML không hợp lệ, React báo lỗi ra console — lỗi có sẵn từ Giai đoạn 5, đã sửa.
+
+### ✅ Giai đoạn 8 — Nội dung
+- [x] **Mở rộng dữ liệu blog**: 8 → **18 bài**, thêm `categorySlug`, viết lại nội dung theo Markdown rút gọn; tải 12 ảnh mới về `public/images/posts/`
+- [x] `PostContent.tsx` — bộ render Markdown rút gọn tự viết (`##`, `-`, `1.`, `>`, `**đậm**`), **không thêm thư viện**
+- [x] Blog: danh sách 2 cột + sidebar (tìm kiếm, chuyên mục kèm số bài, bài mới nhất) + phân trang, đồng bộ URL qua `usePostFilters`
+- [x] Chi tiết bài viết: ảnh bìa, meta, nội dung, bài liên quan; slug sai không trắng trang
+- [x] `PostCard.tsx` — tách từ `BlogPreview.tsx`, dùng chung cho trang chủ / tin tức / bài liên quan
+- [x] Giới thiệu: nội dung đi qua `about.api.ts` (không viết cứng trong component), có dòng thời gian, con số, cam kết, dùng lại `FeatureStrip` và `Testimonials`
+- [x] Liên hệ: form RHF + Zod qua `contact.api.ts`, thông tin cửa hàng đọc từ `STORE_INFO`, bản đồ nhúng Google Maps
+- [x] Xoá `PagePlaceholder.tsx` — không còn trang nào dùng
+- [x] Trang 404 — _đã làm sớm từ Giai đoạn 1_
+
+- **Kết quả:** bộ kiểm thử tự động 13 nhóm tiêu chí, tất cả đạt, 0 lỗi console, 0 request hỏng:
+  - 18 bài chia 3 trang; sang trang 2 → URL đổi, F5 giữ nguyên
+  - Đang ở trang 3, đổi chuyên mục → tự về trang 1; URL rác không làm trắng trang
+  - Tìm kiếm khớp cả tiêu đề lẫn tóm tắt; không khớp → empty state có nút xoá lọc
+  - Chi tiết: 4 `<h2>`, 2 danh sách, 1 trích dẫn render đúng thẻ, **không lộ ký tự `##` hay `**`**
+  - Bài liên quan cùng chuyên mục và **không chứa chính bài đang đọc**
+  - Trang giới thiệu 0 ảnh hỏng; trang liên hệ validate đủ 3 ca sai rồi gửi thành công và reset form
+  - **Chặn toàn bộ mạng ngoài** → cả 4 trang vẫn dùng được, 0 ảnh hỏng; chỉ iframe bản đồ trống
+  - Mobile 375px: 4 trang mới không cuộn ngang
+  - Hồi quy: trang chủ, cửa hàng, giỏ hàng/thanh toán, tài khoản đều còn đạt
+
+> **Hai lỗi thật phát hiện trong giai đoạn này:** (1) `scripts/download-images.mjs` **không thể thay ảnh** — đổi URL trong mock thì script lặng lẽ giữ file cũ, và mỗi lần chạy lại còn xoá dần bảng `IMAGE-CREDITS.md`; (2) soát bảng đối chiếu phát hiện **4 ảnh bài viết sai chủ đề hoàn toàn**, trong đó 2 ảnh có từ Giai đoạn 2 (xem sự cố #13 và #14).
+
+### ✅ Giai đoạn 9 — Hoàn thiện
+- [x] **Tự host font** Quicksand + Inter (`scripts/download-fonts.mjs`, 18 file woff2) — khép lại phụ thuộc bên thứ ba treo từ phiên 4
+- [x] **Tách code theo route** (`React.lazy` + `<Suspense>` trong `MainLayout`): chunk chính **865 → 423 KB** (gzip 262 → 132 KB), sinh 49 chunk, hết cảnh báo 500 KB của Vite
+- [x] **Trang lỗi riêng** `ErrorPage` dùng `useRouteError()` — trước đây `NotFoundPage` kiêm `errorElement` nên mọi lỗi runtime đều hiện "404 Không tìm thấy trang"
+- [x] **Giam focus** trong `Drawer` / `Modal` / `MobileMenu` (`useFocusTrap`), trả focus về nút đã mở
+- [x] **Ring focus dùng chung** ở `:focus-visible`; sửa `PriceRangeSlider` và ô tìm kiếm vốn không có chỉ báo focus
+- [x] **Tôn trọng `prefers-reduced-motion`**: tắt cuộn mượt và tắt tự chạy của cả hai carousel
+- [x] **Sửa thứ tự tiêu đề** trên toàn site: footer h3→h2, `EmptyState`/`ErrorState` h3→h2, thêm tiêu đề ẩn cho `FeatureStrip` / `FilterSidebar` / lưới sản phẩm và bài viết; hero slider bỏ `<h1>` lặp
+- [x] **SEO**: `SeoMeta` dùng chung cho 19 trang, sinh cả thẻ Open Graph và Twitter Card; ảnh chia sẻ mặc định 1200×630 tự sinh (`scripts/generate-og-image.mjs`); thêm `VITE_SITE_URL`
+- [x] Skeleton thay spinner, empty state — _đã có từ các giai đoạn trước_
+- [x] Rà soát responsive toàn bộ 13 trang × 3 kích thước bằng bảng đối chiếu ảnh chụp
+
+- **Kết quả:** bộ kiểm thử tự động 10 nhóm tiêu chí, tất cả đạt, 0 lỗi console, 0 request hỏng:
+  - Chuyển route: header/footer không nháy, **không trắng trang**
+  - Tab qua 22 phần tử: **0 phần tử không thấy ring focus**
+  - Mini-cart và modal: **0/15 và 0/12 lần Tab thoát ra ngoài**, đóng xong focus về đúng nút đã mở
+  - Thứ tự tiêu đề, nhãn nút, `alt` ảnh, số `<h1>`: **0 trang còn vấn đề** trên 13 trang
+  - `prefers-reduced-motion`: cuộn về `auto`, slide không tự chạy sau 7 giây
+  - Thẻ OG đúng `type` cho từng loại trang (`website` / `product` / `article`)
+  - **Chặn toàn bộ mạng ngoài**: host duy nhất bị chặn là `maps.google.com`; 0 ảnh hỏng, **font tiếng Việt vẫn đúng**
+  - Vùng bấm theo ngưỡng WCAG AA 24×24 và cuộn ngang: **sạch ở cả 375 / 768 / 1280px**
+  - Hồi quy: cả 5 bộ kiểm thử của các giai đoạn trước vẫn đạt
+
+> **Ba lỗi thật phát hiện trong giai đoạn này:** (1) ô đăng ký bản tin chỉ cao **19px trên mobile** vì `flex-1` trong container `flex-col` điều khiển chiều cao và đè lên `h-12`; (2) `Drawer` và `Modal` khai `aria-modal="true"` nhưng không hề giam focus — Tab vài lần là chạy ra các nút của trang nền đang bị lớp phủ che; (3) thứ tự tiêu đề nhảy cấp ở gần như mọi trang (xem sự cố #15).
 
 ### ⬜ Giai đoạn 10 — Chuẩn bị ghép Spring Boot
 - [ ] `.env` với `VITE_API_BASE_URL`
@@ -277,10 +357,11 @@ Cập nhật sau mỗi giai đoạn (cũng được đồng bộ trong `docs/PLA
 | 3 | UI dùng chung | ✅ Hoàn thành |
 | 4 | Trang chủ | ✅ Hoàn thành |
 | 5 | Shop & chi tiết SP | ✅ Hoàn thành |
-| 6 | Giỏ hàng & checkout | ⬜ Chưa bắt đầu |
-| 7 | Tài khoản & wishlist | ⬜ Chưa bắt đầu |
-| 8 | Nội dung (blog, giới thiệu, liên hệ) | ⬜ Chưa bắt đầu |
-| 9 | Hoàn thiện | ⬜ Chưa bắt đầu |
+| 5.5 | Nội bộ hoá ảnh (phát sinh) | ✅ Hoàn thành |
+| 6 | Giỏ hàng & thanh toán | ✅ Hoàn thành |
+| 7 | Tài khoản & wishlist | ✅ Hoàn thành |
+| 8 | Nội dung (blog, giới thiệu, liên hệ) | ✅ Hoàn thành |
+| 9 | Hoàn thiện | ✅ Hoàn thành |
 | 10 | Chuẩn bị ghép Spring Boot | ⬜ Chưa bắt đầu |
 
 ---

@@ -67,7 +67,7 @@ export default function Footer() {
         </FooterColumn>
 
         <div>
-          <h3 className="mb-4 text-base">Thông tin liên hệ</h3>
+          <h2 className="mb-4 text-base">Thông tin liên hệ</h2>
           <ul className="space-y-3 text-sm text-ink-muted">
             <li className="flex gap-2.5">
               <MapPin size={17} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
@@ -91,7 +91,7 @@ export default function Footer() {
             </li>
           </ul>
 
-          <h3 className="mt-6 mb-3 text-base">Chính sách</h3>
+          <h2 className="mt-6 mb-3 text-base">Chính sách</h2>
           <ul className="space-y-2 text-sm">
             {POLICY_LINKS.map((item) => (
               <FooterLink key={item.label} to={item.path}>
@@ -114,7 +114,7 @@ export default function Footer() {
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-4 text-base">{title}</h3>
+      <h2 className="mb-4 text-base">{title}</h2>
       <ul className="space-y-2 text-sm">{children}</ul>
     </div>
   )

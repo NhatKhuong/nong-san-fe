@@ -21,6 +21,8 @@ export default function QuantityPicker({
 }: QuantityPickerProps) {
   const buttonSize = size === 'sm' ? 'size-8' : 'size-10'
   const inputWidth = size === 'sm' ? 'w-10' : 'w-12'
+  /** Cao bằng hai nút hai bên — ô chỉ cao 20px là vùng bấm quá nhỏ trên mobile. */
+  const inputHeight = size === 'sm' ? 'h-8' : 'h-10'
 
   function clamp(next: number): number {
     if (Number.isNaN(next)) return min
@@ -50,7 +52,11 @@ export default function QuantityPicker({
         max={max}
         onChange={(event) => onChange(clamp(Number(event.target.value)))}
         aria-label="Số lượng"
-        className={cn(inputWidth, 'bg-transparent text-center text-sm font-semibold outline-none')}
+        className={cn(
+          inputWidth,
+          inputHeight,
+          'bg-transparent text-center text-sm font-semibold outline-none',
+        )}
       />
 
       <button

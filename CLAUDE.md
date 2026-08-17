@@ -106,6 +106,14 @@ npx tsc --noEmit     # chỉ kiểm tra type, chạy trước khi kết thúc m�
   3. dữ liệu rỗng → empty state có hình minh hoạ + gợi ý hành động
 - Ảnh luôn có `alt` mô tả bằng tiếng Việt và `loading="lazy"` (trừ ảnh above-the-fold).
 
+### Quy tắc về ảnh (BẮT BUỘC)
+
+- **Ảnh phải nằm trong `public/images/`**, chia thư mục con theo loại (`products/<danh-mục-gốc>/`, `categories/`, `posts/`, `banners/`, `brands/`, `avatars/`).
+- **Dữ liệu chỉ lưu đường dẫn tương đối** — `/images/rau-cu/ca-rot-huu-co-1.jpg`. Đây là hợp đồng với backend: sau này Spring Boot trả về đúng dạng này.
+- ❌ **Cấm hardcode URL ảnh của bên thứ ba** (`images.unsplash.com`, `picsum.photos`…) trong code hay trong mock. Cần ảnh mới thì tải về bằng `node scripts/download-images.mjs`.
+- **Chuyển đường dẫn thành URL bằng `imageUrl()`** (`src/lib/image.ts`), và **gọi ở lớp `src/api/`, không gọi trong component**. Component nhận URL đã sẵn sàng. Lý do: quên gọi ở một component sẽ không lộ ra lúc dev (vì base đang trống), chỉ vỡ khi deploy với CDN.
+- Thay ảnh thì **đổi luôn tên file** — file trong `public/` không được Vite gắn hash nên giữ nguyên tên sẽ khiến người dùng cũ thấy ảnh cũ trong cache.
+
 ---
 
 ## 8. Quy trình làm việc

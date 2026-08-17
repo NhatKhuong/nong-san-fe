@@ -1,9 +1,13 @@
 import postsJson from '@/mocks/posts.json'
 import { POSTS_PER_PAGE } from '@/lib/constants'
 import { delay } from '@/lib/utils'
-import type { Paginated, Post, PostQuery } from '@/types'
+import { imageUrl } from '@/lib/image'
+import type { Paginated, Post, PostCategory, PostQuery } from '@/types'
 
-const posts = postsJson as Post[]
+const posts = (postsJson as Post[]).map((post) => ({
+  ...post,
+  thumbnail: imageUrl(post.thumbnail),
+}))
 
 function sortByNewest(list: Post[]): Post[] {
   return [...list].sort(
@@ -22,11 +26,16 @@ export async function getPosts(query: PostQuery = {}): Promise<Paginated<Post>> 
 
   let filtered = posts
   if (query.category) {
-    filtered = filtered.filter((post) => post.category === query.category)
+    filtered = filtered.filter((post) => post.categorySlug === query.category)
   }
   if (query.q) {
     const keyword = query.q.trim().toLowerCase()
-    filtered = filtered.filter((post) => post.title.toLowerCase().includes(keyword))
+    // Tìm cả trong tóm tắt để từ khoá không có trong tiêu đề vẫn ra kết quả.
+    filtered = filtered.filter(
+      (post) =>
+        post.title.toLowerCase().includes(keyword) ||
+        post.excerpt.toLowerCase().includes(keyword),
+    )
   }
 
   const sorted = sortByNewest(filtered)
@@ -73,8 +82,23 @@ export async function getRelatedPosts(slug: string, limit = 3): Promise<Post[]> 
   ).slice(0, limit)
 }
 
-/** Danh sách chuyên mục bài viết, dùng cho bộ lọc trang tin tức. */
-export async function getPostCategories(): Promise<string[]> {
+/**
+ * Danh sách chuyên mục kèm số bài, dùng cho sidebar trang tin tức.
+ *
+ * Trả về `PostCategory[]` chứ không phải `string[]`: sidebar cần số đếm, còn URL
+ * cần slug không dấu. Đây là dạng backend sẽ trả về.
+ *
+ * Khi có backend: `const { data } = await client.get('/posts/categories'); return data`
+ */
+export async function getPostCategories(): Promise<PostCategory[]> {
   await delay(100)
-  return [...new Set(posts.map((post) => post.category))]
+
+  const counts = new Map<string, PostCategory>()
+  for (const post of posts) {
+    const existing = counts.get(post.categorySlug)
+    if (existing) existing.count++
+    else counts.set(post.categorySlug, { slug: post.categorySlug, name: post.category, count: 1 })
+  }
+
+  return [...counts.values()].sort((a, b) => b.count - a.count)
 }

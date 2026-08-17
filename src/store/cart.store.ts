@@ -5,10 +5,22 @@ import type { CartItem, Product } from '@/types'
 
 interface CartState {
   items: CartItem[]
+  /**
+   * Chỉ lưu MÃ giảm giá, không lưu cả object `Coupon`.
+   * Giỏ hàng nằm trong localStorage nhiều ngày nên mã có thể đã hết hạn hoặc
+   * đơn không còn đủ điều kiện tối thiểu — phải xác thực lại theo giá trị đơn
+   * hiện tại (xem `useCoupon`) chứ không tin dữ liệu cũ.
+   */
+  couponCode: string | null
+
   /** Thêm sản phẩm; nếu đã có thì cộng dồn số lượng, không vượt tồn kho. */
   addItem: (product: Product, quantity?: number) => void
   removeItem: (productId: number) => void
   updateQuantity: (productId: number, quantity: number) => void
+  applyCoupon: (code: string) => void
+  removeCoupon: () => void
+  /** Đồng bộ tồn kho và giá theo dữ liệu mới nhất từ server. */
+  syncItem: (productId: number, patch: Partial<Pick<CartItem, 'price' | 'stock' | 'quantity'>>) => void
   clear: () => void
 }
 
@@ -30,6 +42,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
+      couponCode: null,
 
       addItem: (product, quantity = 1) =>
         set((state) => {
@@ -60,7 +73,18 @@ export const useCartStore = create<CartState>()(
           ),
         })),
 
-      clear: () => set({ items: [] }),
+      applyCoupon: (code) => set({ couponCode: code.trim().toUpperCase() }),
+
+      removeCoupon: () => set({ couponCode: null }),
+
+      syncItem: (productId, patch) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.productId === productId ? { ...item, ...patch } : item,
+          ),
+        })),
+
+      clear: () => set({ items: [], couponCode: null }),
     }),
     { name: 'nss_cart' },
   ),

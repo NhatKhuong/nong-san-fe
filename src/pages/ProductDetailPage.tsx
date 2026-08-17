@@ -20,6 +20,7 @@ import { calcDiscountPercent, formatVND } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useCartStore } from '@/store/cart.store'
 import { useWishlistStore } from '@/store/wishlist.store'
+import SeoMeta from '@/components/ui/SeoMeta'
 import { useUIStore } from '@/store/ui.store'
 
 type TabKey = 'description' | 'specs' | 'reviews'
@@ -84,8 +85,12 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      <title>{`${product.name} — Nông Sản Sạch`}</title>
-      <meta name="description" content={product.shortDescription} />
+      <SeoMeta
+        title={product.name}
+        description={product.shortDescription}
+        image={product.images[0]}
+        type="product"
+      />
 
       <Breadcrumb
         items={[
@@ -113,7 +118,7 @@ export default function ProductDetailPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('reviews')}
-                className="text-sm text-primary underline-offset-2 hover:underline"
+                className="py-1 text-sm text-primary underline-offset-2 hover:underline"
               >
                 Xem đánh giá
               </button>

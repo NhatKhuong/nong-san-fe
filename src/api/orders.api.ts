@@ -1,6 +1,9 @@
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from '@/lib/constants'
 import { delay } from '@/lib/utils'
-import type { CreateOrderPayload, Order } from '@/types'
+import { effectivePrice } from '@/lib/format'
+import productsJson from '@/mocks/products.json'
+import type { CartIssue, CartItem, CreateOrderPayload, Order, Product } from '@/types'
+import { getCurrentUserId } from './auth.api'
 import { validateCoupon } from './coupons.api'
 
 const ORDERS_KEY = 'nss_mock_orders'
@@ -38,6 +41,54 @@ export function calcShippingFee(subtotal: number): number {
 }
 
 /**
+ * Đối chiếu giỏ hàng với dữ liệu sản phẩm mới nhất.
+ *
+ * `CartItem` là bản chụp lúc thêm vào giỏ, mà giỏ nằm trong localStorage nhiều
+ * ngày — giá và tồn kho có thể đã đổi. Hàm này trả về danh sách vấn đề để trang
+ * giỏ hàng cảnh báo người dùng trước khi đặt.
+ *
+ * Khi có backend: `const { data } = await client.post('/cart/validate', { items }); return data`
+ */
+export async function validateCart(items: CartItem[]): Promise<CartIssue[]> {
+  await delay(400)
+
+  const products = productsJson as Product[]
+  const issues: CartIssue[] = []
+
+  for (const item of items) {
+    const product = products.find((candidate) => candidate.id === item.productId)
+
+    // Sản phẩm bị gỡ khỏi hệ thống cũng coi như hết hàng.
+    if (!product || product.stock <= 0) {
+      issues.push({ productId: item.productId, name: item.name, type: 'out_of_stock' })
+      continue
+    }
+
+    if (item.quantity > product.stock) {
+      issues.push({
+        productId: item.productId,
+        name: item.name,
+        type: 'insufficient_stock',
+        availableStock: product.stock,
+      })
+    }
+
+    const currentPrice = effectivePrice(product.price, product.salePrice)
+    if (currentPrice !== item.price) {
+      issues.push({
+        productId: item.productId,
+        name: item.name,
+        type: 'price_changed',
+        currentPrice,
+        cartPrice: item.price,
+      })
+    }
+  }
+
+  return issues
+}
+
+/**
  * Tạo đơn hàng mới.
  * Khi có backend: `const { data } = await client.post('/orders', payload); return data`
  */
@@ -63,6 +114,8 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
   const order: Order = {
     id: Date.now(),
     code: generateOrderCode(orders.length + 1),
+    // Lấy từ token chứ không nhận từ payload — mô phỏng đúng cách backend làm.
+    userId: getCurrentUserId(),
     items: payload.items,
     shipping: payload.shipping,
     paymentMethod: payload.paymentMethod,
@@ -81,11 +134,17 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
 
 /**
  * Lịch sử đơn hàng của tài khoản đang đăng nhập.
+ *
+ * Lọc nghiêm ngặt theo `userId`: đơn đặt lúc chưa đăng nhập không thuộc về tài
+ * khoản nào, chỉ tra cứu được bằng mã đơn qua `getOrderByCode`.
+ *
  * Khi có backend: `const { data } = await client.get('/orders/me'); return data`
  */
 export async function getMyOrders(): Promise<Order[]> {
   await delay(500)
-  return readOrders()
+  const userId = getCurrentUserId()
+  if (userId === null) return []
+  return readOrders().filter((order) => order.userId === userId)
 }
 
 /**

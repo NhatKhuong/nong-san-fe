@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 interface ModalProps {
   isOpen: boolean
@@ -18,6 +19,8 @@ const SIZE_CLASSES = {
 }
 
 export default function Modal({ isOpen, onClose, title, size = 'md', children }: ModalProps) {
+  const panelRef = useFocusTrap<HTMLDivElement>(isOpen)
+
   useEffect(() => {
     if (!isOpen) return
 
@@ -42,9 +45,11 @@ export default function Modal({ isOpen, onClose, title, size = 'md', children }:
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        tabIndex={-1}
         className={cn(
           'relative max-h-[90vh] w-full overflow-y-auto rounded-xl bg-white shadow-xl',
           SIZE_CLASSES[size],

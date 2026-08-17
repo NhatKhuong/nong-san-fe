@@ -3,7 +3,7 @@
     "id": 1,
     "authorName": "Nguyễn Thị Lan",
     "authorRole": "Nội trợ, Quận 7",
-    "avatar": "https://picsum.photos/seed/nss-av1/120/120",
+    "avatar": "/images/avatars/khach-hang-1.jpg",
     "rating": 5,
     "content": "Rau giao tới còn nguyên sương, lá không dập chút nào. Mình đặt hàng tuần cho cả nhà gần một năm nay và chưa lần nào phải phàn nàn."
   },
@@ -11,7 +11,7 @@
     "id": 2,
     "authorName": "Trần Văn Hải",
     "authorRole": "Đầu bếp nhà hàng",
-    "avatar": "https://picsum.photos/seed/nss-av2/120/120",
+    "avatar": "/images/avatars/khach-hang-2.jpg",
     "rating": 5,
     "content": "Mình lấy cá hồi và thịt bò ở đây cho nhà hàng. Chất lượng ổn định qua từng đợt, đó mới là điều khó nhất mà nhà cung cấp làm được."
   },
@@ -19,7 +19,7 @@
     "id": 3,
     "authorName": "Lê Thanh Bình",
     "authorRole": "Nhân viên văn phòng",
-    "avatar": "https://picsum.photos/seed/nss-av3/120/120",
+    "avatar": "/images/avatars/khach-hang-3.jpg",
     "rating": 4,
     "content": "Đặt buổi tối thì trưa hôm sau đã có hàng. Giá nhỉnh hơn chợ một chút nhưng đổi lại yên tâm về nguồn gốc nên mình thấy xứng đáng."
   },
@@ -27,7 +27,7 @@
     "id": 4,
     "authorName": "Phạm Ngọc Hân",
     "authorRole": "Mẹ bỉm sữa, Bình Thạnh",
-    "avatar": "https://picsum.photos/seed/nss-av4/120/120",
+    "avatar": "/images/avatars/khach-hang-4.jpg",
     "rating": 5,
     "content": "Từ khi có em bé mình khắt khe hẳn chuyện thực phẩm. Rau củ ở đây nấu cháo cho con rất ngọt nước, không cần nêm thêm gì."
   }

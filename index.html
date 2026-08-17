@@ -8,11 +8,24 @@
       name="description"
       content="Cửa hàng nông sản sạch — rau củ, trái cây, thịt hữu cơ tươi ngon, giao tận nhà."
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Font tự host trong /fonts (xem scripts/download-fonts.mjs). Preload đúng hai
+      file dùng ngay ở màn hình đầu — bộ tiếng Việt của chữ thân và của tiêu đề.
+      Các weight và subset còn lại để trình duyệt tự lấy theo unicode-range.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-400-vietnamese.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/quicksand-700-vietnamese.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <title>Nông Sản Sạch — Thực phẩm hữu cơ tươi mỗi ngày</title>
   </head>

@@ -29,6 +29,10 @@ export default function FilterSidebar({
 
   return (
     <div className="space-y-7">
+      {/* Tiêu đề cấp hai cho cả sidebar — mỗi nhóm lọc bên dưới là `<h3>`, không
+          có tiêu đề này thì thứ tự nhảy từ `<h1>` của trang xuống thẳng `<h3>`. */}
+      <h2 className="sr-only">Bộ lọc sản phẩm</h2>
+
       <FilterGroup title="Danh mục">
         <CategoryFilter
           value={query.category}

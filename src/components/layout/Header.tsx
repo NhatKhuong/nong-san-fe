@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Heart, Menu, ShoppingCart, User } from 'lucide-react'
+import { Heart, Menu, ShoppingCart } from 'lucide-react'
+import AccountMenu from './AccountMenu'
 import Logo from './Logo'
 import MobileMenu from './MobileMenu'
 import SearchBox from './SearchBox'
@@ -35,13 +36,9 @@ export default function Header() {
         <SearchBox className="ml-auto hidden max-w-md flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1 md:ml-4">
-          <Link
-            to={ROUTES.ACCOUNT}
-            className="hidden rounded-lg p-2.5 text-ink transition hover:bg-surface hover:text-primary sm:block"
-            aria-label="Tài khoản của tôi"
-          >
-            <User size={22} />
-          </Link>
+          <div className="hidden sm:block">
+            <AccountMenu />
+          </div>
 
           <Link
             to={ROUTES.WISHLIST}

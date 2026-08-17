@@ -79,7 +79,12 @@ export default function SearchBox({ className }: { className?: string }) {
           goToSearchPage()
         }}
       >
-        <div className="flex items-center rounded-full border border-line bg-surface pr-1 focus-within:border-primary">
+        {/*
+          Ring focus đặt trên khung bọc chứ không trên `<input>` (input có
+          `outline-none` để bo tròn không bị outline vuông cắt ngang). Chỉ đổi màu
+          viền 1px là chỉ báo focus quá mờ với người dùng bàn phím.
+        */}
+        <div className="flex items-center rounded-full border border-line bg-surface pr-1 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/40">
           <input
             type="search"
             value={keyword}

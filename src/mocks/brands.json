@@ -1,11 +1,47 @@
 [
-  { "id": 1, "name": "Đà Lạt Organic", "logo": "https://picsum.photos/seed/nss-brand1/200/80" },
-  { "id": 2, "name": "Nông Trại Xanh", "logo": "https://picsum.photos/seed/nss-brand2/200/80" },
-  { "id": 3, "name": "Vườn Nhà Việt", "logo": "https://picsum.photos/seed/nss-brand3/200/80" },
-  { "id": 4, "name": "Nuts House", "logo": "https://picsum.photos/seed/nss-brand4/200/80" },
-  { "id": 5, "name": "Meat Master", "logo": "https://picsum.photos/seed/nss-brand5/200/80" },
-  { "id": 6, "name": "Dairy Farm", "logo": "https://picsum.photos/seed/nss-brand6/200/80" },
-  { "id": 7, "name": "Clean Food Co.", "logo": "https://picsum.photos/seed/nss-brand7/200/80" },
-  { "id": 8, "name": "Mộc Châu Milk", "logo": "https://picsum.photos/seed/nss-brand8/200/80" },
-  { "id": 9, "name": "Fresh Juice Lab", "logo": "https://picsum.photos/seed/nss-brand9/200/80" }
+  {
+    "id": 1,
+    "name": "Đà Lạt Organic",
+    "logo": "/images/brands/da-lat-organic.svg"
+  },
+  {
+    "id": 2,
+    "name": "Nông Trại Xanh",
+    "logo": "/images/brands/nong-trai-xanh.svg"
+  },
+  {
+    "id": 3,
+    "name": "Vườn Nhà Việt",
+    "logo": "/images/brands/vuon-nha-viet.svg"
+  },
+  {
+    "id": 4,
+    "name": "Nuts House",
+    "logo": "/images/brands/nuts-house.svg"
+  },
+  {
+    "id": 5,
+    "name": "Meat Master",
+    "logo": "/images/brands/meat-master.svg"
+  },
+  {
+    "id": 6,
+    "name": "Dairy Farm",
+    "logo": "/images/brands/dairy-farm.svg"
+  },
+  {
+    "id": 7,
+    "name": "Clean Food Co.",
+    "logo": "/images/brands/clean-food-co.svg"
+  },
+  {
+    "id": 8,
+    "name": "Mộc Châu Milk",
+    "logo": "/images/brands/moc-chau-milk.svg"
+  },
+  {
+    "id": 9,
+    "name": "Fresh Juice Lab",
+    "logo": "/images/brands/fresh-juice-lab.svg"
+  }
 ]
