@@ -138,28 +138,44 @@ Xây trước để các giai đoạn sau tái sử dụng, tránh viết trùng
 
 > **Điều chỉnh so với kế hoạch gốc:** `cart.store.ts`, `wishlist.store.ts`, `ui.store.ts` được kéo từ Giai đoạn 6–7 lên Giai đoạn 3. Lý do: `ProductCard` cần gọi trực tiếp `addItem` và `toggleWishlist`; nếu để sau thì phải sửa lại ProductCard và mọi nơi dùng nó. Giai đoạn 6–7 giờ chỉ còn phần UI (trang giỏ hàng, mini-cart, checkout, trang tài khoản).
 
-### ⬜ Giai đoạn 4 — Trang chủ
+### ✅ Giai đoạn 4 — Trang chủ
 Dựng 12 section theo đúng thứ tự site mẫu, mỗi section là 1 component trong `components/home/`:
-- [ ] `HeroSlider` — Swiper, 2 slide, CTA
-- [ ] `FeatureStrip` — 4 ưu điểm (100% hữu cơ, tiêu dùng xanh, freeship, đổi trả)
-- [ ] `CategoryGrid` — 6 danh mục kèm số lượng sản phẩm
-- [ ] `SaleSection` — carousel sản phẩm giảm giá
-- [ ] `PromoBanners` — 3 banner khuyến mãi
-- [ ] `ProductTabs` — tab theo danh mục, đổi tab đổi lưới sản phẩm
-- [ ] `BestSellers` — kèm progress bar "đã bán / còn lại"
-- [ ] `CountdownPromo` — Black Friday + đồng hồ đếm ngược
-- [ ] `Testimonials` — carousel 4 đánh giá
-- [ ] `BrandLogos`
-- [ ] `BlogPreview` — 4 bài mới nhất
-- [ ] `Newsletter`
-- **Kết quả:** trang chủ hoàn chỉnh, responsive mobile/tablet/desktop
+- [x] `HeroSlider` — Swiper autoplay, 2 slide, CTA, ảnh không lazy (above-the-fold)
+- [x] `FeatureStrip` — 4 ưu điểm (100% hữu cơ, tiêu dùng xanh, freeship, đổi trả)
+- [x] `CategoryGrid` — 7 danh mục kèm số lượng sản phẩm
+- [x] `SaleSection` — carousel sản phẩm giảm giá
+- [x] `PromoBanners` — 3 banner khuyến mãi
+- [x] `ProductTabs` — 5 tab theo danh mục, đổi tab đổi lưới sản phẩm
+- [x] `BestSellers` — kèm progress bar "đã bán / còn lại"
+- [x] `CountdownPromo` — đồng hồ đếm ngược, **tự ẩn khi hết hạn**
+- [x] `Testimonials` — carousel 4 đánh giá
+- [x] `BrandLogos` — carousel logo, xám → màu khi hover
+- [x] `BlogPreview` — 4 bài mới nhất
+- [x] `Newsletter` — form đi qua `subscribeNewsletter()` trong lớp API
 
-### ⬜ Giai đoạn 5 — Shop & Chi tiết sản phẩm
-- [ ] **Shop:** sidebar lọc (danh mục cây phân cấp, khoảng giá dạng slider, rating, còn hàng) + sort (mới nhất / giá tăng / giá giảm / bán chạy) + toggle grid/list + phân trang
-- [ ] **Đồng bộ filter với URL query params** (`?category=rau-cu&minPrice=50000&sort=price_asc`) để share link và F5 giữ nguyên trạng thái
-- [ ] **Chi tiết sản phẩm:** gallery ảnh + zoom, thông tin, chọn số lượng, thêm giỏ/mua ngay, tab (Mô tả / Thông tin bổ sung / Đánh giá), sản phẩm liên quan
-- [ ] **Search:** ô tìm kiếm ở header, có debounce + dropdown gợi ý
-- **Kết quả:** lọc/sort/phân trang/tìm kiếm chạy đúng, URL phản ánh trạng thái
+**Phát sinh thêm:** `components/ui/Carousel.tsx` (bọc Swiper một lần, dùng cho 3 section), `PROMO_END_DATE` trong `constants.ts`.
+
+- **Kết quả:** đã kiểm chứng bằng trình duyệt thật ở **375 / 768 / 1280px**: 12 section đúng thứ tự, **0 lỗi console, 0 ảnh hỏng, 0 ảnh thiếu `alt`, không cuộn ngang** ở cả 3 kích thước. Đổi tab trả về đúng sản phẩm theo danh mục. Bấm "Thêm vào giỏ" → badge header 0 → 1.
+
+> **Đã sửa trong giai đoạn này:** bảng màu cũ trượt WCAG AA ở cả 4 màu chữ (primary 2.65:1, accent 2.51:1, ink-muted 4.29:1, ink-light 2.38:1). Bảng màu mới đạt lần lượt 4.99 / 5.18 / 6.69 / 4.54:1. Đồng thời thay toàn bộ ảnh mock từ picsum (ảnh ngẫu nhiên) sang **106 ảnh Unsplash thật**, tất cả đã kiểm tra trả HTTP 200.
+
+### ✅ Giai đoạn 5 — Shop & Chi tiết sản phẩm
+- [x] **Shop:** sidebar lọc (cây danh mục cha–con kèm số lượng, thanh trượt giá 2 đầu, rating, còn hàng / đang giảm giá) + 5 kiểu sắp xếp + toggle grid/list + phân trang. Mobile dùng `<Drawer>`
+- [x] **Đồng bộ filter với URL query params** qua hook `useProductFilters` — nguồn chân lý duy nhất là URL
+- [x] **Chi tiết sản phẩm:** gallery + zoom khi hover, chọn số lượng chặn theo tồn kho, thêm giỏ / mua ngay, wishlist, 3 tab (Mô tả / Thông tin bổ sung / Đánh giá), sản phẩm liên quan, breadcrumb đủ cấp
+- [x] **Search:** tách `SearchBox` khỏi Header, debounce 350ms + dropdown gợi ý, điều hướng bằng ↑↓ Enter Esc
+- [x] **Đánh giá:** `mocks/reviews.json` (48 đánh giá) + `reviews.api.ts` + form viết đánh giá (RHF + Zod), biểu đồ phân bố sao
+- [x] **Xem nhanh:** modal nối vào prop `onQuickView` đã có sẵn của `ProductCard`
+
+- **Kết quả:** đã chạy bộ kiểm thử tự động 11 tiêu chí trên trình duyệt thật, tất cả đạt:
+  - Lọc → URL đổi → F5 giữ nguyên kết quả
+  - Đang ở trang 3, đổi bộ lọc → tự về trang 1
+  - Kéo thanh giá 6 lần → Back **một lần** là thoát khỏi trang (nhờ `replace: true`)
+  - URL rác `?page=abc&minRating=99&sort=hacked` → vẫn hiện đủ 42 sản phẩm
+  - Empty state + nút xoá lọc hoạt động
+  - Tìm kiếm: 5 gợi ý, ↓ Enter vào đúng trang chi tiết
+  - Tồn kho chặn đúng, gửi đánh giá hiện ngay, slug sai không trắng trang
+  - Mobile 375px: drawer bộ lọc chạy, không cuộn ngang, 0 lỗi console
 
 ### ⬜ Giai đoạn 6 — Giỏ hàng & Thanh toán
 - [x] `cart.store.ts` (Zustand + middleware `persist` → localStorage): add, remove, updateQty, clear, selector tính tổng tiền — _đã làm sớm ở Giai đoạn 3_
@@ -259,8 +275,8 @@ Cập nhật sau mỗi giai đoạn (cũng được đồng bộ trong `docs/PLA
 | 1 | Nền móng | ✅ Hoàn thành |
 | 2 | Lớp dữ liệu | ✅ Hoàn thành |
 | 3 | UI dùng chung | ✅ Hoàn thành |
-| 4 | Trang chủ | ⬜ Chưa bắt đầu |
-| 5 | Shop & chi tiết SP | ⬜ Chưa bắt đầu |
+| 4 | Trang chủ | ✅ Hoàn thành |
+| 5 | Shop & chi tiết SP | ✅ Hoàn thành |
 | 6 | Giỏ hàng & checkout | ⬜ Chưa bắt đầu |
 | 7 | Tài khoản & wishlist | ⬜ Chưa bắt đầu |
 | 8 | Nội dung (blog, giới thiệu, liên hệ) | ⬜ Chưa bắt đầu |

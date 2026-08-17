@@ -50,7 +50,23 @@ export interface Review {
   id: number
   productId: number
   authorName: string
+  /** Điểm đánh giá, số nguyên 1–5. */
   rating: number
   content: string
   createdAt: string
+}
+
+export interface CreateReviewPayload {
+  productId: number
+  authorName: string
+  rating: number
+  content: string
+}
+
+/** Tổng hợp đánh giá của một sản phẩm, dùng vẽ biểu đồ phân bố sao. */
+export interface ReviewSummary {
+  average: number
+  total: number
+  /** Số lượt đánh giá theo từng mức sao, khoá là '1'…'5'. */
+  distribution: Record<'1' | '2' | '3' | '4' | '5', number>
 }

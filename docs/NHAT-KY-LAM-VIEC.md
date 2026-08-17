@@ -10,12 +10,13 @@ Ghi lại **diễn biến và lý do đằng sau từng quyết định** của 
 
 | | |
 |---|---|
-| **Cập nhật lần cuối** | 16/08/2026 |
-| **Đã xong** | Giai đoạn 0 → 3 (tài liệu, nền móng, lớp dữ liệu, thư viện UI) |
+| **Cập nhật lần cuối** | 17/08/2026 (phiên 3) |
+| **Đã xong** | Giai đoạn 0 → 5 (tài liệu, nền móng, dữ liệu, UI, trang chủ, **cửa hàng + chi tiết SP**) |
 | **Đang dở** | Không có việc nào dở giữa chừng |
-| **Việc kế tiếp** | Giai đoạn 4 — dựng 12 section trang chủ |
-| **Build** | ✅ `npm run build` chạy sạch (416 KB JS / 130 KB gzip) |
-| **Type-check** | ✅ Không lỗi |
+| **Việc kế tiếp** | Giai đoạn 6 — giỏ hàng + thanh toán |
+| **Build** | ✅ `npm run build` exit 0 |
+| **Lint** | ✅ `npx oxlint` sạch |
+| **Kiểm thử trình duyệt** | ✅ 11/11 tiêu chí nghiệm thu đạt, 0 lỗi console |
 
 ### Chạy lại dự án
 
@@ -28,45 +29,85 @@ Tài khoản demo để test đăng nhập (Giai đoạn 7): `demo@nongsansach.v
 
 ### Lưu ý khi mở lại
 
-Trang chủ hiện tại là **bản tạm** — chỉ hiển thị một lưới sản phẩm để kiểm tra `ProductCard`. Nội dung này nằm trong [`src/pages/HomePage.tsx`](../src/pages/HomePage.tsx) và **sẽ bị thay hoàn toàn** ở Giai đoạn 4. Đừng nhầm đây là trang chủ thật.
+Đã xong: trang chủ (12 section), cửa hàng (lọc/sắp xếp/phân trang), chi tiết sản phẩm (gallery, tab, đánh giá), tìm kiếm có gợi ý, xem nhanh. Còn **13 trang vẫn dùng `PagePlaceholder`** — component này sẽ bị xoá khi cả 10 giai đoạn hoàn tất.
 
-Tương tự, 15 trang khác đang dùng `PagePlaceholder` — component này sẽ bị xoá khi cả 10 giai đoạn hoàn tất.
+Bundle vượt ngưỡng cảnh báo 500 KB của Vite (chủ yếu do Swiper). **Không cần xử lý ngay** — tách code theo route bằng `React.lazy` đã nằm trong Giai đoạn 9.
 
----
-
-## Tiếp theo làm gì (Giai đoạn 4)
-
-Dựng 12 section trang chủ, mỗi section là một component riêng trong `src/components/home/`. Thứ tự bám theo site mẫu:
-
-1. `HeroSlider` — Swiper, 2 slide (dữ liệu đã có sẵn ở `getHeroSlides()`)
-2. `FeatureStrip` — 4 ưu điểm
-3. `CategoryGrid` — 6–7 danh mục kèm số lượng SP (`useRootCategories()` đã trả sẵn `productCount`)
-4. `SaleSection` — carousel SP giảm giá (`useProducts({ onSaleOnly: true })`)
-5. `PromoBanners` — 3 banner
-6. `ProductTabs` — tab theo danh mục
-7. `BestSellers` — dùng `<ProductGrid showSoldProgress />`, đã có sẵn thanh tiến trình
-8. `CountdownPromo` — đồng hồ đếm ngược
-9. `Testimonials` — `useTestimonials()`
-10. `BrandLogos` — `useBrands()`
-11. `BlogPreview` — `useLatestPosts(4)`
-12. `Newsletter`
-
-**Toàn bộ hook và dữ liệu cần thiết đã dựng xong ở Giai đoạn 2–3** — Giai đoạn 4 chỉ còn việc ghép giao diện, không phải đụng lại lớp API.
-
-Nhớ tick `- [x]` trong [`PLAN.md`](PLAN.md) sau mỗi section.
+Khi kiểm thử bằng trình duyệt headless sẽ thấy vài request `fonts.gstatic.com` trả 404. Đây là do patchright sửa User-Agent nên URL font subset không khớp, **không phải lỗi dự án** — font vẫn hiển thị bình thường.
 
 ---
 
-## Hai quyết định còn treo
+## Tiếp theo làm gì (Giai đoạn 6)
 
-Nên chốt **trước** khi dựng trang chủ, vì sửa sau sẽ tốn hơn nhiều:
+Giỏ hàng và thanh toán. Phần **logic giỏ hàng đã xong từ Giai đoạn 3**, giai đoạn này chủ yếu là giao diện:
 
-1. **Màu thương hiệu** — đang dùng xanh `#7FAD39` + cam `#F5871F` lấy theo site mẫu. Đổi bây giờ chỉ sửa vài dòng token trong [`src/index.css`](../src/index.css); đổi sau khi đã dựng 12 section thì phải rà lại toàn bộ.
-2. **Ảnh sản phẩm** — đang dùng `picsum.photos` nên ảnh là **ảnh ngẫu nhiên, không phải nông sản**. Nếu có bộ ảnh thật thì thay sớm, tránh phải sửa 42 bản ghi trong `products.json` về sau.
+| Việc | Dùng sẵn cái gì |
+|---|---|
+| Mini-cart drawer | `useUIStore` đã có `isMiniCartOpen` / `openMiniCart` / `closeMiniCart`; `ProductCard` và trang chi tiết **đã gọi `openMiniCart()`** sau khi thêm giỏ — hiện chưa có gì mở ra, cần dựng drawer |
+| Trang giỏ hàng | `useCartStore` + selector `selectSubtotal`, `selectItemCount`; `<QuantityPicker />` |
+| Mã giảm giá | `validateCoupon(code, subtotal)`, `getActiveCoupons()` trong `coupons.api.ts` |
+| Phí vận chuyển | `calcShippingFee(subtotal)` trong `orders.api.ts` + hằng `FREE_SHIPPING_THRESHOLD` |
+| Đặt hàng | `createOrder(payload)` — đã tự tính giảm giá, phí ship, sinh mã đơn `NSS-yyyymmdd-nnnn` |
+| Form checkout | React Hook Form + Zod (xem `ReviewForm.tsx` làm mẫu), `<Input>`, `<Textarea>`, `<Select>` |
+
+**Ba điểm cần chú ý:**
+
+1. `openMiniCart()` hiện đang được gọi ở 4 chỗ nhưng **chưa có UI nào lắng nghe** — dựng mini-cart drawer là việc đầu tiên nên làm.
+2. `CartItem` lưu **snapshot** giá và tồn kho tại thời điểm thêm. Trang giỏ hàng cần chặn tăng số lượng vượt `item.stock`.
+3. Sau khi đặt hàng thành công phải `clear()` giỏ và điều hướng sang trang thành công kèm mã đơn.
+
+Nhớ tick `- [x]` trong [`PLAN.md`](PLAN.md) ngay khi xong từng mục.
 
 ---
 
 ## Dòng thời gian
+
+### Phiên 3 — 17/08/2026
+
+#### Giai đoạn 5: cửa hàng, chi tiết sản phẩm, tìm kiếm
+
+Phần khó nhất không phải giao diện mà là **đồng bộ trạng thái bộ lọc với URL**. Toàn bộ gom vào một hook [`useProductFilters`](../src/hooks/useProductFilters.ts) — URL là nguồn chân lý duy nhất, component không giữ state bộ lọc riêng.
+
+Ba cái bẫy đã xử lý ngay từ đầu thay vì để phát sinh bug sau:
+
+1. **Đổi bộ lọc phải reset `page` về 1.** Không làm thì đang ở trang 5, lọc lại còn 2 trang → lưới trống trơn mà người dùng không hiểu vì sao.
+2. **Thanh trượt giá ghi URL bằng `replace: true`.** Nếu dùng `push`, kéo thanh 20 bước sẽ tạo 20 mục lịch sử và người dùng phải bấm Back 20 lần mới thoát được trang. Ngoài ra `PriceRangeSlider` chỉ gọi `onCommit` khi **thả chuột / nhả phím**, không gọi trong lúc kéo.
+3. **Tham số URL rác bị bỏ qua.** `?page=abc&minRating=99&sort=hacked` phải rơi về mặc định chứ không cho lưới trắng. Đã kiểm thử tự động tình huống này.
+
+Còn `view=grid|list` cũng để trong URL (thay vì Zustand) để link chia sẻ tái hiện đúng cái người gửi đang nhìn.
+
+#### Bổ sung dữ liệu đánh giá
+
+Type `Review` đã khai báo từ Giai đoạn 2 nhưng chưa có mock lẫn API. Đã thêm `mocks/reviews.json` (48 đánh giá), `api/reviews.api.ts` và `hooks/useReviews.ts`.
+
+**Đơn giản hoá có chủ ý:** gửi đánh giá mới **không** cập nhật `rating`/`reviewCount` trong `products.json` — tổng hợp điểm là việc của backend. Đã ghi rõ trong comment của `getReviewSummary()` để sau này không nhầm là bug.
+
+#### Kiểm thử
+
+Viết bộ kiểm thử tự động 11 tiêu chí (`qa-shop.mjs` trong scratchpad của phiên), chạy trên trình duyệt thật. Tất cả đạt, 0 lỗi console.
+
+---
+
+### Phiên 2 — 17/08/2026
+
+#### Chốt hai quyết định treo từ phiên trước
+
+**Màu thương hiệu:** đổi từ xanh `#7FAD39` sang xanh đậm `#4A7C2A`. Ban đầu chỉ là yêu cầu thẩm mỹ, nhưng khi tính độ tương phản để chọn tông mới thì phát hiện vấn đề nghiêm trọng hơn (xem sự cố #4).
+
+**Ảnh sản phẩm:** đổi từ picsum sang ảnh Unsplash thật. Quá trình chọn nguồn tốn công hơn dự kiến (xem sự cố #5).
+
+#### Dựng 12 section trang chủ
+
+Toàn bộ nằm trong `src/components/home/`, `HomePage.tsx` chỉ ghép lại. Nền trắng và nền `surface` xen kẽ để phân tách khối.
+
+Phát sinh thêm ngoài kế hoạch:
+- `components/ui/Carousel.tsx` — bọc Swiper một lần thay vì lặp cấu hình ở 3 section (SaleSection, Testimonials, BrandLogos)
+- `PROMO_END_DATE` trong `constants.ts` — mốc kết thúc khuyến mãi cho `CountdownPromo`
+- `subscribeNewsletter()` trong `marketing.api.ts` — để form Newsletter đi qua lớp API đúng quy tắc kiến trúc, không gọi thẳng trong component
+
+`HomePage.tsx` dùng thẻ `<title>` và `<meta>` trực tiếp trong JSX — React 19 tự đưa lên `<head>`, không cần thư viện SEO.
+
+---
 
 ### Phiên 1 — 16/08/2026
 
@@ -171,6 +212,71 @@ and will stop functioning in TypeScript 7.0
 
 **Bài học:** với ảnh từ CDN ngoài, phải chờ tải xong rồi mới kết luận, đừng vội báo lỗi.
 
+### 4. Bảng màu lấy từ site mẫu trượt chuẩn tiếp cận WCAG
+
+**Phát hiện:** khi tính độ tương phản để chọn tông xanh mới, hoá ra **cả 4 màu chữ đang dùng đều không đạt WCAG AA** (chuẩn tối thiểu 4.5:1 cho chữ thường):
+
+| Token | Cũ | Tỉ lệ | Mới | Tỉ lệ |
+|---|---|---|---|---|
+| `primary` (nút, chữ trắng) | `#7FAD39` | 2.65:1 ❌ | `#4A7C2A` | 4.99:1 ✅ |
+| `accent` (badge sale) | `#F5871F` | 2.51:1 ❌ | `#C2410C` | 5.18:1 ✅ |
+| `ink-muted` | `#7A7A7A` | 4.29:1 ❌ | `#5C5C5C` | 6.69:1 ✅ |
+| `ink-light` (placeholder) | `#A8A8A8` | 2.38:1 ❌ | `#767676` | 4.54:1 ✅ |
+
+**Nguyên nhân:** màu được lấy đúng theo site mẫu — và **site mẫu cũng trượt chuẩn**. Sao chép màu từ một thiết kế có sẵn không đảm bảo thiết kế đó đúng.
+
+**Cách xử lý:** đổi bảng màu nhưng **giữ nguyên tên token**, nên không component nào phải sửa. Đã thêm ghi chú ở đầu khối `@theme` trong `index.css` nhắc tính lại tỉ lệ nếu đổi màu.
+
+**Bài học:** tính độ tương phản trước khi chốt màu, đừng tin site tham khảo.
+
+### 5. loremflickr trả ảnh sai chủ đề hoàn toàn
+
+**Triệu chứng:** phương án ban đầu là dùng `loremflickr.com/700/700/<từ-khoá>?lock=<id>` cho 42 ảnh sản phẩm — ảnh khớp từ khoá, ổn định qua các lần tải, không cần API key. Nghe rất hợp lý.
+
+**Thực tế khi xem tận mắt:** từ khoá `carrot,vegetable` trả về ảnh macro trông như ngọn lửa, `salmon,fish` trả về ảnh chụp bàn ăn sushi trong nhà hàng, `orange,citrus` trả về ảnh AI vẽ con rắn hình vỏ chanh. Lại còn có watermark Flickr. Hoàn toàn không dùng được cho catalog.
+
+**Cách xử lý:** chuyển sang Unsplash với photo ID cố định. Lấy ID bằng cách đọc trang tìm kiếm của Unsplash theo từ khoá, rồi:
+1. Kiểm tra **toàn bộ 106 URL** trả HTTP 200 — phát hiện 1 ID chết (404), đã thay
+2. Xem tận mắt ảnh đại diện của **từng nhóm** trước khi gán
+
+Bước 2 lộ ra hai lỗi gán mà việc kiểm HTTP không thể bắt: nhóm ảnh lấy từ tìm kiếm `eggs-butter-cheese` bị **trộn lẫn** (ảnh đầu tiên là bơ chứ không phải trứng, nên "Trứng gà thả vườn" hiện ảnh bơ), và nhóm `raw-chicken-pork-meat` có 5 ảnh gà nhưng chỉ 1 ảnh heo (nên "Sườn non heo" hiện ảnh gà). Đã lấy thêm ảnh chuyên biệt cho trứng / phô mai / sữa chua / thịt heo rồi gán lại.
+
+**Bài học:** HTTP 200 chỉ chứng minh ảnh **tồn tại**, không chứng minh ảnh **đúng nội dung**. Với ảnh minh hoạ, phải xem tận mắt ít nhất một mẫu cho mỗi nhóm.
+
+### 6. `--script` của skill browser-automation lỗi trên Windows
+
+**Triệu chứng:** `ERR_UNSUPPORTED_ESM_URL_SCHEME ... Received protocol 'c:'`
+
+**Nguyên nhân:** skill ghép đường dẫn thành `${process.cwd()}/${scriptPath}` rồi `import()`. Trên Windows chuỗi này thành `C:\...\file.mjs`, không phải URL `file://` hợp lệ.
+
+**Cách xử lý:** hai hướng, tuỳ nhu cầu:
+- Kiểm tra đơn giản → dùng `--eval` với biểu thức async, chạy hoàn toàn trong trình duyệt
+- Cần đổi kích thước màn hình (skill không có tuỳ chọn viewport) → viết script Playwright riêng, import `patchright` bằng URL `file:///...` và **phải truyền `channel: 'chromium'`** (nếu không sẽ báo thiếu trình duyệt, vì bản headless shell mặc định chưa được cài)
+
+Script kiểm thử đa kích thước dùng lại được nằm ở thư mục scratchpad của phiên (`responsive.mjs`).
+
+### 7. Ảnh sai chủ đề — lần hai, và cách soát hiệu quả hơn
+
+**Triệu chứng:** ở Phiên 3, mở trang cửa hàng thì thấy "Cà chua bi hữu cơ" hiện ảnh **củ hành**. Trước đó Phiên 2 đã sửa hai đợt tương tự (nhóm trứng, nhóm thịt).
+
+**Nguyên nhân gốc:** cách thu thập ảnh theo **nhóm từ khoá ghép** (`tomato-onion`, `eggs-butter-cheese`, `raw-chicken-pork-meat`) cho ra danh sách trộn lẫn nhiều chủ đề. Chỉ xem một ảnh mẫu mỗi nhóm thì không đủ — ảnh mẫu đúng không bảo đảm 5 ảnh còn lại cũng đúng.
+
+**Cách xử lý hiệu quả hơn nhiều:** thay vì soi từng ảnh chụp trang rồi phát hiện lỗi nhỏ giọt, dựng một **bảng đối chiếu**: sinh file HTML lưới 42 ô, mỗi ô là ảnh chính + tên sản phẩm, rồi chụp một tấm duy nhất. Soát một lượt phát hiện luôn **12 sản phẩm sai** (khoai tây ra bí ngô, chuối ra bơ, cá hồi ra tôm, dầu ô liu ra gạo…). Script nằm ở `contact-sheet.mjs` trong scratchpad.
+
+Sau khi sửa, dựng lại bảng đối chiếu để nghiệm thu — lần hai chỉ còn 1 lỗi (thanh long ra đu đủ), sửa nốt.
+
+**Bài học:** với dữ liệu lặp lại nhiều bản ghi, hãy dựng một khung nhìn tổng hợp để soát một lượt, đừng kiểm tra bằng cách mở từng trang. Và khi lấy ảnh theo từ khoá, **dùng từ khoá đơn** (`potatoes`, `cherry-tomatoes`) thay vì ghép nhiều chủ đề.
+
+### 8. Drawer đóng vẫn Tab vào được
+
+**Triệu chứng:** kịch bản kiểm thử báo `strict mode violation` — nút "Rau củ hữu cơ" khớp 2 phần tử. Hoá ra `FilterSidebar` tồn tại hai bản trong DOM: sidebar desktop và bản trong drawer mobile.
+
+**Vấn đề thật đằng sau:** `Drawer` và `MobileMenu` khi đóng chỉ bị đẩy ra ngoài màn hình bằng `translate-x-full`, **không ẩn hẳn**. Nghĩa là người dùng bàn phím vẫn Tab được vào toàn bộ nút bên trong một panel đang đóng, và trình đọc màn hình vẫn đọc chúng.
+
+**Cách xử lý:** thêm thuộc tính `inert={!isOpen}` cho cả hai component (React 19 hỗ trợ sẵn). Một thuộc tính xử lý cả focus lẫn khả năng tiếp cận của trình đọc màn hình.
+
+**Bài học:** panel ẩn bằng `transform` vẫn nằm trong luồng focus. Kiểm thử tự động vô tình phát hiện ra — đây là lợi ích phụ đáng giá của việc viết test bằng vai trò (role) thay vì CSS selector.
+
 ---
 
 ## Những điều chỉnh so với kế hoạch gốc
@@ -184,6 +290,19 @@ Ghi lại để hiểu vì sao code hiện tại khác đôi chỗ so với `PLA
 **Lý do:** `ProductCard` cần gọi trực tiếp `addItem()` và `toggleWishlist()`. Nếu để đúng lịch (Giai đoạn 6–7) thì ở Giai đoạn 3 phải viết `ProductCard` với prop callback tạm, rồi Giai đoạn 6 lại sửa chính component đó cùng mọi nơi dùng nó. Làm sớm rẻ hơn.
 
 Giai đoạn 6–7 giờ chỉ còn phần **giao diện** (trang giỏ hàng, mini-cart drawer, checkout, trang tài khoản).
+
+### Hai nguồn ảnh khác nhau, có lý do
+
+Ảnh mock không lấy từ một nguồn duy nhất:
+
+| Loại | Nguồn | Vì sao |
+|---|---|---|
+| 42 sản phẩm, 11 danh mục, 8 bài viết, hero, banner | Unsplash ID cố định | Số lượng đủ nhỏ để kiểm tra được từng nhóm bằng mắt; tải nhanh (~0.2s) |
+| 4 avatar testimonial | picsum | Ảnh người ngẫu nhiên là chấp nhận được, không cần đúng chủ đề |
+
+Đã cân nhắc và **loại bỏ** loremflickr dù nó tiện hơn — lý do ở sự cố #5.
+
+Khi có ảnh thật của cửa hàng: đặt vào `public/img/`, sửa đường dẫn trong `src/mocks/products.json` và `categories.json`. Không component nào phải sửa.
 
 ### Bỏ `react-helmet-async`
 
@@ -200,6 +319,10 @@ Những thứ phát sinh trong lúc làm, thấy cần nên thêm:
 - `components/product/ProductGrid.tsx` — bọc sẵn cả 3 nhánh loading / error / empty, để không phải lặp lại logic này ở mọi trang
 - `hooks/queryKeys.ts` — gom query key một chỗ, tránh lệch chuỗi khi invalidate cache
 - `mocks/coupons.json` + `api/coupons.api.ts` — chuẩn bị sẵn cho tính năng mã giảm giá ở Giai đoạn 6
+- `components/ui/Carousel.tsx` (Phiên 2) — bọc Swiper một lần, tránh lặp cấu hình ở 3 section trang chủ
+- `mocks/reviews.json` + `api/reviews.api.ts` + `hooks/useReviews.ts` (Phiên 3) — type `Review` có sẵn từ Giai đoạn 2 nhưng thiếu hẳn dữ liệu và hàm API
+- `hooks/useProductFilters.ts` (Phiên 3) — gom toàn bộ logic đồng bộ URL ↔ bộ lọc vào một chỗ
+- `components/layout/SearchBox.tsx` (Phiên 3) — tách khỏi `Header.tsx` khi file này sắp chạm ngưỡng ~200 dòng trong `CLAUDE.md`; nhân tiện thêm dropdown gợi ý
 
 ---
 
@@ -216,6 +339,13 @@ Nơi cần tìm khi quay lại:
 | Sửa thông tin cửa hàng, hotline | [`src/lib/constants.ts`](../src/lib/constants.ts) — `STORE_INFO` |
 | Sửa thẻ sản phẩm | [`src/components/product/ProductCard.tsx`](../src/components/product/ProductCard.tsx) |
 | Sửa logic giỏ hàng | [`src/store/cart.store.ts`](../src/store/cart.store.ts) |
+| Sửa một section trang chủ | [`src/components/home/`](../src/components/home/) — mỗi section một file |
+| Đổi thứ tự section trang chủ | [`src/pages/HomePage.tsx`](../src/pages/HomePage.tsx) |
+| Đổi mốc kết thúc khuyến mãi | `PROMO_END_DATE` trong [`src/lib/constants.ts`](../src/lib/constants.ts) |
+| Sửa logic lọc / URL trang cửa hàng | [`src/hooks/useProductFilters.ts`](../src/hooks/useProductFilters.ts) |
+| Thêm/sửa bộ lọc ở sidebar | [`src/components/filter/`](../src/components/filter/) |
+| Sửa dropdown gợi ý tìm kiếm | [`src/components/layout/SearchBox.tsx`](../src/components/layout/SearchBox.tsx) |
+| Thêm/sửa đánh giá mock | [`src/mocks/reviews.json`](../src/mocks/reviews.json) |
 | Xem quy tắc code | [`../CLAUDE.md`](../CLAUDE.md) |
 | Xem tiến độ | [`PLAN.md`](PLAN.md) |
 

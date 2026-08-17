@@ -45,6 +45,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Menu điều hướng"
+        // Cùng lý do như Drawer: menu đóng vẫn nằm trong DOM nên phải chặn focus.
+        inert={!isOpen}
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-white transition-transform duration-300 lg:hidden',
           isOpen ? 'translate-x-0' : '-translate-x-full',

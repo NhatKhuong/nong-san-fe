@@ -5,26 +5,28 @@
    Quy tắc: KHÔNG hardcode mã màu trong className, luôn dùng token.
    Ví dụ: bg-primary, text-ink-muted, bg-surface
 ------------------------------------------------------------------- */
+/* Mọi màu chữ dưới đây đã được kiểm tra đạt WCAG AA (>= 4.5:1) trên nền tương ứng.
+   Nếu đổi màu, tính lại tỉ lệ tương phản trước khi commit. */
 @theme {
-  /* Xanh lá organic — màu thương hiệu chính */
-  --color-primary: #7fad39;
-  --color-primary-dark: #6a9130;
-  --color-primary-light: #a3cc63;
-  --color-primary-soft: #eef5e2;
+  /* Xanh lá organic đậm — màu thương hiệu chính. Chữ trắng đạt 4.99:1 */
+  --color-primary: #4a7c2a;
+  --color-primary-dark: #3a6220;
+  --color-primary-light: #7ba85c;
+  --color-primary-soft: #edf4e4;
 
-  /* Cam — badge giảm giá, giá khuyến mãi, CTA phụ */
-  --color-accent: #f5871f;
-  --color-accent-dark: #d9740f;
-  --color-accent-soft: #fdf0e2;
+  /* Cam đất — badge giảm giá, giá khuyến mãi. Chữ trắng đạt 5.18:1 */
+  --color-accent: #c2410c;
+  --color-accent-dark: #9a340a;
+  --color-accent-soft: #fceee5;
 
   /* Nền */
   --color-surface: #faf8f2;
-  --color-surface-alt: #f2f4ec;
+  --color-surface-alt: #f1f4ec;
 
-  /* Chữ */
+  /* Chữ — tỉ lệ trên nền trắng: 13.7 / 6.69 / 4.54 */
   --color-ink: #2b2b2b;
-  --color-ink-muted: #7a7a7a;
-  --color-ink-light: #a8a8a8;
+  --color-ink-muted: #5c5c5c;
+  --color-ink-light: #767676;
 
   /* Viền */
   --color-line: #e6e6e6;
@@ -67,6 +69,7 @@
   }
   input[type='number'] {
     -moz-appearance: textfield;
+    appearance: textfield;
   }
 }
 

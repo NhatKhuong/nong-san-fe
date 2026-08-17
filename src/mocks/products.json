@@ -5,7 +5,10 @@
     "name": "Cải ngọt hữu cơ",
     "price": 32000,
     "salePrice": 26000,
-    "images": ["https://picsum.photos/seed/nss-p1a/700/700", "https://picsum.photos/seed/nss-p1b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1533321942807-08e4008b2025?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 101,
     "brandId": 1,
     "rating": 4.6,
@@ -26,7 +29,10 @@
     "name": "Cải tím hữu cơ",
     "price": 55000,
     "salePrice": 47000,
-    "images": ["https://picsum.photos/seed/nss-p2a/700/700", "https://picsum.photos/seed/nss-p2b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1651172915092-4389b362b25d?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1584701830110-c2ecf0a5f2a1?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 101,
     "brandId": 1,
     "rating": 4.4,
@@ -47,7 +53,10 @@
     "name": "Xà lách Romaine hữu cơ",
     "price": 45000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p3a/700/700", "https://picsum.photos/seed/nss-p3b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1617884638394-d9eef1b0f40e?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1556801712-76c8eb07bbc9?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 101,
     "brandId": 1,
     "rating": 4.7,
@@ -68,7 +77,10 @@
     "name": "Rau muống hữu cơ",
     "price": 22000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p4a/700/700", "https://picsum.photos/seed/nss-p4b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1549736624-81a2ca809ad7?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 101,
     "brandId": 2,
     "rating": 4.3,
@@ -89,7 +101,10 @@
     "name": "Cà rốt hữu cơ",
     "price": 48000,
     "salePrice": 39000,
-    "images": ["https://picsum.photos/seed/nss-p5a/700/700", "https://picsum.photos/seed/nss-p5b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1590868309235-ea34bed7bd7f?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 102,
     "brandId": 1,
     "rating": 4.8,
@@ -110,7 +125,10 @@
     "name": "Khoai tây hữu cơ",
     "price": 42000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p6a/700/700", "https://picsum.photos/seed/nss-p6b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1603048719539-9ecb4aa395e3?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 102,
     "brandId": 1,
     "rating": 4.5,
@@ -131,7 +149,10 @@
     "name": "Hành tím hữu cơ",
     "price": 68000,
     "salePrice": 55000,
-    "images": ["https://picsum.photos/seed/nss-p7a/700/700", "https://picsum.photos/seed/nss-p7b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1588613000160-2b766dd44779?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1601238499791-3d1d28636122?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 102,
     "brandId": 2,
     "rating": 4.6,
@@ -152,7 +173,10 @@
     "name": "Bí đỏ hữu cơ",
     "price": 35000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p8a/700/700", "https://picsum.photos/seed/nss-p8b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1459260216545-994dda21d51a?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 102,
     "brandId": 2,
     "rating": 4.4,
@@ -173,7 +197,10 @@
     "name": "Cà chua bi hữu cơ",
     "price": 58000,
     "salePrice": 49000,
-    "images": ["https://picsum.photos/seed/nss-p9a/700/700", "https://picsum.photos/seed/nss-p9b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1524593166156-312f362cada0?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 102,
     "brandId": 1,
     "rating": 4.9,
@@ -194,7 +221,10 @@
     "name": "Bắp cải trắng hữu cơ",
     "price": 28000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p10a/700/700", "https://picsum.photos/seed/nss-p10b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1652860213441-6622f9fec77f?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1591586007768-40725cc562a1?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 101,
     "brandId": 2,
     "rating": 4.2,
@@ -209,14 +239,16 @@
     "isBestSeller": false,
     "createdAt": "2026-03-28"
   },
-
   {
     "id": 11,
     "slug": "cam-sanh-huu-co",
     "name": "Cam sành hữu cơ",
     "price": 89000,
     "salePrice": 72000,
-    "images": ["https://picsum.photos/seed/nss-p11a/700/700", "https://picsum.photos/seed/nss-p11b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 201,
     "brandId": 3,
     "rating": 4.7,
@@ -237,7 +269,10 @@
     "name": "Chuối già hữu cơ",
     "price": 45000,
     "salePrice": 37000,
-    "images": ["https://picsum.photos/seed/nss-p12a/700/700", "https://picsum.photos/seed/nss-p12b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1587132137056-bfbf0166836e?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1528825871115-3581a5387919?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 201,
     "brandId": 3,
     "rating": 4.5,
@@ -258,7 +293,10 @@
     "name": "Bơ 034 hữu cơ",
     "price": 120000,
     "salePrice": 85000,
-    "images": ["https://picsum.photos/seed/nss-p13a/700/700", "https://picsum.photos/seed/nss-p13b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1640258941842-87fcb2d0999c?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1622704430673-59c152a9991c?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 201,
     "brandId": 3,
     "rating": 4.8,
@@ -279,7 +317,10 @@
     "name": "Dưa hấu không hạt hữu cơ",
     "price": 65000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p14a/700/700", "https://picsum.photos/seed/nss-p14b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1563114773-84221bd62daa?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 201,
     "brandId": 3,
     "rating": 4.4,
@@ -300,7 +341,10 @@
     "name": "Xoài cát Hoà Lộc",
     "price": 145000,
     "salePrice": 119000,
-    "images": ["https://picsum.photos/seed/nss-p15a/700/700", "https://picsum.photos/seed/nss-p15b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1553279768-865429fa0078?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 201,
     "brandId": 3,
     "rating": 4.9,
@@ -321,7 +365,10 @@
     "name": "Thanh long ruột đỏ hữu cơ",
     "price": 72000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p16a/700/700", "https://picsum.photos/seed/nss-p16b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1635843110565-cb35d1c03d86?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1514517315590-0ea51442327c?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 201,
     "brandId": 3,
     "rating": 4.3,
@@ -342,7 +389,10 @@
     "name": "Hạt óc chó Mỹ",
     "price": 320000,
     "salePrice": 265000,
-    "images": ["https://picsum.photos/seed/nss-p17a/700/700", "https://picsum.photos/seed/nss-p17b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1524593000379-d4729b2c4f99?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1605024344839-e6e41aea6b23?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 202,
     "brandId": 4,
     "rating": 4.8,
@@ -363,7 +413,10 @@
     "name": "Hạnh nhân rang bơ",
     "price": 285000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p18a/700/700", "https://picsum.photos/seed/nss-p18b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1693812879904-b8161644ce5a?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1708874493509-7bdef1abf750?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 202,
     "brandId": 4,
     "rating": 4.7,
@@ -384,7 +437,10 @@
     "name": "Hạt chia Úc",
     "price": 175000,
     "salePrice": 149000,
-    "images": ["https://picsum.photos/seed/nss-p19a/700/700", "https://picsum.photos/seed/nss-p19b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1604768802835-899055f0e245?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1642497393633-a19e9231fb92?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 202,
     "brandId": 4,
     "rating": 4.6,
@@ -399,14 +455,16 @@
     "isBestSeller": false,
     "createdAt": "2026-05-08"
   },
-
   {
     "id": 20,
     "slug": "thit-bo-uc-huu-co",
     "name": "Thịt bò Úc hữu cơ",
     "price": 485000,
     "salePrice": 399000,
-    "images": ["https://picsum.photos/seed/nss-p20a/700/700", "https://picsum.photos/seed/nss-p20b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1723893905879-0e309c2a8e06?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1690983325551-b922137727be?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 3,
     "brandId": 5,
     "rating": 4.8,
@@ -427,7 +485,10 @@
     "name": "Gà ta thả vườn",
     "price": 185000,
     "salePrice": 159000,
-    "images": ["https://picsum.photos/seed/nss-p21a/700/700", "https://picsum.photos/seed/nss-p21b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1672787153655-0c19308dcc60?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 3,
     "brandId": 5,
     "rating": 4.7,
@@ -448,7 +509,10 @@
     "name": "Thịt heo hữu cơ ba chỉ",
     "price": 215000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p22a/700/700", "https://picsum.photos/seed/nss-p22b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1623047437095-27418540c288?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1611059263765-f57653f3bba3?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 3,
     "brandId": 5,
     "rating": 4.5,
@@ -469,7 +533,10 @@
     "name": "Sườn non heo hữu cơ",
     "price": 265000,
     "salePrice": 229000,
-    "images": ["https://picsum.photos/seed/nss-p23a/700/700", "https://picsum.photos/seed/nss-p23b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1560883389-3bd36d16d021?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1612156502174-bbbad9882af2?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 3,
     "brandId": 5,
     "rating": 4.6,
@@ -490,7 +557,10 @@
     "name": "Ức gà phi lê hữu cơ",
     "price": 145000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p24a/700/700", "https://picsum.photos/seed/nss-p24b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1682991136736-a2b44623eeba?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1633096013004-e2cb4023b560?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 3,
     "brandId": 5,
     "rating": 4.4,
@@ -511,7 +581,10 @@
     "name": "Bò Mỹ thái lát nhúng lẩu",
     "price": 395000,
     "salePrice": 329000,
-    "images": ["https://picsum.photos/seed/nss-p25a/700/700", "https://picsum.photos/seed/nss-p25b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1690983323238-0b91789e1b5a?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1690983330536-3b0089d07cf9?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 3,
     "brandId": 5,
     "rating": 4.7,
@@ -526,14 +599,16 @@
     "isBestSeller": false,
     "createdAt": "2026-06-30"
   },
-
   {
     "id": 26,
     "slug": "trung-ga-tha-vuon",
     "name": "Trứng gà thả vườn",
     "price": 62000,
     "salePrice": 52000,
-    "images": ["https://picsum.photos/seed/nss-p26a/700/700", "https://picsum.photos/seed/nss-p26b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1639194335563-d56b83f0060c?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 4,
     "brandId": 6,
     "rating": 4.8,
@@ -554,7 +629,10 @@
     "name": "Trứng vịt hữu cơ",
     "price": 58000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p27a/700/700", "https://picsum.photos/seed/nss-p27b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1588467850695-a898367ce465?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1589431974314-4c9ab65e6673?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 4,
     "brandId": 6,
     "rating": 4.4,
@@ -575,7 +653,10 @@
     "name": "Bơ lạt hữu cơ",
     "price": 165000,
     "salePrice": 139000,
-    "images": ["https://picsum.photos/seed/nss-p28a/700/700", "https://picsum.photos/seed/nss-p28b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1590912710024-6d51a6771abd?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1615844374583-c79a039a10e0?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 4,
     "brandId": 6,
     "rating": 4.7,
@@ -596,7 +677,10 @@
     "name": "Phô mai Cheddar khối",
     "price": 195000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p29a/700/700", "https://picsum.photos/seed/nss-p29b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1683314573422-649a3c6ad784?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1589881133595-a3c085cb731d?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 4,
     "brandId": 6,
     "rating": 4.5,
@@ -611,14 +695,16 @@
     "isBestSeller": false,
     "createdAt": "2026-05-18"
   },
-
   {
     "id": 30,
     "slug": "gao-lut-huu-co",
     "name": "Gạo lứt đỏ hữu cơ",
     "price": 98000,
     "salePrice": 82000,
-    "images": ["https://picsum.photos/seed/nss-p30a/700/700", "https://picsum.photos/seed/nss-p30b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1536153635972-1fc2e818f642?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1673158190671-cd4e3baffbec?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 5,
     "brandId": 7,
     "rating": 4.6,
@@ -639,7 +725,10 @@
     "name": "Tôm thẻ tươi sống",
     "price": 340000,
     "salePrice": 289000,
-    "images": ["https://picsum.photos/seed/nss-p31a/700/700", "https://picsum.photos/seed/nss-p31b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1578069744397-2f3942a02a7b?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1677643612263-49e89efd5345?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 5,
     "brandId": 7,
     "rating": 4.7,
@@ -660,7 +749,10 @@
     "name": "Cá hồi Na Uy phi lê",
     "price": 620000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p32a/700/700", "https://picsum.photos/seed/nss-p32b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1499125562588-29fb8a56b5d5?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1559058789-672da06263d8?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 5,
     "brandId": 7,
     "rating": 4.9,
@@ -681,7 +773,10 @@
     "name": "Mật ong rừng nguyên chất",
     "price": 285000,
     "salePrice": 245000,
-    "images": ["https://picsum.photos/seed/nss-p33a/700/700", "https://picsum.photos/seed/nss-p33b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1652282556241-0ce13285d00f?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1629240811918-d92da93a93ad?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 5,
     "brandId": 7,
     "rating": 4.8,
@@ -702,7 +797,10 @@
     "name": "Dầu ô liu Extra Virgin",
     "price": 375000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p34a/700/700", "https://picsum.photos/seed/nss-p34b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1610547939489-73202bc6afda?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 5,
     "brandId": 7,
     "rating": 4.6,
@@ -717,14 +815,16 @@
     "isBestSeller": false,
     "createdAt": "2026-05-05"
   },
-
   {
     "id": 35,
     "slug": "sua-tuoi-thanh-trung",
     "name": "Sữa tươi thanh trùng không đường",
     "price": 42000,
     "salePrice": 35000,
-    "images": ["https://picsum.photos/seed/nss-p35a/700/700", "https://picsum.photos/seed/nss-p35b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1639151082235-406d8eb262b9?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1585083969600-495ee7e3604b?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 6,
     "brandId": 8,
     "rating": 4.7,
@@ -745,7 +845,10 @@
     "name": "Sữa chua Hy Lạp không đường",
     "price": 68000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p36a/700/700", "https://picsum.photos/seed/nss-p36b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1612182062572-e29c5dfb5eb4?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1552320764-9fc870798a3f?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 6,
     "brandId": 8,
     "rating": 4.6,
@@ -766,7 +869,10 @@
     "name": "Kem tươi Whipping",
     "price": 115000,
     "salePrice": 95000,
-    "images": ["https://picsum.photos/seed/nss-p37a/700/700", "https://picsum.photos/seed/nss-p37b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1576186726115-4d51596775d1?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 6,
     "brandId": 8,
     "rating": 4.4,
@@ -787,7 +893,10 @@
     "name": "Sữa hạnh nhân không đường",
     "price": 78000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p38a/700/700", "https://picsum.photos/seed/nss-p38b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1523473827533-2a64d0d36748?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1550630997-aea8d3d982ed?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 6,
     "brandId": 8,
     "rating": 4.3,
@@ -802,14 +911,16 @@
     "isBestSeller": false,
     "createdAt": "2026-05-12"
   },
-
   {
     "id": 39,
     "slug": "nuoc-ep-cam-nguyen-chat",
     "name": "Nước ép cam nguyên chất",
     "price": 95000,
     "salePrice": 79000,
-    "images": ["https://picsum.photos/seed/nss-p39a/700/700", "https://picsum.photos/seed/nss-p39b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1640213505284-21352ee0d76b?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 7,
     "brandId": 9,
     "rating": 4.7,
@@ -830,7 +941,10 @@
     "name": "Nước ép cà rốt táo",
     "price": 89000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p40a/700/700", "https://picsum.photos/seed/nss-p40b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1650547001322-145ff2c0bed7?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1650547002496-e7ed9df4bf3c?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 7,
     "brandId": 9,
     "rating": 4.5,
@@ -851,7 +965,10 @@
     "name": "Nước ép cần tây detox",
     "price": 105000,
     "salePrice": 88000,
-    "images": ["https://picsum.photos/seed/nss-p41a/700/700", "https://picsum.photos/seed/nss-p41b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1695634237630-f99602661946?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1621506289894-c3a62d6be8f3?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 7,
     "brandId": 9,
     "rating": 4.2,
@@ -872,7 +989,10 @@
     "name": "Nước ép dưa hấu bạc hà",
     "price": 85000,
     "salePrice": null,
-    "images": ["https://picsum.photos/seed/nss-p42a/700/700", "https://picsum.photos/seed/nss-p42b/700/700"],
+    "images": [
+      "https://images.unsplash.com/photo-1640213505284-21352ee0d76b?w=700&h=700&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=700&h=700&fit=crop&q=80"
+    ],
     "categoryId": 7,
     "brandId": 9,
     "rating": 4.4,

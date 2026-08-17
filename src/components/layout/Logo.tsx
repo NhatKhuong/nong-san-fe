@@ -20,11 +20,14 @@ export default function Logo({ compact = false, className }: LogoProps) {
         <Leaf size={22} aria-hidden="true" />
       </span>
       <span className="leading-tight">
-        <span className="block font-heading text-lg font-bold text-primary-dark">
+        <span className="block font-heading text-base font-bold text-primary-dark sm:text-lg">
           {STORE_INFO.name}
         </span>
+        {/* Tagline chiếm ~150px và không co được — ẩn ở màn hình hẹp để header không tràn ngang */}
         {!compact && (
-          <span className="block text-[11px] text-ink-muted">{STORE_INFO.tagline}</span>
+          <span className="hidden text-[11px] text-ink-muted sm:block">
+            {STORE_INFO.tagline}
+          </span>
         )}
       </span>
     </Link>

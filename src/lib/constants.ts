@@ -64,3 +64,10 @@ export const FREE_SHIPPING_THRESHOLD = 500_000
 
 /** Phí vận chuyển mặc định khi chưa đạt ngưỡng miễn phí (VNĐ). */
 export const SHIPPING_FEE = 30_000
+
+/**
+ * Thời điểm kết thúc chương trình khuyến mãi trên trang chủ.
+ * Khi có backend, giá trị này sẽ đến từ API thay vì hằng số.
+ * `CountdownPromo` tự ẩn khi mốc này đã trôi qua.
+ */
+export const PROMO_END_DATE = '2026-12-31T23:59:59+07:00'

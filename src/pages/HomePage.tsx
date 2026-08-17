@@ -1,29 +1,41 @@
-import SectionHeading from '@/components/ui/SectionHeading'
-import ProductGrid from '@/components/product/ProductGrid'
-import { useProducts } from '@/hooks/useProducts'
-import { ROUTES } from '@/lib/constants'
+import HeroSlider from '@/components/home/HeroSlider'
+import FeatureStrip from '@/components/home/FeatureStrip'
+import CategoryGrid from '@/components/home/CategoryGrid'
+import SaleSection from '@/components/home/SaleSection'
+import PromoBanners from '@/components/home/PromoBanners'
+import ProductTabs from '@/components/home/ProductTabs'
+import BestSellers from '@/components/home/BestSellers'
+import CountdownPromo from '@/components/home/CountdownPromo'
+import Testimonials from '@/components/home/Testimonials'
+import BrandLogos from '@/components/home/BrandLogos'
+import BlogPreview from '@/components/home/BlogPreview'
+import Newsletter from '@/components/home/Newsletter'
 
-// TẠM THỜI: dùng để kiểm tra ProductCard ở Giai đoạn 3.
-// Sẽ được thay bằng 12 section đầy đủ ở Giai đoạn 4.
+/**
+ * Trang chủ — 12 section theo bố cục site mẫu.
+ * Nền trắng và nền `surface` xen kẽ để phân tách khối thị giác.
+ */
 export default function HomePage() {
-  const { data, isLoading, error, refetch } = useProducts({ limit: 10, sort: 'newest' })
-
   return (
-    <div className="container-app py-10">
-      <SectionHeading
-        title="Sản phẩm mới nhất"
-        description="Kiểm tra hiển thị ProductCard: có giảm giá, hết hàng, và thanh tiến trình đã bán."
-        viewAllPath={ROUTES.SHOP}
+    <>
+      <title>Nông Sản Sạch — Thực phẩm hữu cơ tươi mỗi ngày</title>
+      <meta
+        name="description"
+        content="Rau củ, trái cây và thịt cá hữu cơ đạt chuẩn, thu hoạch trong ngày và giao tận nhà. Miễn phí vận chuyển cho đơn từ 500.000 ₫."
       />
-      <ProductGrid
-        products={data?.items}
-        isLoading={isLoading}
-        error={error}
-        onRetry={() => refetch()}
-        columns={5}
-        skeletonCount={10}
-        showSoldProgress
-      />
-    </div>
+
+      <HeroSlider />
+      <FeatureStrip />
+      <CategoryGrid />
+      <SaleSection />
+      <PromoBanners />
+      <ProductTabs />
+      <BestSellers />
+      <CountdownPromo />
+      <Testimonials />
+      <BrandLogos />
+      <BlogPreview />
+      <Newsletter />
+    </>
   )
 }

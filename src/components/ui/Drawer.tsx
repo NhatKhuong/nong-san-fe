@@ -53,6 +53,9 @@ export default function Drawer({
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        // Drawer đóng chỉ bị dịch ra ngoài màn hình chứ không ẩn hẳn, nên nếu không
+        // đánh dấu `inert` thì người dùng vẫn Tab được vào các nút bên trong.
+        inert={!isOpen}
         className={cn(
           'fixed inset-y-0 z-50 flex w-96 max-w-[90vw] flex-col bg-white transition-transform duration-300',
           side === 'right' ? 'right-0' : 'left-0',

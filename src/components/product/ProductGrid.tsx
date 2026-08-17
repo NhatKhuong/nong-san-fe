@@ -14,6 +14,7 @@ interface ProductGridProps {
   /** Số skeleton hiển thị khi đang tải. */
   skeletonCount?: number
   showSoldProgress?: boolean
+  onQuickView?: (product: Product) => void
   emptyTitle?: string
   emptyDescription?: string
   emptyAction?: React.ReactNode
@@ -35,6 +36,7 @@ export default function ProductGrid({
   columns = 4,
   skeletonCount = 8,
   showSoldProgress = false,
+  onQuickView,
   emptyTitle = 'Không tìm thấy sản phẩm nào',
   emptyDescription = 'Thử bỏ bớt bộ lọc hoặc tìm với từ khoá khác.',
   emptyAction,
@@ -65,6 +67,7 @@ export default function ProductGrid({
           key={product.id}
           product={product}
           showSoldProgress={showSoldProgress}
+          onQuickView={onQuickView}
         />
       ))}
     </div>

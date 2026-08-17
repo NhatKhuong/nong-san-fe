@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Heart, Menu, Search, ShoppingCart, User } from 'lucide-react'
+import { Link, NavLink } from 'react-router-dom'
+import { Heart, Menu, ShoppingCart, User } from 'lucide-react'
 import Logo from './Logo'
 import MobileMenu from './MobileMenu'
+import SearchBox from './SearchBox'
 import TopBar from './TopBar'
 import { MAIN_NAV, ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -11,24 +12,15 @@ import { selectWishlistCount, useWishlistStore } from '@/store/wishlist.store'
 
 export default function Header() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [keyword, setKeyword] = useState('')
-  const navigate = useNavigate()
 
   const cartCount = useCartStore(selectItemCount)
   const wishlistCount = useWishlistStore(selectWishlistCount)
-
-  function handleSearch(event: React.FormEvent) {
-    event.preventDefault()
-    const trimmed = keyword.trim()
-    if (!trimmed) return
-    navigate(`${ROUTES.SHOP}?q=${encodeURIComponent(trimmed)}`)
-  }
 
   return (
     <header className="sticky top-0 z-40 bg-white shadow-sm">
       <TopBar />
 
-      <div className="container-app flex h-18 items-center gap-4">
+      <div className="container-app flex h-18 items-center gap-2 sm:gap-4">
         <button
           type="button"
           onClick={() => setMobileMenuOpen(true)}
@@ -40,29 +32,7 @@ export default function Header() {
 
         <Logo />
 
-        <form
-          onSubmit={handleSearch}
-          role="search"
-          className="ml-auto hidden max-w-md flex-1 md:block"
-        >
-          <div className="flex items-center rounded-full border border-line bg-surface pr-1 focus-within:border-primary">
-            <input
-              type="search"
-              value={keyword}
-              onChange={(event) => setKeyword(event.target.value)}
-              placeholder="Bạn muốn tìm nông sản gì?"
-              aria-label="Tìm kiếm sản phẩm"
-              className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-sm outline-none placeholder:text-ink-light"
-            />
-            <button
-              type="submit"
-              className="flex size-9 items-center justify-center rounded-full bg-primary text-white transition hover:bg-primary-dark"
-              aria-label="Tìm kiếm"
-            >
-              <Search size={17} />
-            </button>
-          </div>
-        </form>
+        <SearchBox className="ml-auto hidden max-w-md flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1 md:ml-4">
           <Link

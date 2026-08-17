@@ -28,6 +28,11 @@ export const queryKeys = {
     testimonials: ['marketing', 'testimonials'] as const,
     brands: ['marketing', 'brands'] as const,
   },
+  reviews: {
+    all: ['reviews'] as const,
+    byProduct: (productId: number) => ['reviews', 'product', productId] as const,
+    summary: (productId: number) => ['reviews', 'summary', productId] as const,
+  },
   orders: {
     all: ['orders'] as const,
     detail: (code: string) => ['orders', 'detail', code] as const,
