@@ -1,0 +1,1843 @@
+[
+  {
+    "id": 1787411100000,
+    "code": "NSS-20260822-0035",
+    "userId": 6,
+    "items": [
+      {
+        "productId": 24,
+        "slug": "uc-ga-phi-le",
+        "name": "Ức gà phi lê hữu cơ",
+        "image": "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+        "unit": "kg",
+        "price": 145000,
+        "originalPrice": 145000,
+        "quantity": 1,
+        "stock": 64
+      },
+      {
+        "productId": 22,
+        "slug": "thit-heo-huu-co",
+        "name": "Thịt heo hữu cơ ba chỉ",
+        "image": "/images/products/thit-huu-co/thit-heo-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 215000,
+        "originalPrice": 215000,
+        "quantity": 2,
+        "stock": 36
+      },
+      {
+        "productId": 28,
+        "slug": "bo-lat-huu-co",
+        "name": "Bơ lạt hữu cơ",
+        "image": "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+        "unit": "hộp 200g",
+        "price": 139000,
+        "originalPrice": 165000,
+        "quantity": 3,
+        "stock": 48
+      }
+    ],
+    "shipping": {
+      "fullName": "Võ Quốc Bảo",
+      "phone": "0778901234",
+      "email": "bao.vo@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương"
+    },
+    "paymentMethod": "cod",
+    "status": "pending",
+    "subtotal": 992000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 992000,
+    "couponCode": null,
+    "createdAt": "2026-08-22T15:05:00.000Z"
+  },
+  {
+    "id": 1787256000000,
+    "code": "NSS-20260821-0034",
+    "userId": 7,
+    "items": [
+      {
+        "productId": 41,
+        "slug": "nuoc-ep-can-tay",
+        "name": "Nước ép cần tây detox",
+        "image": "/images/products/nuoc-ep/nuoc-ep-can-tay-1.jpg",
+        "unit": "chai 1L",
+        "price": 88000,
+        "originalPrice": 105000,
+        "quantity": 3,
+        "stock": 60
+      }
+    ],
+    "shipping": {
+      "fullName": "Đặng Kim Ngân",
+      "phone": "0898765432",
+      "email": "ngan.dang@example.com",
+      "province": "TP. Hà Nội",
+      "district": "Quận Hoàn Kiếm",
+      "ward": "Phường Hàng Bạc",
+      "street": "32 Hàng Bạc",
+      "note": "Gói riêng phần rau, tránh dập."
+    },
+    "paymentMethod": "cod",
+    "status": "pending",
+    "subtotal": 264000,
+    "discount": 26400,
+    "shippingFee": 30000,
+    "total": 267600,
+    "couponCode": "CHAOBAN10",
+    "createdAt": "2026-08-20T20:00:00.000Z"
+  },
+  {
+    "id": 1787154540000,
+    "code": "NSS-20260819-0033",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 39,
+        "slug": "nuoc-ep-cam-nguyen-chat",
+        "name": "Nước ép cam nguyên chất",
+        "image": "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-1.jpg",
+        "unit": "chai 1L",
+        "price": 79000,
+        "originalPrice": 95000,
+        "quantity": 1,
+        "stock": 85
+      }
+    ],
+    "shipping": {
+      "fullName": "Lê Thị Bích",
+      "phone": "0912345678",
+      "email": "bich.le@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 7",
+      "ward": "Phường Tân Phong",
+      "street": "19 Nguyễn Đức Cảnh"
+    },
+    "paymentMethod": "cod",
+    "status": "pending",
+    "subtotal": 79000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 109000,
+    "couponCode": null,
+    "createdAt": "2026-08-19T15:49:00.000Z"
+  },
+  {
+    "id": 1787002200000,
+    "code": "NSS-20260818-0032",
+    "userId": 5,
+    "items": [
+      {
+        "productId": 26,
+        "slug": "trung-ga-tha-vuon",
+        "name": "Trứng gà thả vườn",
+        "image": "/images/products/bo-trung/trung-ga-tha-vuon-1.jpg",
+        "unit": "hộp 10 quả",
+        "price": 52000,
+        "originalPrice": 62000,
+        "quantity": 3,
+        "stock": 220
+      },
+      {
+        "productId": 24,
+        "slug": "uc-ga-phi-le",
+        "name": "Ức gà phi lê hữu cơ",
+        "image": "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+        "unit": "kg",
+        "price": 145000,
+        "originalPrice": 145000,
+        "quantity": 2,
+        "stock": 64
+      },
+      {
+        "productId": 19,
+        "slug": "hat-chia-uc",
+        "name": "Hạt chia Úc",
+        "image": "/images/products/trai-cay-hat/hat-chia-uc-1.jpg",
+        "unit": "túi 500g",
+        "price": 149000,
+        "originalPrice": 175000,
+        "quantity": 1,
+        "stock": 95
+      }
+    ],
+    "shipping": {
+      "fullName": "Phạm Thu Hà",
+      "phone": "0356789012",
+      "email": "ha.pham@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương"
+    },
+    "paymentMethod": "momo",
+    "status": "pending",
+    "subtotal": 595000,
+    "discount": 50000,
+    "shippingFee": 0,
+    "total": 545000,
+    "couponCode": "HUUCO50",
+    "createdAt": "2026-08-17T21:30:00.000Z"
+  },
+  {
+    "id": 1786831260000,
+    "code": "NSS-20260816-0031",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 39,
+        "slug": "nuoc-ep-cam-nguyen-chat",
+        "name": "Nước ép cam nguyên chất",
+        "image": "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-1.jpg",
+        "unit": "chai 1L",
+        "price": 79000,
+        "originalPrice": 95000,
+        "quantity": 3,
+        "stock": 85
+      },
+      {
+        "productId": 40,
+        "slug": "nuoc-ep-ca-rot-tao",
+        "name": "Nước ép cà rốt táo",
+        "image": "/images/products/nuoc-ep/nuoc-ep-ca-rot-tao-1.jpg",
+        "unit": "chai 1L",
+        "price": 89000,
+        "originalPrice": 89000,
+        "quantity": 1,
+        "stock": 72
+      },
+      {
+        "productId": 42,
+        "slug": "nuoc-ep-dua-hau-bac-ha",
+        "name": "Nước ép dưa hấu bạc hà",
+        "image": "/images/products/nuoc-ep/nuoc-ep-dua-hau-bac-ha-1.jpg",
+        "unit": "chai 1L",
+        "price": 85000,
+        "originalPrice": 85000,
+        "quantity": 1,
+        "stock": 0
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 7",
+      "ward": "Phường Tân Phong",
+      "street": "19 Nguyễn Đức Cảnh"
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "confirmed",
+    "subtotal": 411000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 441000,
+    "couponCode": null,
+    "createdAt": "2026-08-15T22:01:00.000Z"
+  },
+  {
+    "id": 1786645200000,
+    "code": "NSS-20260814-0030",
+    "userId": null,
+    "items": [
+      {
+        "productId": 9,
+        "slug": "ca-chua-bi-huu-co",
+        "name": "Cà chua bi hữu cơ",
+        "image": "/images/products/rau-cu/ca-chua-bi-huu-co-1.jpg",
+        "unit": "hộp 500g",
+        "price": 49000,
+        "originalPrice": 58000,
+        "quantity": 1,
+        "stock": 70
+      },
+      {
+        "productId": 39,
+        "slug": "nuoc-ep-cam-nguyen-chat",
+        "name": "Nước ép cam nguyên chất",
+        "image": "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-1.jpg",
+        "unit": "chai 1L",
+        "price": 79000,
+        "originalPrice": 95000,
+        "quantity": 2,
+        "stock": 85
+      }
+    ],
+    "shipping": {
+      "fullName": "Hoàng Gia Huy",
+      "phone": "0932165498",
+      "email": "huy.hoang@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ",
+      "note": "Giao giờ hành chính, gọi trước 15 phút."
+    },
+    "paymentMethod": "cod",
+    "status": "pending",
+    "subtotal": 207000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 237000,
+    "couponCode": null,
+    "createdAt": "2026-08-13T18:20:00.000Z"
+  },
+  {
+    "id": 1786556760000,
+    "code": "NSS-20260813-0029",
+    "userId": 4,
+    "items": [
+      {
+        "productId": 11,
+        "slug": "cam-sanh-huu-co",
+        "name": "Cam sành hữu cơ",
+        "image": "/images/products/trai-cay-hat/cam-sanh-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 89000,
+        "quantity": 3,
+        "stock": 160
+      }
+    ],
+    "shipping": {
+      "fullName": "Trần Minh Khoa",
+      "phone": "0987654321",
+      "email": "khoa.tran@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 7",
+      "ward": "Phường Tân Phong",
+      "street": "19 Nguyễn Đức Cảnh"
+    },
+    "paymentMethod": "momo",
+    "status": "confirmed",
+    "subtotal": 216000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 246000,
+    "couponCode": null,
+    "createdAt": "2026-08-12T17:46:00.000Z"
+  },
+  {
+    "id": 1786404540000,
+    "code": "NSS-20260811-0028",
+    "userId": 7,
+    "items": [
+      {
+        "productId": 29,
+        "slug": "pho-mai-cheddar",
+        "name": "Phô mai Cheddar khối",
+        "image": "/images/products/bo-trung/pho-mai-cheddar-1.jpg",
+        "unit": "khối 250g",
+        "price": 195000,
+        "originalPrice": 195000,
+        "quantity": 2,
+        "stock": 35
+      }
+    ],
+    "shipping": {
+      "fullName": "Đặng Kim Ngân",
+      "phone": "0898765432",
+      "email": "ngan.dang@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi"
+    },
+    "paymentMethod": "cod",
+    "status": "confirmed",
+    "subtotal": 390000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 420000,
+    "couponCode": null,
+    "createdAt": "2026-08-10T23:29:00.000Z"
+  },
+  {
+    "id": 1786215420000,
+    "code": "NSS-20260809-0027",
+    "userId": 6,
+    "items": [
+      {
+        "productId": 39,
+        "slug": "nuoc-ep-cam-nguyen-chat",
+        "name": "Nước ép cam nguyên chất",
+        "image": "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-1.jpg",
+        "unit": "chai 1L",
+        "price": 79000,
+        "originalPrice": 95000,
+        "quantity": 2,
+        "stock": 85
+      },
+      {
+        "productId": 38,
+        "slug": "sua-hanh-nhan",
+        "name": "Sữa hạnh nhân không đường",
+        "image": "/images/products/sua-kem/sua-hanh-nhan-1.jpg",
+        "unit": "chai 1L",
+        "price": 78000,
+        "originalPrice": 78000,
+        "quantity": 2,
+        "stock": 110
+      },
+      {
+        "productId": 23,
+        "slug": "suon-non-heo-huu-co",
+        "name": "Sườn non heo hữu cơ",
+        "image": "/images/products/thit-huu-co/suon-non-heo-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 229000,
+        "originalPrice": 265000,
+        "quantity": 1,
+        "stock": 28
+      }
+    ],
+    "shipping": {
+      "fullName": "Võ Quốc Bảo",
+      "phone": "0778901234",
+      "email": "bao.vo@example.com",
+      "province": "TP. Hà Nội",
+      "district": "Quận Ba Đình",
+      "ward": "Phường Kim Mã",
+      "street": "77 Kim Mã"
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "shipping",
+    "subtotal": 543000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 543000,
+    "couponCode": null,
+    "createdAt": "2026-08-08T18:57:00.000Z"
+  },
+  {
+    "id": 1786118580000,
+    "code": "NSS-20260807-0026",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 15,
+        "slug": "xoai-cat-hoa-loc",
+        "name": "Xoài cát Hoà Lộc",
+        "image": "/images/products/trai-cay-hat/xoai-cat-hoa-loc-1.jpg",
+        "unit": "kg",
+        "price": 119000,
+        "originalPrice": 145000,
+        "quantity": 3,
+        "stock": 38
+      },
+      {
+        "productId": 22,
+        "slug": "thit-heo-huu-co",
+        "name": "Thịt heo hữu cơ ba chỉ",
+        "image": "/images/products/thit-huu-co/thit-heo-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 215000,
+        "originalPrice": 215000,
+        "quantity": 3,
+        "stock": 36
+      },
+      {
+        "productId": 19,
+        "slug": "hat-chia-uc",
+        "name": "Hạt chia Úc",
+        "image": "/images/products/trai-cay-hat/hat-chia-uc-1.jpg",
+        "unit": "túi 500g",
+        "price": 149000,
+        "originalPrice": 175000,
+        "quantity": 2,
+        "stock": 95
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ",
+      "note": "Gói riêng phần rau, tránh dập."
+    },
+    "paymentMethod": "cod",
+    "status": "confirmed",
+    "subtotal": 1300000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 1300000,
+    "couponCode": null,
+    "createdAt": "2026-08-07T16:03:00.000Z"
+  },
+  {
+    "id": 1785941340000,
+    "code": "NSS-20260805-0025",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 42,
+        "slug": "nuoc-ep-dua-hau-bac-ha",
+        "name": "Nước ép dưa hấu bạc hà",
+        "image": "/images/products/nuoc-ep/nuoc-ep-dua-hau-bac-ha-1.jpg",
+        "unit": "chai 1L",
+        "price": 85000,
+        "originalPrice": 85000,
+        "quantity": 3,
+        "stock": 0
+      },
+      {
+        "productId": 21,
+        "slug": "ga-ta-tha-vuon",
+        "name": "Gà ta thả vườn",
+        "image": "/images/products/thit-huu-co/ga-ta-tha-vuon-1.jpg",
+        "unit": "con ~1.5kg",
+        "price": 159000,
+        "originalPrice": 185000,
+        "quantity": 3,
+        "stock": 58
+      },
+      {
+        "productId": 24,
+        "slug": "uc-ga-phi-le",
+        "name": "Ức gà phi lê hữu cơ",
+        "image": "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+        "unit": "kg",
+        "price": 145000,
+        "originalPrice": 145000,
+        "quantity": 2,
+        "stock": 64
+      },
+      {
+        "productId": 8,
+        "slug": "bi-do-huu-co",
+        "name": "Bí đỏ hữu cơ",
+        "image": "/images/products/rau-cu/bi-do-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 35000,
+        "originalPrice": 35000,
+        "quantity": 3,
+        "stock": 110
+      }
+    ],
+    "shipping": {
+      "fullName": "Lê Thị Bích",
+      "phone": "0912345678",
+      "email": "bich.le@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi"
+    },
+    "paymentMethod": "vnpay",
+    "status": "shipping",
+    "subtotal": 1127000,
+    "discount": 112700,
+    "shippingFee": 0,
+    "total": 1014300,
+    "couponCode": "CHAOBAN10",
+    "createdAt": "2026-08-05T14:49:00.000Z"
+  },
+  {
+    "id": 1785775380000,
+    "code": "NSS-20260803-0024",
+    "userId": null,
+    "items": [
+      {
+        "productId": 22,
+        "slug": "thit-heo-huu-co",
+        "name": "Thịt heo hữu cơ ba chỉ",
+        "image": "/images/products/thit-huu-co/thit-heo-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 215000,
+        "originalPrice": 215000,
+        "quantity": 2,
+        "stock": 36
+      },
+      {
+        "productId": 14,
+        "slug": "dua-hau-khong-hat",
+        "name": "Dưa hấu không hạt hữu cơ",
+        "image": "/images/products/trai-cay-hat/dua-hau-khong-hat-1.jpg",
+        "unit": "quả ~3kg",
+        "price": 65000,
+        "originalPrice": 65000,
+        "quantity": 3,
+        "stock": 45
+      },
+      {
+        "productId": 28,
+        "slug": "bo-lat-huu-co",
+        "name": "Bơ lạt hữu cơ",
+        "image": "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+        "unit": "hộp 200g",
+        "price": 139000,
+        "originalPrice": 165000,
+        "quantity": 3,
+        "stock": 48
+      },
+      {
+        "productId": 1,
+        "slug": "cai-ngot-huu-co",
+        "name": "Cải ngọt hữu cơ",
+        "image": "/images/products/rau-cu/cai-ngot-huu-co-1.jpg",
+        "unit": "bó 300g",
+        "price": 26000,
+        "originalPrice": 32000,
+        "quantity": 3,
+        "stock": 120
+      }
+    ],
+    "shipping": {
+      "fullName": "Đỗ Trọng Nghĩa",
+      "phone": "0523456789",
+      "email": "nghia.do@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi"
+    },
+    "paymentMethod": "cod",
+    "status": "confirmed",
+    "subtotal": 1120000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 1120000,
+    "couponCode": null,
+    "createdAt": "2026-08-03T16:43:00.000Z"
+  },
+  {
+    "id": 1785721200000,
+    "code": "NSS-20260803-0023",
+    "userId": 5,
+    "items": [
+      {
+        "productId": 8,
+        "slug": "bi-do-huu-co",
+        "name": "Bí đỏ hữu cơ",
+        "image": "/images/products/rau-cu/bi-do-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 35000,
+        "originalPrice": 35000,
+        "quantity": 3,
+        "stock": 110
+      },
+      {
+        "productId": 1,
+        "slug": "cai-ngot-huu-co",
+        "name": "Cải ngọt hữu cơ",
+        "image": "/images/products/rau-cu/cai-ngot-huu-co-1.jpg",
+        "unit": "bó 300g",
+        "price": 26000,
+        "originalPrice": 32000,
+        "quantity": 2,
+        "stock": 120
+      },
+      {
+        "productId": 11,
+        "slug": "cam-sanh-huu-co",
+        "name": "Cam sành hữu cơ",
+        "image": "/images/products/trai-cay-hat/cam-sanh-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 89000,
+        "quantity": 2,
+        "stock": 160
+      },
+      {
+        "productId": 28,
+        "slug": "bo-lat-huu-co",
+        "name": "Bơ lạt hữu cơ",
+        "image": "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+        "unit": "hộp 200g",
+        "price": 139000,
+        "originalPrice": 165000,
+        "quantity": 2,
+        "stock": 48
+      }
+    ],
+    "shipping": {
+      "fullName": "Phạm Thu Hà",
+      "phone": "0356789012",
+      "email": "ha.pham@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương",
+      "note": "Gói riêng phần rau, tránh dập."
+    },
+    "paymentMethod": "cod",
+    "status": "shipping",
+    "subtotal": 579000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 579000,
+    "couponCode": null,
+    "createdAt": "2026-08-03T01:40:00.000Z"
+  },
+  {
+    "id": 1785511440000,
+    "code": "NSS-20260731-0022",
+    "userId": 4,
+    "items": [
+      {
+        "productId": 3,
+        "slug": "xa-lach-romaine",
+        "name": "Xà lách Romaine hữu cơ",
+        "image": "/images/products/rau-cu/xa-lach-romaine-1.jpg",
+        "unit": "kg",
+        "price": 45000,
+        "originalPrice": 45000,
+        "quantity": 2,
+        "stock": 85
+      },
+      {
+        "productId": 38,
+        "slug": "sua-hanh-nhan",
+        "name": "Sữa hạnh nhân không đường",
+        "image": "/images/products/sua-kem/sua-hanh-nhan-1.jpg",
+        "unit": "chai 1L",
+        "price": 78000,
+        "originalPrice": 78000,
+        "quantity": 2,
+        "stock": 110
+      },
+      {
+        "productId": 7,
+        "slug": "hanh-tim-huu-co",
+        "name": "Hành tím hữu cơ",
+        "image": "/images/products/rau-cu/hanh-tim-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 55000,
+        "originalPrice": 68000,
+        "quantity": 3,
+        "stock": 90
+      }
+    ],
+    "shipping": {
+      "fullName": "Trần Minh Khoa",
+      "phone": "0987654321",
+      "email": "khoa.tran@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ"
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "delivered",
+    "subtotal": 411000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 441000,
+    "couponCode": null,
+    "createdAt": "2026-07-31T15:24:00.000Z"
+  },
+  {
+    "id": 1785370740000,
+    "code": "NSS-20260730-0021",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 16,
+        "slug": "thanh-long-ruot-do",
+        "name": "Thanh long ruột đỏ hữu cơ",
+        "image": "/images/products/trai-cay-hat/thanh-long-ruot-do-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 72000,
+        "quantity": 1,
+        "stock": 88
+      },
+      {
+        "productId": 38,
+        "slug": "sua-hanh-nhan",
+        "name": "Sữa hạnh nhân không đường",
+        "image": "/images/products/sua-kem/sua-hanh-nhan-1.jpg",
+        "unit": "chai 1L",
+        "price": 78000,
+        "originalPrice": 78000,
+        "quantity": 2,
+        "stock": 110
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hà Nội",
+      "district": "Quận Ba Đình",
+      "ward": "Phường Kim Mã",
+      "street": "77 Kim Mã"
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "shipping",
+    "subtotal": 228000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 258000,
+    "couponCode": null,
+    "createdAt": "2026-07-30T00:19:00.000Z"
+  },
+  {
+    "id": 1785191160000,
+    "code": "NSS-20260728-0020",
+    "userId": 7,
+    "items": [
+      {
+        "productId": 21,
+        "slug": "ga-ta-tha-vuon",
+        "name": "Gà ta thả vườn",
+        "image": "/images/products/thit-huu-co/ga-ta-tha-vuon-1.jpg",
+        "unit": "con ~1.5kg",
+        "price": 159000,
+        "originalPrice": 185000,
+        "quantity": 1,
+        "stock": 58
+      }
+    ],
+    "shipping": {
+      "fullName": "Đặng Kim Ngân",
+      "phone": "0898765432",
+      "email": "ngan.dang@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ",
+      "note": "Để hàng ở quầy lễ tân giúp mình."
+    },
+    "paymentMethod": "cod",
+    "status": "shipping",
+    "subtotal": 159000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 189000,
+    "couponCode": null,
+    "createdAt": "2026-07-27T22:26:00.000Z"
+  },
+  {
+    "id": 1785099780000,
+    "code": "NSS-20260727-0019",
+    "userId": 6,
+    "items": [
+      {
+        "productId": 28,
+        "slug": "bo-lat-huu-co",
+        "name": "Bơ lạt hữu cơ",
+        "image": "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+        "unit": "hộp 200g",
+        "price": 139000,
+        "originalPrice": 165000,
+        "quantity": 1,
+        "stock": 48
+      },
+      {
+        "productId": 2,
+        "slug": "cai-tim-huu-co",
+        "name": "Cải tím hữu cơ",
+        "image": "/images/products/rau-cu/cai-tim-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 47000,
+        "originalPrice": 55000,
+        "quantity": 3,
+        "stock": 64
+      },
+      {
+        "productId": 17,
+        "slug": "hat-oc-cho-my",
+        "name": "Hạt óc chó Mỹ",
+        "image": "/images/products/trai-cay-hat/hat-oc-cho-my-1.jpg",
+        "unit": "túi 500g",
+        "price": 265000,
+        "originalPrice": 320000,
+        "quantity": 3,
+        "stock": 60
+      }
+    ],
+    "shipping": {
+      "fullName": "Võ Quốc Bảo",
+      "phone": "0778901234",
+      "email": "bao.vo@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ"
+    },
+    "paymentMethod": "vnpay",
+    "status": "cancelled",
+    "subtotal": 1075000,
+    "discount": 30000,
+    "shippingFee": 0,
+    "total": 1045000,
+    "couponCode": "FREESHIP",
+    "createdAt": "2026-07-26T21:03:00.000Z"
+  },
+  {
+    "id": 1784930580000,
+    "code": "NSS-20260725-0018",
+    "userId": null,
+    "items": [
+      {
+        "productId": 28,
+        "slug": "bo-lat-huu-co",
+        "name": "Bơ lạt hữu cơ",
+        "image": "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+        "unit": "hộp 200g",
+        "price": 139000,
+        "originalPrice": 165000,
+        "quantity": 3,
+        "stock": 48
+      },
+      {
+        "productId": 39,
+        "slug": "nuoc-ep-cam-nguyen-chat",
+        "name": "Nước ép cam nguyên chất",
+        "image": "/images/products/nuoc-ep/nuoc-ep-cam-nguyen-chat-1.jpg",
+        "unit": "chai 1L",
+        "price": 79000,
+        "originalPrice": 95000,
+        "quantity": 3,
+        "stock": 85
+      },
+      {
+        "productId": 18,
+        "slug": "hanh-nhan-rang-bo",
+        "name": "Hạnh nhân rang bơ",
+        "image": "/images/products/trai-cay-hat/hanh-nhan-rang-bo-1.jpg",
+        "unit": "túi 500g",
+        "price": 285000,
+        "originalPrice": 285000,
+        "quantity": 3,
+        "stock": 75
+      }
+    ],
+    "shipping": {
+      "fullName": "Hoàng Gia Huy",
+      "phone": "0932165498",
+      "email": "huy.hoang@example.com",
+      "province": "TP. Hà Nội",
+      "district": "Quận Ba Đình",
+      "ward": "Phường Kim Mã",
+      "street": "77 Kim Mã"
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 1509000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 1509000,
+    "couponCode": null,
+    "createdAt": "2026-07-24T22:03:00.000Z"
+  },
+  {
+    "id": 1784769240000,
+    "code": "NSS-20260723-0017",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 30,
+        "slug": "gao-lut-huu-co",
+        "name": "Gạo lứt đỏ hữu cơ",
+        "image": "/images/products/thuc-pham-sach/gao-lut-huu-co-1.jpg",
+        "unit": "túi 2kg",
+        "price": 82000,
+        "originalPrice": 98000,
+        "quantity": 2,
+        "stock": 180
+      },
+      {
+        "productId": 1,
+        "slug": "cai-ngot-huu-co",
+        "name": "Cải ngọt hữu cơ",
+        "image": "/images/products/rau-cu/cai-ngot-huu-co-1.jpg",
+        "unit": "bó 300g",
+        "price": 26000,
+        "originalPrice": 32000,
+        "quantity": 3,
+        "stock": 120
+      },
+      {
+        "productId": 33,
+        "slug": "mat-ong-rung",
+        "name": "Mật ong rừng nguyên chất",
+        "image": "/images/products/thuc-pham-sach/mat-ong-rung-1.jpg",
+        "unit": "chai 500ml",
+        "price": 245000,
+        "originalPrice": 285000,
+        "quantity": 3,
+        "stock": 70
+      }
+    ],
+    "shipping": {
+      "fullName": "Lê Thị Bích",
+      "phone": "0912345678",
+      "email": "bich.le@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương"
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 977000,
+    "discount": 97700,
+    "shippingFee": 0,
+    "total": 879300,
+    "couponCode": "CHAOBAN10",
+    "createdAt": "2026-07-23T01:14:00.000Z"
+  },
+  {
+    "id": 1784643600000,
+    "code": "NSS-20260721-0016",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 12,
+        "slug": "chuoi-gia-huu-co",
+        "name": "Chuối già hữu cơ",
+        "image": "/images/products/trai-cay-hat/chuoi-gia-huu-co-1.jpg",
+        "unit": "nải ~1.2kg",
+        "price": 37000,
+        "originalPrice": 45000,
+        "quantity": 2,
+        "stock": 130
+      },
+      {
+        "productId": 20,
+        "slug": "thit-bo-uc-huu-co",
+        "name": "Thịt bò Úc hữu cơ",
+        "image": "/images/products/thit-huu-co/thit-bo-uc-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 399000,
+        "originalPrice": 485000,
+        "quantity": 3,
+        "stock": 42
+      },
+      {
+        "productId": 8,
+        "slug": "bi-do-huu-co",
+        "name": "Bí đỏ hữu cơ",
+        "image": "/images/products/rau-cu/bi-do-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 35000,
+        "originalPrice": 35000,
+        "quantity": 1,
+        "stock": 110
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương",
+      "note": "Để hàng ở quầy lễ tân giúp mình."
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "delivered",
+    "subtotal": 1306000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 1306000,
+    "couponCode": null,
+    "createdAt": "2026-07-21T14:20:00.000Z"
+  },
+  {
+    "id": 1784476260000,
+    "code": "NSS-20260719-0015",
+    "userId": 5,
+    "items": [
+      {
+        "productId": 11,
+        "slug": "cam-sanh-huu-co",
+        "name": "Cam sành hữu cơ",
+        "image": "/images/products/trai-cay-hat/cam-sanh-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 89000,
+        "quantity": 2,
+        "stock": 160
+      },
+      {
+        "productId": 20,
+        "slug": "thit-bo-uc-huu-co",
+        "name": "Thịt bò Úc hữu cơ",
+        "image": "/images/products/thit-huu-co/thit-bo-uc-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 399000,
+        "originalPrice": 485000,
+        "quantity": 1,
+        "stock": 42
+      }
+    ],
+    "shipping": {
+      "fullName": "Phạm Thu Hà",
+      "phone": "0356789012",
+      "email": "ha.pham@example.com",
+      "province": "TP. Hà Nội",
+      "district": "Quận Hoàn Kiếm",
+      "ward": "Phường Hàng Bạc",
+      "street": "32 Hàng Bạc"
+    },
+    "paymentMethod": "vnpay",
+    "status": "delivered",
+    "subtotal": 543000,
+    "discount": 50000,
+    "shippingFee": 30000,
+    "total": 523000,
+    "couponCode": "HUUCO50",
+    "createdAt": "2026-07-19T15:51:00.000Z"
+  },
+  {
+    "id": 1784296980000,
+    "code": "NSS-20260717-0014",
+    "userId": 4,
+    "items": [
+      {
+        "productId": 24,
+        "slug": "uc-ga-phi-le",
+        "name": "Ức gà phi lê hữu cơ",
+        "image": "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+        "unit": "kg",
+        "price": 145000,
+        "originalPrice": 145000,
+        "quantity": 1,
+        "stock": 64
+      }
+    ],
+    "shipping": {
+      "fullName": "Trần Minh Khoa",
+      "phone": "0987654321",
+      "email": "khoa.tran@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương"
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "delivered",
+    "subtotal": 145000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 175000,
+    "couponCode": null,
+    "createdAt": "2026-07-17T14:03:00.000Z"
+  },
+  {
+    "id": 1784133360000,
+    "code": "NSS-20260715-0013",
+    "userId": null,
+    "items": [
+      {
+        "productId": 36,
+        "slug": "sua-chua-hy-lap",
+        "name": "Sữa chua Hy Lạp không đường",
+        "image": "/images/products/sua-kem/sua-chua-hy-lap-1.jpg",
+        "unit": "hũ 500g",
+        "price": 68000,
+        "originalPrice": 68000,
+        "quantity": 1,
+        "stock": 90
+      },
+      {
+        "productId": 21,
+        "slug": "ga-ta-tha-vuon",
+        "name": "Gà ta thả vườn",
+        "image": "/images/products/thit-huu-co/ga-ta-tha-vuon-1.jpg",
+        "unit": "con ~1.5kg",
+        "price": 159000,
+        "originalPrice": 185000,
+        "quantity": 2,
+        "stock": 58
+      }
+    ],
+    "shipping": {
+      "fullName": "Bùi Ngọc Lan",
+      "phone": "0765432198",
+      "email": "lan.bui@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi"
+    },
+    "paymentMethod": "cod",
+    "status": "cancelled",
+    "subtotal": 386000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 416000,
+    "couponCode": null,
+    "createdAt": "2026-07-15T16:36:00.000Z"
+  },
+  {
+    "id": 1784052720000,
+    "code": "NSS-20260715-0012",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 9,
+        "slug": "ca-chua-bi-huu-co",
+        "name": "Cà chua bi hữu cơ",
+        "image": "/images/products/rau-cu/ca-chua-bi-huu-co-1.jpg",
+        "unit": "hộp 500g",
+        "price": 49000,
+        "originalPrice": 58000,
+        "quantity": 3,
+        "stock": 70
+      },
+      {
+        "productId": 24,
+        "slug": "uc-ga-phi-le",
+        "name": "Ức gà phi lê hữu cơ",
+        "image": "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+        "unit": "kg",
+        "price": 145000,
+        "originalPrice": 145000,
+        "quantity": 1,
+        "stock": 64
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi",
+      "note": "Gói riêng phần rau, tránh dập."
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "delivered",
+    "subtotal": 292000,
+    "discount": 30000,
+    "shippingFee": 30000,
+    "total": 292000,
+    "couponCode": "FREESHIP",
+    "createdAt": "2026-07-14T18:12:00.000Z"
+  },
+  {
+    "id": 1783872960000,
+    "code": "NSS-20260712-0011",
+    "userId": 7,
+    "items": [
+      {
+        "productId": 11,
+        "slug": "cam-sanh-huu-co",
+        "name": "Cam sành hữu cơ",
+        "image": "/images/products/trai-cay-hat/cam-sanh-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 89000,
+        "quantity": 1,
+        "stock": 160
+      },
+      {
+        "productId": 30,
+        "slug": "gao-lut-huu-co",
+        "name": "Gạo lứt đỏ hữu cơ",
+        "image": "/images/products/thuc-pham-sach/gao-lut-huu-co-1.jpg",
+        "unit": "túi 2kg",
+        "price": 82000,
+        "originalPrice": 98000,
+        "quantity": 1,
+        "stock": 180
+      },
+      {
+        "productId": 42,
+        "slug": "nuoc-ep-dua-hau-bac-ha",
+        "name": "Nước ép dưa hấu bạc hà",
+        "image": "/images/products/nuoc-ep/nuoc-ep-dua-hau-bac-ha-1.jpg",
+        "unit": "chai 1L",
+        "price": 85000,
+        "originalPrice": 85000,
+        "quantity": 3,
+        "stock": 0
+      },
+      {
+        "productId": 26,
+        "slug": "trung-ga-tha-vuon",
+        "name": "Trứng gà thả vườn",
+        "image": "/images/products/bo-trung/trung-ga-tha-vuon-1.jpg",
+        "unit": "hộp 10 quả",
+        "price": 52000,
+        "originalPrice": 62000,
+        "quantity": 1,
+        "stock": 220
+      }
+    ],
+    "shipping": {
+      "fullName": "Đặng Kim Ngân",
+      "phone": "0898765432",
+      "email": "ngan.dang@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Gò Vấp",
+      "ward": "Phường 10",
+      "street": "45/7 Nguyễn Văn Nghi"
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 461000,
+    "discount": 46100,
+    "shippingFee": 30000,
+    "total": 444900,
+    "couponCode": "CHAOBAN10",
+    "createdAt": "2026-07-12T16:16:00.000Z"
+  },
+  {
+    "id": 1783717140000,
+    "code": "NSS-20260711-0010",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 25,
+        "slug": "bo-my-thai-lat",
+        "name": "Bò Mỹ thái lát nhúng lẩu",
+        "image": "/images/products/thit-huu-co/bo-my-thai-lat-1.jpg",
+        "unit": "khay 500g",
+        "price": 329000,
+        "originalPrice": 395000,
+        "quantity": 2,
+        "stock": 0
+      },
+      {
+        "productId": 12,
+        "slug": "chuoi-gia-huu-co",
+        "name": "Chuối già hữu cơ",
+        "image": "/images/products/trai-cay-hat/chuoi-gia-huu-co-1.jpg",
+        "unit": "nải ~1.2kg",
+        "price": 37000,
+        "originalPrice": 45000,
+        "quantity": 3,
+        "stock": 130
+      },
+      {
+        "productId": 5,
+        "slug": "ca-rot-huu-co",
+        "name": "Cà rốt hữu cơ",
+        "image": "/images/products/rau-cu/ca-rot-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 39000,
+        "originalPrice": 48000,
+        "quantity": 2,
+        "stock": 200
+      },
+      {
+        "productId": 15,
+        "slug": "xoai-cat-hoa-loc",
+        "name": "Xoài cát Hoà Lộc",
+        "image": "/images/products/trai-cay-hat/xoai-cat-hoa-loc-1.jpg",
+        "unit": "kg",
+        "price": 119000,
+        "originalPrice": 145000,
+        "quantity": 1,
+        "stock": 38
+      }
+    ],
+    "shipping": {
+      "fullName": "Lê Thị Bích",
+      "phone": "0912345678",
+      "email": "bich.le@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "TP. Thủ Đức",
+      "ward": "Phường Thảo Điền",
+      "street": "8 Quốc Hương",
+      "note": "Gói riêng phần rau, tránh dập."
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 966000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 966000,
+    "couponCode": null,
+    "createdAt": "2026-07-10T20:59:00.000Z"
+  },
+  {
+    "id": 1783620660000,
+    "code": "NSS-20260710-0009",
+    "userId": 6,
+    "items": [
+      {
+        "productId": 6,
+        "slug": "khoai-tay-huu-co",
+        "name": "Khoai tây hữu cơ",
+        "image": "/images/products/rau-cu/khoai-tay-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 42000,
+        "originalPrice": 42000,
+        "quantity": 3,
+        "stock": 175
+      },
+      {
+        "productId": 21,
+        "slug": "ga-ta-tha-vuon",
+        "name": "Gà ta thả vườn",
+        "image": "/images/products/thit-huu-co/ga-ta-tha-vuon-1.jpg",
+        "unit": "con ~1.5kg",
+        "price": 159000,
+        "originalPrice": 185000,
+        "quantity": 3,
+        "stock": 58
+      },
+      {
+        "productId": 33,
+        "slug": "mat-ong-rung",
+        "name": "Mật ong rừng nguyên chất",
+        "image": "/images/products/thuc-pham-sach/mat-ong-rung-1.jpg",
+        "unit": "chai 500ml",
+        "price": 245000,
+        "originalPrice": 285000,
+        "quantity": 1,
+        "stock": 70
+      }
+    ],
+    "shipping": {
+      "fullName": "Võ Quốc Bảo",
+      "phone": "0778901234",
+      "email": "bao.vo@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 7",
+      "ward": "Phường Tân Phong",
+      "street": "19 Nguyễn Đức Cảnh"
+    },
+    "paymentMethod": "momo",
+    "status": "delivered",
+    "subtotal": 848000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 848000,
+    "couponCode": null,
+    "createdAt": "2026-07-09T18:11:00.000Z"
+  },
+  {
+    "id": 1783462740000,
+    "code": "NSS-20260708-0008",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 28,
+        "slug": "bo-lat-huu-co",
+        "name": "Bơ lạt hữu cơ",
+        "image": "/images/products/bo-trung/bo-lat-huu-co-1.jpg",
+        "unit": "hộp 200g",
+        "price": 139000,
+        "originalPrice": 165000,
+        "quantity": 3,
+        "stock": 48
+      },
+      {
+        "productId": 16,
+        "slug": "thanh-long-ruot-do",
+        "name": "Thanh long ruột đỏ hữu cơ",
+        "image": "/images/products/trai-cay-hat/thanh-long-ruot-do-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 72000,
+        "quantity": 3,
+        "stock": 88
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi"
+    },
+    "paymentMethod": "bank_transfer",
+    "status": "cancelled",
+    "subtotal": 633000,
+    "discount": 30000,
+    "shippingFee": 0,
+    "total": 603000,
+    "couponCode": "FREESHIP",
+    "createdAt": "2026-07-07T22:19:00.000Z"
+  },
+  {
+    "id": 1783286760000,
+    "code": "NSS-20260706-0007",
+    "userId": null,
+    "items": [
+      {
+        "productId": 30,
+        "slug": "gao-lut-huu-co",
+        "name": "Gạo lứt đỏ hữu cơ",
+        "image": "/images/products/thuc-pham-sach/gao-lut-huu-co-1.jpg",
+        "unit": "túi 2kg",
+        "price": 82000,
+        "originalPrice": 98000,
+        "quantity": 2,
+        "stock": 180
+      },
+      {
+        "productId": 8,
+        "slug": "bi-do-huu-co",
+        "name": "Bí đỏ hữu cơ",
+        "image": "/images/products/rau-cu/bi-do-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 35000,
+        "originalPrice": 35000,
+        "quantity": 2,
+        "stock": 110
+      },
+      {
+        "productId": 29,
+        "slug": "pho-mai-cheddar",
+        "name": "Phô mai Cheddar khối",
+        "image": "/images/products/bo-trung/pho-mai-cheddar-1.jpg",
+        "unit": "khối 250g",
+        "price": 195000,
+        "originalPrice": 195000,
+        "quantity": 2,
+        "stock": 35
+      }
+    ],
+    "shipping": {
+      "fullName": "Hoàng Gia Huy",
+      "phone": "0932165498",
+      "email": "huy.hoang@example.com",
+      "province": "TP. Hà Nội",
+      "district": "Quận Ba Đình",
+      "ward": "Phường Kim Mã",
+      "street": "77 Kim Mã",
+      "note": "Giao giờ hành chính, gọi trước 15 phút."
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 624000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 624000,
+    "couponCode": null,
+    "createdAt": "2026-07-05T21:26:00.000Z"
+  },
+  {
+    "id": 1783210080000,
+    "code": "NSS-20260705-0006",
+    "userId": 5,
+    "items": [
+      {
+        "productId": 35,
+        "slug": "sua-tuoi-thanh-trung",
+        "name": "Sữa tươi thanh trùng không đường",
+        "image": "/images/products/sua-kem/sua-tuoi-thanh-trung-1.jpg",
+        "unit": "chai 1L",
+        "price": 35000,
+        "originalPrice": 42000,
+        "quantity": 2,
+        "stock": 200
+      },
+      {
+        "productId": 17,
+        "slug": "hat-oc-cho-my",
+        "name": "Hạt óc chó Mỹ",
+        "image": "/images/products/trai-cay-hat/hat-oc-cho-my-1.jpg",
+        "unit": "túi 500g",
+        "price": 265000,
+        "originalPrice": 320000,
+        "quantity": 2,
+        "stock": 60
+      },
+      {
+        "productId": 40,
+        "slug": "nuoc-ep-ca-rot-tao",
+        "name": "Nước ép cà rốt táo",
+        "image": "/images/products/nuoc-ep/nuoc-ep-ca-rot-tao-1.jpg",
+        "unit": "chai 1L",
+        "price": 89000,
+        "originalPrice": 89000,
+        "quantity": 1,
+        "stock": 72
+      },
+      {
+        "productId": 41,
+        "slug": "nuoc-ep-can-tay",
+        "name": "Nước ép cần tây detox",
+        "image": "/images/products/nuoc-ep/nuoc-ep-can-tay-1.jpg",
+        "unit": "chai 1L",
+        "price": 88000,
+        "originalPrice": 105000,
+        "quantity": 3,
+        "stock": 60
+      }
+    ],
+    "shipping": {
+      "fullName": "Phạm Thu Hà",
+      "phone": "0356789012",
+      "email": "ha.pham@example.com",
+      "province": "TP. Hà Nội",
+      "district": "Quận Ba Đình",
+      "ward": "Phường Kim Mã",
+      "street": "77 Kim Mã"
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 953000,
+    "discount": 95300,
+    "shippingFee": 0,
+    "total": 857700,
+    "couponCode": "CHAOBAN10",
+    "createdAt": "2026-07-05T00:08:00.000Z"
+  },
+  {
+    "id": 1783019340000,
+    "code": "NSS-20260703-0005",
+    "userId": 4,
+    "items": [
+      {
+        "productId": 10,
+        "slug": "bap-cai-trang-huu-co",
+        "name": "Bắp cải trắng hữu cơ",
+        "image": "/images/products/rau-cu/bap-cai-trang-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 28000,
+        "originalPrice": 28000,
+        "quantity": 2,
+        "stock": 0
+      }
+    ],
+    "shipping": {
+      "fullName": "Trần Minh Khoa",
+      "phone": "0987654321",
+      "email": "khoa.tran@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ"
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 56000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 86000,
+    "couponCode": null,
+    "createdAt": "2026-07-02T19:09:00.000Z"
+  },
+  {
+    "id": 1782836940000,
+    "code": "NSS-20260630-0004",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 7,
+        "slug": "hanh-tim-huu-co",
+        "name": "Hành tím hữu cơ",
+        "image": "/images/products/rau-cu/hanh-tim-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 55000,
+        "originalPrice": 68000,
+        "quantity": 3,
+        "stock": 90
+      },
+      {
+        "productId": 24,
+        "slug": "uc-ga-phi-le",
+        "name": "Ức gà phi lê hữu cơ",
+        "image": "/images/products/thit-huu-co/uc-ga-phi-le-1.jpg",
+        "unit": "kg",
+        "price": 145000,
+        "originalPrice": 145000,
+        "quantity": 1,
+        "stock": 64
+      },
+      {
+        "productId": 4,
+        "slug": "rau-muong-huu-co",
+        "name": "Rau muống hữu cơ",
+        "image": "/images/products/rau-cu/rau-muong-huu-co-1.jpg",
+        "unit": "bó 400g",
+        "price": 22000,
+        "originalPrice": 22000,
+        "quantity": 2,
+        "stock": 150
+      },
+      {
+        "productId": 18,
+        "slug": "hanh-nhan-rang-bo",
+        "name": "Hạnh nhân rang bơ",
+        "image": "/images/products/trai-cay-hat/hanh-nhan-rang-bo-1.jpg",
+        "unit": "túi 500g",
+        "price": 285000,
+        "originalPrice": 285000,
+        "quantity": 1,
+        "stock": 75
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hà Nội",
+      "district": "Quận Hoàn Kiếm",
+      "ward": "Phường Hàng Bạc",
+      "street": "32 Hàng Bạc",
+      "note": "Để hàng ở quầy lễ tân giúp mình."
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 639000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 639000,
+    "couponCode": null,
+    "createdAt": "2026-06-30T16:29:00.000Z"
+  },
+  {
+    "id": 1782674880000,
+    "code": "NSS-20260629-0003",
+    "userId": null,
+    "items": [
+      {
+        "productId": 25,
+        "slug": "bo-my-thai-lat",
+        "name": "Bò Mỹ thái lát nhúng lẩu",
+        "image": "/images/products/thit-huu-co/bo-my-thai-lat-1.jpg",
+        "unit": "khay 500g",
+        "price": 329000,
+        "originalPrice": 395000,
+        "quantity": 3,
+        "stock": 0
+      },
+      {
+        "productId": 13,
+        "slug": "bo-034-huu-co",
+        "name": "Bơ 034 hữu cơ",
+        "image": "/images/products/trai-cay-hat/bo-034-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 85000,
+        "originalPrice": 120000,
+        "quantity": 1,
+        "stock": 55
+      }
+    ],
+    "shipping": {
+      "fullName": "Bùi Ngọc Lan",
+      "phone": "0765432198",
+      "email": "lan.bui@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận 1",
+      "ward": "Phường Bến Nghé",
+      "street": "128 Đồng Khởi"
+    },
+    "paymentMethod": "vnpay",
+    "status": "cancelled",
+    "subtotal": 1072000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 1072000,
+    "couponCode": null,
+    "createdAt": "2026-06-28T19:28:00.000Z"
+  },
+  {
+    "id": 1782581280000,
+    "code": "NSS-20260628-0002",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 3,
+        "slug": "xa-lach-romaine",
+        "name": "Xà lách Romaine hữu cơ",
+        "image": "/images/products/rau-cu/xa-lach-romaine-1.jpg",
+        "unit": "kg",
+        "price": 45000,
+        "originalPrice": 45000,
+        "quantity": 1,
+        "stock": 85
+      },
+      {
+        "productId": 36,
+        "slug": "sua-chua-hy-lap",
+        "name": "Sữa chua Hy Lạp không đường",
+        "image": "/images/products/sua-kem/sua-chua-hy-lap-1.jpg",
+        "unit": "hũ 500g",
+        "price": 68000,
+        "originalPrice": 68000,
+        "quantity": 3,
+        "stock": 90
+      }
+    ],
+    "shipping": {
+      "fullName": "Lê Thị Bích",
+      "phone": "0912345678",
+      "email": "bich.le@example.com",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Bình Thạnh",
+      "ward": "Phường 25",
+      "street": "212 Điện Biên Phủ"
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 249000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 279000,
+    "couponCode": null,
+    "createdAt": "2026-06-27T17:28:00.000Z"
+  },
+  {
+    "id": 1782423420000,
+    "code": "NSS-20260626-0001",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 12,
+        "slug": "chuoi-gia-huu-co",
+        "name": "Chuối già hữu cơ",
+        "image": "/images/products/trai-cay-hat/chuoi-gia-huu-co-1.jpg",
+        "unit": "nải ~1.2kg",
+        "price": 37000,
+        "originalPrice": 45000,
+        "quantity": 1,
+        "stock": 130
+      },
+      {
+        "productId": 11,
+        "slug": "cam-sanh-huu-co",
+        "name": "Cam sành hữu cơ",
+        "image": "/images/products/trai-cay-hat/cam-sanh-huu-co-1.jpg",
+        "unit": "kg",
+        "price": 72000,
+        "originalPrice": 89000,
+        "quantity": 3,
+        "stock": 160
+      },
+      {
+        "productId": 3,
+        "slug": "xa-lach-romaine",
+        "name": "Xà lách Romaine hữu cơ",
+        "image": "/images/products/rau-cu/xa-lach-romaine-1.jpg",
+        "unit": "kg",
+        "price": 45000,
+        "originalPrice": 45000,
+        "quantity": 3,
+        "stock": 85
+      }
+    ],
+    "shipping": {
+      "fullName": "Nguyễn Văn An",
+      "phone": "0901234567",
+      "email": "demo@nongsansach.vn",
+      "province": "TP. Hồ Chí Minh",
+      "district": "Quận Gò Vấp",
+      "ward": "Phường 10",
+      "street": "45/7 Nguyễn Văn Nghi",
+      "note": "Để hàng ở quầy lễ tân giúp mình."
+    },
+    "paymentMethod": "cod",
+    "status": "delivered",
+    "subtotal": 388000,
+    "discount": 0,
+    "shippingFee": 30000,
+    "total": 418000,
+    "couponCode": null,
+    "createdAt": "2026-06-25T21:37:00.000Z"
+  }
+]

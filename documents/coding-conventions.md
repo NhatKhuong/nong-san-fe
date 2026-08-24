@@ -253,6 +253,24 @@ thông báo vô nghĩa. **Build xanh, lint sạch, màn hình đẹp, console im
 ErrorState" là bất khả thi. Chứng minh nhánh lỗi bằng cách gọi với dữ liệu không tồn tại
 (ví dụ `/quan-tri/san-pham/999999/chinh-sua`), không phải bằng DevTools offline.
 
+**Khẳng định phải nhắm vào đúng node chứa kết quả, KHÔNG dùng `body.innerText`.**
+
+```js
+// ❌ đúng ngay lập tức, trước cả khi bấm nút — vì "Đã xác nhận" nằm sẵn trong <option>
+await waitFor(() => document.body.innerText.includes('Đã xác nhận'))
+
+// ✅ nhắm vào chính node hiển thị kết quả
+await waitFor(() => document.querySelector('span.rounded-full')?.textContent === 'Đã xác nhận')
+```
+
+Bài học từ backlog 0005: lượt smoke đầu **passed trong khi không chứng minh gì**. Giao diện nào
+cũng chứa sẵn nhãn của **mọi** trạng thái trong các control của nó (`<option>`, `<select>`, menu),
+nên `body.innerText` gần như luôn khớp **trước khi hành động xảy ra**. Nó chỉ lộ ra vì agent đọc
+thêm `localStorage` và thấy overlay còn rỗng.
+
+Với thao tác ghi, cách chắc chắn nhất là kiểm **cả hai**: node hiển thị **và** dữ liệu đã ghi
+xuống (`localStorage`, hoặc gọi lại hàm đọc).
+
 ---
 
 ## 9. Điều cấm
