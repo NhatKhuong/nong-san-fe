@@ -2,6 +2,7 @@ export type { Paginated } from './common'
 export type { Category } from './category'
 export type {
   Product,
+  ProductPayload,
   ProductQuery,
   ProductSort,
   Review,
@@ -31,3 +32,9 @@ export type { Testimonial, Brand, HeroSlide, PromoBanner } from './marketing'
 export type { Province, District, Ward } from './location'
 export type { AboutContent, AboutStat, Commitment, Milestone } from './about'
 export type { ContactMessage, ContactPayload } from './contact'
+export type {
+  AdminOverview,
+  AdminOrderQuery,
+  AdminProductQuery,
+  AdminUserQuery,
+} from './admin'

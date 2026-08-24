@@ -25,6 +25,41 @@ export interface Product {
   createdAt: string
 }
 
+/**
+ * Dữ liệu form thêm/sửa sản phẩm ở khu quản trị.
+ *
+ * **`rating`, `reviewCount`, `sold`, `createdAt` CỐ Ý vắng mặt.** Chúng là kết
+ * quả tính từ dữ liệu khác — đánh giá, đơn hàng, thời điểm tạo — nên backend là
+ * nguồn chân lý duy nhất (`API_CONTRACT.md` §C.3). Cho form gửi lên được thì
+ * admin sẽ "sửa" được số sao và số đã bán, và con số hiển thị sẽ mâu thuẫn với
+ * chính danh sách đánh giá ngay bên dưới nó.
+ *
+ * `id` cũng vắng: backend cấp khi tạo, còn khi sửa thì id đi trên đường dẫn.
+ *
+ * ⚠️ `images` là **đường dẫn TƯƠNG ĐỐI** (`/images/rau-cu/ca-rot-1.jpg`), giống
+ * hệt `Product.images` đi vào `src/api/`. KHÔNG cho `imageUrl()` chạm vào giá
+ * trị này: `imageUrl()` chỉ được gọi khi *đọc* ở lớp `src/api/`, đưa URL đã
+ * ghép base vào payload gửi lên là ghi luôn cả gốc CDN xuống cơ sở dữ liệu.
+ */
+export interface ProductPayload {
+  name: string
+  /** Bỏ trống thì backend tự sinh từ `name`. */
+  slug?: string
+  price: number
+  salePrice: number | null
+  /** Đường dẫn tương đối `/images/...` — xem cảnh báo ở JSDoc của interface. */
+  images: string[]
+  categoryId: number
+  brandId: number | null
+  stock: number
+  unit: string
+  origin: string
+  shortDescription: string
+  description: string
+  isFeatured: boolean
+  isBestSeller: boolean
+}
+
 export type ProductSort = 'newest' | 'price_asc' | 'price_desc' | 'best_selling' | 'rating'
 
 /** Tham số lọc trang cửa hàng — đồng bộ với URL query params. */

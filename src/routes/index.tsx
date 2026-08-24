@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import MainLayout from '@/components/layout/MainLayout'
+import { adminRoute } from './adminRoutes'
 import { ROUTES } from '@/lib/constants'
 
 import HomePage from '@/pages/HomePage'
@@ -43,6 +44,13 @@ import {
  *
  * Khung chờ nằm ở `<Suspense>` trong `MainLayout` nên header và footer không nháy
  * khi chuyển trang.
+ *
+ * ⚠️ **Cây này KHÔNG còn là cây duy nhất.** Mảng dưới đây có HAI mục top-level:
+ * storefront (`MainLayout`) và khu quản trị (`adminRoute`, khai ở
+ * `adminRoutes.tsx`). Khu quản trị đứng riêng vì `MainLayout` render
+ * `Header`/`Footer`/`TopBar`/`MiniCart` vô điều kiện và không có cách nào tắt —
+ * chi tiết và các phương án đã loại nằm ở ADR 0001. Thêm trang quản trị mới thì
+ * sửa `adminRoutes.tsx`, đừng thêm vào cây storefront.
  */
 export const router = createBrowserRouter([
   {
@@ -91,4 +99,14 @@ export const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
+
+  /*
+   * Mục top-level thứ hai: khu quản trị `/quan-tri/*` với layout, `errorElement`
+   * và `<Suspense>` riêng — xem `adminRoutes.tsx` và ADR 0001.
+   *
+   * Phải đứng SAU splat `'*'` ở trên chỉ về mặt đọc hiểu; React Router v7 chấm
+   * điểm theo độ cụ thể của path nên `/quan-tri` vẫn thắng splat của storefront
+   * dù xếp ở đâu trong mảng này.
+   */
+  adminRoute,
 ])

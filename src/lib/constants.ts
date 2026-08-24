@@ -18,6 +18,21 @@ export const ROUTES = {
   BLOG_DETAIL: '/tin-tuc/:slug',
   ABOUT: '/gioi-thieu',
   CONTACT: '/lien-he',
+
+  /*
+   * Khu quản trị — cây route top-level THỨ HAI, sibling với `MainLayout`
+   * (xem `routes/adminRoutes.tsx` và ADR 0001). Đường dẫn con vẫn khai tuyệt đối
+   * như khối `/tai-khoan` ở trên: React Router chấp nhận vì chúng bắt đầu bằng
+   * đúng path của route cha.
+   */
+  ADMIN: '/quan-tri',
+  ADMIN_PRODUCTS: '/quan-tri/san-pham',
+  ADMIN_PRODUCT_NEW: '/quan-tri/san-pham/them-moi',
+  ADMIN_PRODUCT_EDIT: '/quan-tri/san-pham/:id/chinh-sua',
+  ADMIN_ORDERS: '/quan-tri/don-hang',
+  ADMIN_ORDER_DETAIL: '/quan-tri/don-hang/:code',
+  ADMIN_CUSTOMERS: '/quan-tri/khach-hang',
+  ADMIN_CUSTOMER_DETAIL: '/quan-tri/khach-hang/:id',
 } as const
 
 /** Sinh đường dẫn chi tiết sản phẩm từ slug. */
@@ -25,6 +40,17 @@ export const productPath = (slug: string): string => `/san-pham/${slug}`
 
 /** Sinh đường dẫn chi tiết bài viết từ slug. */
 export const blogPath = (slug: string): string => `/tin-tuc/${slug}`
+
+/** Sinh đường dẫn màn sửa sản phẩm trong khu quản trị. */
+export const adminProductEditPath = (id: number | string): string =>
+  `/quan-tri/san-pham/${id}/chinh-sua`
+
+/** Sinh đường dẫn chi tiết đơn hàng trong khu quản trị — khoá là **mã đơn**, không phải id. */
+export const adminOrderDetailPath = (code: string): string => `/quan-tri/don-hang/${code}`
+
+/** Sinh đường dẫn chi tiết khách hàng trong khu quản trị. */
+export const adminCustomerDetailPath = (id: number | string): string =>
+  `/quan-tri/khach-hang/${id}`
 
 /** Sinh đường dẫn cửa hàng đã lọc sẵn theo danh mục. */
 export const shopByCategoryPath = (categorySlug: string): string =>
@@ -59,6 +85,16 @@ export const PRODUCTS_PER_PAGE = 12
 
 /** Số bài viết mỗi trang ở trang tin tức. */
 export const POSTS_PER_PAGE = 6
+
+/**
+ * Ngưỡng cảnh báo sắp hết hàng: `0 < stock <= 10` là `low_stock`.
+ *
+ * **Backend phải dùng đúng con số này** cho `stockStatus=low_stock` của
+ * `AdminProductQuery`. Hai đầu lệch nhau thì bộ lọc "sắp hết" trả một tập,
+ * còn nhãn hiển thị trên từng dòng lại nói khác — sai lệch âm thầm, không có
+ * lỗi nào nổ ra.
+ */
+export const LOW_STOCK_THRESHOLD = 10
 
 /** Ngưỡng miễn phí vận chuyển (VNĐ). */
 export const FREE_SHIPPING_THRESHOLD = 500_000
