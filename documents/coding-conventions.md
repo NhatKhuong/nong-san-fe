@@ -308,6 +308,23 @@ Ba biến thể trên cùng một gốc: **node tồn tại ≠ node nói ra k�
 coi ba ví dụ này là danh sách đầy đủ — hãy hỏi *"khẳng định này có đúng trước khi hành động xảy ra
 không?"*. Nếu có, nó không chứng minh gì.
 
+**Biến thể thứ tư, và nó ở tầng khác: thư viện hiển thị có quyền không vẽ gì cho một giá trị hợp lệ.**
+
+Ba biến thể trên nói về *khẳng định sai chỗ*. Cái này nói về **khoảng cách giữa dữ liệu và pixel** —
+không khẳng định nào ở tầng dữ liệu bắt được nó. Bài học từ backlog 0007: dữ liệu đúng, hợp đồng
+đúng, zero-fill đúng — và Recharts vẫn **không vẽ gì** cho `count: 0`, nên biểu đồ 5 trạng thái chỉ
+hiện 1 cột.
+
+Hai quy tắc rút ra:
+
+1. **Đếm phần tử đã render, và đếm ở khoảng dữ liệu NGHÈO NHẤT.** Khoảng dữ liệu giàu làm mọi biểu
+   đồ trông đúng. Ở 0007, khoảng 30 ngày (cả 5 trạng thái đều khác 0) pass sạch; chỉ khoảng 7 ngày
+   mới lộ ra lỗi.
+2. **Ảnh chụp ở bề rộng nhỏ nhất là bằng chứng không thay thế được.** Cũng ở 0007, 5 nhãn tiếng Việt
+   dài chồng lên nhau thành dải chữ không đọc được ở 375px — **DOM hoàn toàn hợp lệ, mọi phép đếm
+   đều pass**. Chỉ ảnh mới bắt được. Kiểm DOM và xem ảnh là hai loại bằng chứng khác nhau, không
+   loại nào thay được loại nào.
+
 ---
 
 ## 9. Điều cấm
