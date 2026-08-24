@@ -2,7 +2,7 @@
 
 Tài liệu này mô tả **chính xác những gì frontend đang mong đợi**. Nó không phải bản đề xuất — frontend đã được xây và kiểm thử xong theo đúng các shape dưới đây, nên backend khớp được bao nhiêu thì phần frontend phải sửa ít bấy nhiêu.
 
-> **Nguồn chân lý thực sự vẫn là code:** 45 hàm trong `src/api/*.api.ts` và 12 file trong `src/types/`. Mỗi hàm đều có sẵn dòng comment `Khi có backend: ...` ghi đúng lời gọi sẽ thay thế. Tài liệu này gom chúng lại một chỗ để bàn giao.
+> **Nguồn chân lý thực sự vẫn là code:** 57 hàm `export` trong 15 file `src/api/*.api.ts` và 12 file kiểu dữ liệu trong `src/types/` (chưa kể `index.ts` chỉ re-export). Mỗi hàm đều có sẵn dòng comment `Khi có backend: ...` ghi đúng lời gọi sẽ thay thế. Tài liệu này gom chúng lại một chỗ để bàn giao.
 
 **Trạng thái:** frontend chạy hoàn toàn bằng mock JSON trong `src/mocks/`. Chưa có một request HTTP thật nào được phát ra.
 
@@ -239,7 +239,7 @@ Toàn bộ nội dung trang Giới thiệu (câu chuyện, mốc thời gian, co
 
 ### B.12 Khu quản trị — `/admin/**` (khung, chưa chốt)
 
-> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint) và **§B.12.2 đã chốt** (backlog 0005, 3 endpoint) — cả hai đã cộng vào §F; hai mục còn lại vẫn rỗng — ai điền mục nào thì cập nhật §F trong cùng lần sửa.
+> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint), **§B.12.2 đã chốt** (backlog 0005, 3 endpoint) và **§B.12.3 đã chốt** (backlog 0006, 2 endpoint; định nghĩa "khách hàng" chốt ở backlog 0008) — cả ba đã cộng vào §F; **§B.12.4 vẫn rỗng** — ai điền mục đó thì cập nhật §F trong cùng lần sửa.
 
 Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
 
@@ -304,7 +304,20 @@ Hàm nằm ở `src/api/adminOrders.api.ts`, **không** ở `orders.api.ts` — 
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
 |---|---|---|---|---|---|
-| _chưa chốt_ | `/admin/customers…` | — | — | 401, 403 | 🔒 admin |
+| `getAdminUsers` | `GET /admin/customers` | query: `q`, `role` (**bỏ trống ⇒ `customer`**), `page`, `limit` | `Paginated<User>` | 401, 403 | 🔒 admin |
+| `getAdminUser` | `GET /admin/customers/{id}` | — | `User` | 401, 403, 404 | 🔒 admin |
+
+Hàm nằm ở `src/api/adminUsers.api.ts`, **không** ở `auth.api.ts` — cùng lý do với §B.12.1 và §B.12.2: `/auth/**` là namespace của chính người đang đăng nhập, `/admin/**` là namespace đọc chéo mọi người dùng, và hai bên được gác bằng hai lớp bảo mật khác nhau.
+
+- **Chỉ đọc, và giai đoạn này cố ý KHÔNG mở đường ghi.** Không sửa hồ sơ, không xoá, không khoá tài khoản, không đổi vai trò (backlog 0006). Riêng vai trò thì không phải "chưa làm" mà là **không được làm ở đây**: `role` chỉ được gán ở phía server và `PUT /auth/me` cũng phải bỏ qua nó (ADR 0002, §C.4). Một endpoint `PATCH /admin/customers/{id}/role` mở ra là mở đúng cái cửa ADR đó đóng lại — cần thì phải là một quyết định của Owner, không phải một dòng thêm vào bảng này.
+- **`User` không bao giờ kèm `password`** — kể cả hash. Backend trả **DTO**, không trả entity; lớp mock làm đúng vậy bằng `toPublicUser()` ngay tại ranh giới đọc kho dữ liệu, nên không lời gọi nào ở tầng trên còn cầm được trường đó. Đây là khẳng định kiểm được: `getAdminUsers()` trả về object không có khoá `password`.
+- **Khoá theo `id`, không phải email.** Email là thứ khách tự sửa được ở `/tai-khoan`, mà link hồ sơ đã lưu không được hỏng sau lần Lưu đầu tiên — cùng lý do `getAdminProduct` khoá theo `id` chứ không theo `slug` (§B.12.1).
+- **`q`** khớp **họ tên** hoặc **email** hoặc **số điện thoại**. So khớp tên **bỏ dấu** (`le thi bich` khớp `Lê Thị Bích`), email so khớp trên chuỗi đã hạ chữ thường, số điện thoại khớp cả đoạn giữa.
+- **"Khách hàng" = `role == "customer"`, và `role` bỏ trống thì backend mặc định đúng tập đó** (Owner chốt 2026-08-24, backlog 0008). Tài khoản quản trị là nhân viên nội bộ, không phải khách — `GET /admin/customers` không kèm tham số nào thì **không** được trả về bản ghi `admin` nào.
+- **Đây phải là đúng tập mà `customerCount` của §B.12.4 đếm.** Hai mục này là hai chỗ duy nhất trong tài liệu đếm người dùng, và chúng phải đếm **cùng một tập**: lệch nhau thì người dùng thấy bảng 11 dòng còn ô chỉ số ghi 12, không có lỗi nào nổ ra và không chỗ nào nói ra là vì sao. Ai điền §B.12.4 thì đọc dòng này trước; ai đổi định nghĩa ở đây thì sửa cả §B.12.4 trong cùng lần sửa.
+- **`role` vẫn là bộ lọc, không phải cột phân quyền** — mặc định `customer` là **mặc định**, không phải hàng rào. Truyền `role=admin` vẫn trả về tài khoản quản trị; đó là chỗ để xem tập khác khi cần, và là lý do bảng vẫn giữ cột "Vai trò" (sẽ nói đúng ngay khi có vai trò thứ ba). Quyền vào được namespace này đã do filter `/admin/**` gác, không phải do tham số này.
+- **Không có `sort`.** `AdminUserQuery` cố ý không khai nó (hợp đồng chốt ở backlog 0003). Thứ tự cố định là **`id` tăng dần**, chứ không phải "mới nhất trước": `User` **không có `createdAt`**, nên không tồn tại mốc thời gian nào để xếp theo. Muốn thứ tự đó thì phải thêm trường vào `types/user.ts` **và** vào hợp đồng này trước — không phải đoán ở lớp truy vấn.
+- **Lịch sử đơn của một khách KHÔNG có endpoint riêng.** Màn hồ sơ gọi lại `GET /admin/orders?userId={id}` (§B.12.2). Đây chính là chỗ §C.4.2 được dùng đến: `userId` là bộ lọc hợp lệ **trong** namespace `/admin`, và vì có nó nên `/orders/me` không bao giờ cần mọc thêm `?userId=` (§C.4.3b). Thêm `GET /admin/customers/{id}/orders` là tạo cái thứ hai làm đúng việc cái thứ nhất đã làm, với một hàng rào quyền phải nhớ gác lại lần nữa.
 
 #### B.12.4 Tổng quan — số liệu tổng hợp
 
@@ -421,6 +434,7 @@ Thứ tự đề xuất: `categories` → `products` → `posts` (công khai, d�
 
 - [ ] Xoá thư mục `src/mocks/`
 - [ ] Xoá `getCurrentUserId()` trong `auth.api.ts` nếu không còn ai gọi
+- [ ] Xoá `readPublicUsers()` trong `auth.api.ts` — hàm **chỉ chạy ở client** (§F), đọc thẳng kho `nss_mock_users`. `adminUsers.api.ts` là nơi duy nhất gọi nó; khi hai hàm ở đó thành lời gọi HTTP thì nó không còn ai gọi và phải biến mất cùng `src/mocks/`. Để lại là để lại một đường đọc dữ liệu giả song song với backend thật
 - [ ] Kiểm tra `ApiError` hoạt động: gọi một endpoint sai chủ đích, xác nhận giao diện hiện **tiếng Việt** chứ không phải `"Request failed with status code 404"`
 - [ ] Chạy lại cả 7 bộ kiểm thử
 
@@ -441,10 +455,10 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 | Con số | Giá trị |
 |---|---|
-| Endpoint | 53 |
-| File trong `src/api/` | 17 (14 file `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock) |
-| Hàm chỉ chạy ở client | 2 — `getCurrentUserId()`, `calcShippingFee()` |
+| Endpoint | 55 |
+| File trong `src/api/` | 18 (15 file `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock) |
+| Hàm chỉ chạy ở client | 3 — `getCurrentUserId()`, `calcShippingFee()`, `readPublicUsers()` |
 | Kiểu dữ liệu | 12 file trong `src/types/` |
-| Chỗ hiển thị `error.message` cho người dùng | 24 |
+| Chỗ hiển thị `error.message` cho người dùng | 33 |
 
 Thêm endpoint mới thì cập nhật cả bảng B **và** con số ở đây — lệch nhau nghĩa là có hàm chưa được ghi.

@@ -271,6 +271,43 @@ thêm `localStorage` và thấy overlay còn rỗng.
 Với thao tác ghi, cách chắc chắn nhất là kiểm **cả hai**: node hiển thị **và** dữ liệu đã ghi
 xuống (`localStorage`, hoặc gọi lại hàm đọc).
 
+**Biến thể nguy hiểm hơn — "X đã biến mất" khớp với trạng thái loading y hệt trạng thái kết quả.**
+
+```js
+// ❌ passed cả khi vẫn đang loading — nhánh Skeleton cũng không có <table>
+await waitFor(() => document.querySelector('main table') === null)
+
+// ✅ chờ chính node NÓI RA kết quả
+await waitFor(() => document.querySelector('main h2')?.textContent === 'Không có khách hàng nào khớp')
+```
+
+Bài học từ backlog 0006. Đây là biến thể "trạng thái trung gian" của cùng cái bẫy, và nó tấn công
+**cả những màn không có `<option>` nào** — tức là mọi màn. Vì mọi trạng thái bất đồng bộ đều phải
+có đủ ba nhánh loading / error / empty (§5), **sự vắng mặt của một thứ không bao giờ phân biệt
+được ba nhánh đó**. Luôn chờ node khẳng định kết quả, đừng chờ sự vắng mặt của thứ trước đó.
+
+**Biến thể thứ ba — placeholder luôn có nội dung.**
+
+```jsx
+// component:  title={user ? user.fullName : 'Chi tiết khách hàng'}
+
+// ❌ passed lúc còn loading — placeholder cũng là "có nội dung"
+await waitFor(() => document.querySelector('main h1')?.textContent.length > 0)
+
+// ✅ so với chính giá trị mong đợi
+await waitFor(() => document.querySelector('main h1')?.textContent === 'Lê Thị Bích')
+```
+
+Bài học từ backlog 0008. Quy tắc chung: **component nào viết `x ? a : placeholder` thì khẳng định
+phải so với `a`, không phải "có nội dung"** — placeholder sinh ra chính là để luôn có nội dung.
+
+---
+
+Ba biến thể trên cùng một gốc: **node tồn tại ≠ node nói ra kết quả.** Cái bẫy lần lượt nấp trong
+`<option>` (0005), trong sự vắng mặt (0006), rồi trong giá trị mặc định của một prop (0008). Đừng
+coi ba ví dụ này là danh sách đầy đủ — hãy hỏi *"khẳng định này có đúng trước khi hành động xảy ra
+không?"*. Nếu có, nó không chứng minh gì.
+
 ---
 
 ## 9. Điều cấm
