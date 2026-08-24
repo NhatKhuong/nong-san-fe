@@ -148,12 +148,13 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 | `updateProfile` | `PUT /auth/me` | `Partial<User>` | `User` | 404, 409 email trùng | ✅ |
 | `changePassword` | `PUT /auth/password` | `ChangePasswordPayload` | `204` | 401, 422 sai mật khẩu cũ | ✅ |
 
-**Bốn điều bắt buộc:**
+**Năm điều bắt buộc:**
 
 1. `User` trả về **không bao giờ chứa password** — kể cả dạng đã hash.
-2. `updateProfile` **không được cho phép ghi đè `id`**, kể cả khi client gửi lên.
-3. `logout` phải **thu hồi refresh token**, nếu không nó vẫn dùng được đến khi hết hạn dù người dùng đã thoát.
-4. `forgotPassword` **luôn trả 204**, kể cả khi email không tồn tại. Trả 404 sẽ biến endpoint này thành công cụ dò xem địa chỉ nào đã đăng ký.
+2. `updateProfile` **không được cho phép ghi đè `id` hay `role`**, kể cả khi client gửi lên. Hai trường này bị chốt lại từ bản ghi cũ; sửa hồ sơ không được phép tự nâng quyền.
+3. `register` **luôn tạo tài khoản `role: "customer"` và bỏ qua mọi trường `role` gửi lên trong body.** `RegisterPayload` cố ý không khai `role`, nhưng backend vẫn phải tự bỏ qua nó — client gửi thừa một trường là chuyện không ngăn được. **Vai trò chỉ được gán ở phía server** (§C.4.2 và [ADR 0002](../../../management/decisions/0002-phan-quyen-role-va-namespace-admin.md)); nếu client tự chọn được vai trò thì ai cũng tự cấp quyền quản trị cho mình được.
+4. `logout` phải **thu hồi refresh token**, nếu không nó vẫn dùng được đến khi hết hạn dù người dùng đã thoát.
+5. `forgotPassword` **luôn trả 204**, kể cả khi email không tồn tại. Trả 404 sẽ biến endpoint này thành công cụ dò xem địa chỉ nào đã đăng ký.
 
 `getCurrentUserId()` trong cùng file **không phải endpoint** — nó giải id từ token phía client. Khi ghép backend thật, id lấy từ JWT ở phía server.
 
@@ -236,6 +237,45 @@ Mock hiện chỉ có **10 tỉnh rút gọn**. Backend cấp bộ đầy đủ 
 
 Toàn bộ nội dung trang Giới thiệu (câu chuyện, mốc thời gian, con số, cam kết) là **dữ liệu**, không viết cứng trong component — người vận hành sửa được mà không cần deploy.
 
+### B.12 Khu quản trị — `/admin/**` (khung, chưa chốt)
+
+> **Khung rỗng có chủ đích.** Bốn mục dưới đây được điền dần bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **Chưa mục nào thêm endpoint**, nên con số ở §F vẫn đúng — ai điền mục nào thì cập nhật §F trong cùng lần sửa.
+
+Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
+
+- Nằm dưới tiền tố `/admin/**`, bắt buộc JWT có `role == "admin"` — gác bằng **một filter trên cả tiền tố**, không rải `@PreAuthorize` từng handler (§C.4.2, §C.4.3).
+- **Được phép** nhận `userId` như một **bộ lọc** — đây là khác biệt duy nhất so với phạm vi khách hàng, và là lý do namespace này tồn tại.
+- Sai vai trò → **403**; không token → **401**.
+- Cần dữ liệu của khách hàng khác thì mở **endpoint song sinh** ở đây, **không** thêm `?userId=` vào endpoint ngoài `/admin` (§C.4.3b).
+
+#### B.12.1 Sản phẩm — thêm, sửa, xoá
+
+| Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
+|---|---|---|---|---|---|
+| _chưa chốt_ | `/admin/products…` | — | — | 401, 403 | 🔒 admin |
+
+#### B.12.2 Đơn hàng — liệt kê chéo người dùng, đổi trạng thái
+
+| Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
+|---|---|---|---|---|---|
+| _chưa chốt_ | `/admin/orders…` | — | — | 401, 403 | 🔒 admin |
+
+> Song sinh với `GET /orders/me`. Hai endpoint tồn tại song song **chính là** cách giữ §C.4.1 không bị nới lỏng.
+
+#### B.12.3 Khách hàng — chỉ đọc
+
+| Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
+|---|---|---|---|---|---|
+| _chưa chốt_ | `/admin/customers…` | — | — | 401, 403 | 🔒 admin |
+
+#### B.12.4 Tổng quan — số liệu tổng hợp
+
+| Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
+|---|---|---|---|---|---|
+| _chưa chốt_ | `/admin/stats…` | — | — | 401, 403 | 🔒 admin |
+
+> Số liệu tổng hợp **do backend tính**, cùng lý do với §C.3: gộp ở client nghĩa là tải toàn bộ đơn hàng của mọi khách về trình duyệt.
+
 ---
 
 ## C. Backend là nguồn chân lý ở những chỗ này
@@ -267,13 +307,36 @@ Frontend hiện tính tất cả những con số này ở client vì chưa có 
 
 `createReview` ở mock **không cập nhật** `rating` và `reviewCount` của sản phẩm — đã ghi rõ trong comment của `getReviewSummary()` để không bị nhầm là bug. Backend phải tính lại hai trường này khi có đánh giá mới.
 
-### C.4 Kiểm quyền sở hữu
+### C.4 Kiểm quyền sở hữu — hai phạm vi tách bạch
 
-Mọi endpoint dưới `/addresses` và `/orders/me` phải lọc theo người dùng trong JWT. Không endpoint nào được nhận `userId` từ query hay body.
+Khu quản trị cần liệt kê **mọi** đơn hàng và **mọi** khách hàng, tức đúng thứ mục này cấm. Quy tắc **không bị nới lỏng** để chiều admin — nới nó ra là hỏng đúng thứ nó bảo vệ. Thay vào đó nó được tách thành ba vế không lẫn vào nhau được. Xem [ADR 0002](../../../management/decisions/0002-phan-quyen-role-va-namespace-admin.md).
+
+#### C.4.1 Phạm vi khách hàng — siết chặt hơn trước
+
+Mọi endpoint **ngoài** `/admin` có chạm dữ liệu riêng của người dùng — `/addresses/**`, `/orders/me`, `/auth/me`, `/auth/password` — lấy chủ sở hữu **chỉ từ claim `sub` của JWT**. Không nhận `userId` qua query, path hay body.
+
+Vi phạm ở đây là **rò rỉ dữ liệu**, không phải lỗi hiển thị.
+
+#### C.4.2 Phạm vi quản trị — mới
+
+Endpoint dưới `/admin/**` **cố ý truy vấn chéo người dùng** và bắt buộc JWT có `role == "admin"`.
+
+- Nhóm này **được phép** nhận `userId` như một **bộ lọc** — đó là mục đích tồn tại của nó.
+- Token hợp lệ nhưng sai vai trò → **403**. Không token → **401**.
+- Chọn 403 chứ không phải 404: token hợp lệ, chỉ thiếu quyền. Đổi thành 404 để giấu sự tồn tại sẽ che mất lỗi cấu hình vai trò lúc vận hành.
+- Vai trò **chỉ được gán ở phía server** — `POST /auth/register` luôn tạo `customer` (§B.4 điều 3), `PUT /auth/me` không được ghi đè `role` (§B.4 điều 2).
+
+#### C.4.3 Luật giữ hai phạm vi tách bạch
+
+**(a)** Kiểm vai trò là **một filter trên cả tiền tố `/admin/**`**, không rải rác từng handler. Một lần quên `@PreAuthorize` là rò dữ liệu toàn bộ khách hàng.
+
+**(b) Không endpoint nào ngoài `/admin` được mọc thêm `?userId=`** chỉ vì admin cần dữ liệu đó. Cần thì mở **endpoint song sinh** dưới `/admin` — `/orders/me` và `/admin/orders` tồn tại song song chính là để tránh điều này. Cái giá là mỗi năng lực quản trị cần **hai** endpoint thay vì một endpoint có cờ; đó là cái giá cố ý.
+
+> ⚠️ **`AdminRoute` ở frontend không phải bảo mật.** `src/components/auth/AdminRoute.tsx` chỉ ẩn màn hình cho gọn: `role` nó đọc nằm trong localStorage của chính máy người dùng, sửa `nss_auth` thành `role: "admin"` mất 5 giây. **Hàng rào thật duy nhất là filter ở §C.4.3a.** Rủi ro thật ở đây là nhầm lẫn — sẽ có người tưởng vòng chặn phía client có nghĩa gì đó.
 
 ---
 
-## D. Năm thay đổi hợp đồng đã tích luỹ
+## D. Bảy thay đổi hợp đồng đã tích luỹ
 
 Ghi lại vì chúng phát sinh rải rác qua các giai đoạn, và đều đã có ghi chú tại chỗ trong code.
 
@@ -284,6 +347,12 @@ Ghi lại vì chúng phát sinh rải rác qua các giai đoạn, và đều đ�
 | 3 | `Address` thêm `provinceCode` và `districtCode` — **giữ cả mã lẫn tên** | 7 | `types/user.ts` |
 | 4 | `Post.categorySlug`; `getPostCategories()` trả `PostCategory[]` thay vì `string[]` | 8 | `types/post.ts` |
 | 5 | `AuthResponse.refreshToken` | 10 | `types/user.ts` |
+| 6 | `User.role: 'customer' \| 'admin'` — **bắt buộc**, không phải `role?:`. Phản chiếu claim `role` trong JWT. `RegisterPayload` **không** có trường này | Khu QT | `types/user.ts` |
+| 7 | Namespace `/admin/**` được phép truy vấn chéo người dùng; §C.4 tách thành C.4.1 / C.4.2 / C.4.3 | Khu QT | §B.12, §C.4 |
+
+**#6 và #7 đến từ đâu:** [ADR 0002](../../../management/decisions/0002-phan-quyen-role-va-namespace-admin.md) và backlog 0002. "Khu QT" là giai đoạn 1 của khu vực quản trị `/quan-tri`, không nằm trong dãy giai đoạn 1–10 của phần khách hàng.
+
+**Vì sao `role` bắt buộc chứ không `role?:` (#6):** optional nghĩa là mọi chỗ gọi phải so với `undefined`, và TypeScript không bao giờ ép mock hay backend phải cung cấp nó. Dữ liệu cũ được xử lý ở đúng **hai ranh giới hydrate** — `readUsers()` trong `auth.api.ts` backfill `'customer'` khi đọc `nss_mock_users`, và `persist` `version: 1` + `migrate` của `auth.store.ts` khi rehydrate `nss_auth`. Cả hai mặc định về **quyền thấp nhất**, nên không ai bị nâng quyền nhầm và không ai bị ép đăng xuất.
 
 **Vì sao `Address` giữ cả mã lẫn tên (#3):** ô `<Select>` chọn địa giới hành chính chạy theo **mã**, còn `ShippingInfo` của đơn hàng lưu **tên**. Chỉ lưu tên thì mỗi lần mở lại form phải tra ngược tên → mã, và cơ chế đó vỡ ngay khi tên đơn vị hành chính thay đổi.
 

@@ -1,9 +1,23 @@
+/**
+ * Vai trò của tài khoản — phản chiếu claim `role` trong JWT.
+ *
+ * **Bắt buộc, không phải `role?:`.** Optional nghĩa là mọi chỗ gọi phải so với
+ * `undefined`, và TypeScript không bao giờ ép mock hay backend phải cung cấp
+ * trường này. Dữ liệu cũ được xử lý ở đúng hai ranh giới hydrate
+ * (`auth.api.ts` khi đọc `nss_mock_users`, `auth.store.ts` khi rehydrate
+ * `nss_auth`) chứ không bằng cách nới lỏng kiểu.
+ *
+ * Vai trò **chỉ được gán ở phía server** — xem ADR 0002.
+ */
+export type UserRole = 'customer' | 'admin'
+
 export interface User {
   id: number
   fullName: string
   email: string
   phone: string
   avatar: string | null
+  role: UserRole
 }
 
 /**
@@ -35,6 +49,13 @@ export interface LoginPayload {
   password: string
 }
 
+/**
+ * Dữ liệu đăng ký.
+ *
+ * **Cố ý không có `role`.** `POST /auth/register` luôn tạo tài khoản `customer`
+ * và bỏ qua mọi trường `role` gửi lên trong body — nếu client tự chọn được vai
+ * trò thì ai cũng tự cấp quyền quản trị cho mình được (ADR 0002).
+ */
 export interface RegisterPayload {
   fullName: string
   email: string

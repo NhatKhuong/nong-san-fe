@@ -12,6 +12,7 @@ export type { Post, PostCategory, PostQuery } from './post'
 export type { CartItem, CartSummary, CartIssue, Coupon } from './cart'
 export type {
   User,
+  UserRole,
   Address,
   AddressPayload,
   LoginPayload,

@@ -6,6 +6,7 @@ import type {
   LoginPayload,
   RegisterPayload,
   User,
+  UserRole,
 } from '@/types'
 
 const MOCK_USERS_KEY = 'nss_mock_users'
@@ -15,6 +16,13 @@ interface StoredUser extends User {
   password: string
 }
 
+/**
+ * Bản ghi đọc lên từ localStorage: máy nào đã chạy dự án trước khi có `role`
+ * thì dữ liệu còn thiếu trường đó. Chỉ dùng bên trong `readUsers()` — mọi thứ
+ * ra khỏi hàm đó đã là `StoredUser` đầy đủ.
+ */
+type LegacyStoredUser = Omit<StoredUser, 'role'> & { role?: UserRole }
+
 /** Tài khoản demo có sẵn để đăng nhập thử ngay mà không cần đăng ký. */
 const DEMO_USER: StoredUser = {
   id: 1,
@@ -22,26 +30,68 @@ const DEMO_USER: StoredUser = {
   email: 'demo@nongsansach.vn',
   phone: '0901234567',
   avatar: null,
+  role: 'customer',
   password: '123456',
 }
 
+/** Tài khoản quản trị demo — cách duy nhất để thử vai trò `admin` khi chưa có backend. */
+const DEMO_ADMIN: StoredUser = {
+  id: 2,
+  fullName: 'Trần Quản Trị',
+  email: 'admin@nongsansach.vn',
+  phone: '0907654321',
+  avatar: null,
+  role: 'admin',
+  password: '123456',
+}
+
+const SEED_USERS: StoredUser[] = [DEMO_USER, DEMO_ADMIN]
+
 /**
- * Đọc danh sách user, gieo sẵn tài khoản demo vào localStorage ở lần đọc đầu tiên.
+ * Đọc danh sách user: **đọc → chuẩn hoá → bảo đảm → ghi lại**.
  *
- * Trước đây hàm này trả về `[DEMO_USER, ...stored]` — demo không nằm trong
- * localStorage nên mọi thay đổi lên nó (sửa hồ sơ, đổi mật khẩu) đều biến mất
- * sau khi tải lại trang. Gieo một lần rồi chỉ đọc từ localStorage thì tài khoản
- * demo hành xử y hệt tài khoản do người dùng đăng ký.
+ * Trước đây hàm này chỉ gieo khi khoá localStorage **vắng mặt**. Cách đó hỏng
+ * ngay lúc hợp đồng đổi: máy nào đã chạy dự án thì khoá đã tồn tại, nên sẽ không
+ * bao giờ nhận được tài khoản quản trị và mọi bản ghi cũ vĩnh viễn thiếu `role`.
+ * Vì vậy mỗi lần đọc đều:
+ *
+ * 1. parse những gì đang có (hỏng thì coi như rỗng),
+ * 2. backfill `role: 'customer'` cho bản ghi cũ — mặc định về **quyền thấp
+ *    nhất**, không ai bị nâng quyền nhầm,
+ * 3. bảo đảm hai tài khoản demo có mặt,
+ * 4. chỉ ghi lại khi thật sự có gì đó thay đổi.
+ *
+ * Đối chiếu tài khoản gieo theo **cả id lẫn email**: nếu ai đó đã đăng ký trùng
+ * email demo thì gieo thêm sẽ tạo hai bản ghi cùng email và `login` chọn bừa.
  */
 function readUsers(): StoredUser[] {
+  let stored: LegacyStoredUser[] = []
   try {
     const raw = localStorage.getItem(MOCK_USERS_KEY)
-    if (raw) return JSON.parse(raw) as StoredUser[]
+    const parsed: unknown = raw ? JSON.parse(raw) : null
+    if (Array.isArray(parsed)) stored = parsed as LegacyStoredUser[]
   } catch {
-    // Dữ liệu hỏng thì gieo lại từ đầu bên dưới.
+    // Dữ liệu hỏng thì coi như chưa có gì và gieo lại từ đầu bên dưới.
   }
-  writeUsers([DEMO_USER])
-  return [DEMO_USER]
+
+  let changed = stored.some((record) => record.role === undefined)
+  const users: StoredUser[] = stored.map((record) => ({
+    ...record,
+    role: record.role ?? 'customer',
+  }))
+
+  for (const seed of SEED_USERS) {
+    const exists = users.some(
+      (user) => user.id === seed.id || user.email.toLowerCase() === seed.email,
+    )
+    if (!exists) {
+      users.push(seed)
+      changed = true
+    }
+  }
+
+  if (changed) writeUsers(users)
+  return users
 }
 
 function writeUsers(users: StoredUser[]): void {
@@ -95,7 +145,12 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 /**
- * Đăng ký tài khoản mới.
+ * Đăng ký tài khoản mới — **luôn là `customer`**.
+ *
+ * `RegisterPayload` cố ý không có `role`, và backend cũng phải **bỏ qua mọi
+ * trường `role` gửi lên trong body**: vai trò chỉ được gán ở phía server, nếu
+ * không thì ai cũng tự cấp quyền quản trị cho mình được (ADR 0002).
+ *
  * Khi có backend: `const { data } = await client.post('/auth/register', payload); setAuthToken(data.token); return data`
  */
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
@@ -112,6 +167,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
     email: payload.email.trim().toLowerCase(),
     phone: payload.phone.trim(),
     avatar: null,
+    role: 'customer',
     password: payload.password,
   }
   writeUsers([...users, newUser])
@@ -157,8 +213,17 @@ export async function updateProfile(payload: Partial<User> & { id: number }): Pr
   )
   if (isEmailTaken) throw new Error('Email này đã được tài khoản khác sử dụng.')
 
-  // `id` và `password` không được phép ghi đè từ payload.
-  const updated: StoredUser = { ...users[index], ...payload, id: users[index].id }
+  /*
+   * `id`, `role` và `password` không được phép ghi đè từ payload. `role` bị chốt
+   * lại y như `id`: sửa hồ sơ không được phép tự nâng quyền, và `PUT /auth/me`
+   * ở backend cũng phải bỏ qua trường này (ADR 0002).
+   */
+  const updated: StoredUser = {
+    ...users[index],
+    ...payload,
+    id: users[index].id,
+    role: users[index].role,
+  }
   users[index] = updated
   writeUsers(users)
   return toPublicUser(updated)

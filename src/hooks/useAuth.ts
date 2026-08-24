@@ -9,13 +9,19 @@ import {
 } from '@/api/auth.api'
 import { getMyOrders } from '@/api/orders.api'
 import { queryKeys } from './queryKeys'
-import { selectIsAuthenticated, useAuthStore } from '@/store/auth.store'
+import { selectIsAdmin, selectIsAuthenticated, useAuthStore } from '@/store/auth.store'
 
-/** Trạng thái đăng nhập hiện tại, dùng ở header, route bảo vệ và trang thanh toán. */
+/**
+ * Trạng thái đăng nhập hiện tại, dùng ở header, route bảo vệ và trang thanh toán.
+ *
+ * `isAdmin` chỉ dùng để vẽ giao diện (ẩn/hiện menu, `AdminRoute`) — không phải
+ * kiểm quyền. Quyền thật do backend gác, xem JSDoc của `AdminRoute.tsx`.
+ */
 export function useCurrentUser() {
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore(selectIsAuthenticated)
-  return { user, isAuthenticated }
+  const isAdmin = useAuthStore(selectIsAdmin)
+  return { user, isAuthenticated, isAdmin }
 }
 
 export function useLogin() {

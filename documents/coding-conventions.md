@@ -91,6 +91,30 @@ Vi phạm nhóm này sẽ khiến việc ghép backend Spring Boot phải sửa 
 - Validate form bằng React Hook Form + Zod. Quy tắc dùng chung (ví dụ `PHONE_PATTERN`)
   khai ở `src/lib/validation.ts`, **không** để mỗi form tự viết lại.
 
+### 5.1 Gieo dữ liệu mock vào localStorage (bắt buộc)
+
+Mọi hàm đọc một khoá mock trong localStorage (`nss_mock_users`, `nss_mock_orders`,
+`nss_mock_addresses`, `nss_mock_contact_messages`…) phải theo đúng bốn bước:
+
+> **đọc → chuẩn hoá → bảo đảm → ghi lại**
+>
+> 1. parse những gì đang có (hỏng thì coi như rỗng)
+> 2. **backfill** trường mới cho bản ghi cũ, mặc định về giá trị **ít quyền / ít rủi ro nhất**
+> 3. bảo đảm các bản ghi gieo sẵn có mặt — đối chiếu theo **cả `id` lẫn khoá tự nhiên** (email…)
+> 4. chỉ ghi lại khi thật sự có gì đó thay đổi
+
+**Cấm kiểu "gieo khi khoá vắng mặt".** Nó luôn đúng trên máy sạch và luôn sai trên máy của
+người đã chạy dự án — tức là sai đúng ở chỗ không ai test. Khoá đã tồn tại thì bản ghi cũ
+vĩnh viễn thiếu trường mới, và dữ liệu gieo mới không bao giờ tới được máy đó.
+
+Với state đi qua `persist` của Zustand thì dùng `version` + `migrate` (xem `store/auth.store.ts`),
+**không** ép đăng xuất: `migrate` mặc định về quyền thấp nhất và không đá người đang làm việc dở
+ra ngoài. Hàm `migrate` phải **idempotent**.
+
+**Ticket nào đổi shape của một type dùng chung thì phần Verify bắt buộc có một điểm kiểm
+"dữ liệu localStorage cũ"**: ghi tay một bản ghi theo shape cũ, tải lại trang, và chứng minh
+người đang đăng nhập không bị văng ra. Xem `management/backlog/0002-*` làm mẫu.
+
 ---
 
 ## 6. Ảnh (bắt buộc)
