@@ -2,7 +2,10 @@
 
 Website thương mại điện tử bán nông sản sạch / thực phẩm hữu cơ, xây bằng **React + TypeScript + Vite + Tailwind CSS**.
 
-Backend sẽ được phát triển sau bằng **Spring Boot**. Ở giai đoạn hiện tại toàn bộ dữ liệu đến từ mock JSON, truy cập qua lớp service `src/api/` — khi backend sẵn sàng chỉ cần đổi phần thân các hàm trong lớp này.
+Backend được xây riêng bằng **Spring Boot**. Ở giai đoạn hiện tại frontend vẫn chạy hoàn toàn bằng mock JSON, truy cập qua lớp service `src/api/` — khi ghép backend chỉ cần đổi **thân** các hàm trong lớp này, chữ ký giữ nguyên.
+
+> **Đây là một surface trong workspace Gangline, được điều phối từ `../../management`.**
+> Đừng làm việc thẳng vào repo này — xem [Làm việc với dự án này](#làm-việc-với-dự-án-này).
 
 ## Yêu cầu
 
@@ -56,11 +59,45 @@ src/
 └── routes/       # Khai báo router
 ```
 
+## Làm việc với dự án này
+
+Repo này không được sửa trực tiếp. Nó là **surface `app`** trong một workspace file-native:
+
+```
+harness-starter-git-based/
+├── management/          ← hub điều phối, khởi động agent từ đây
+│   ├── backlog/         ← board: mỗi việc là một file NNNN-slug.md, chỉ mục ở STATUS.md
+│   ├── bugs/            ← mỗi lỗi là một file
+│   └── decisions/       ← ADR: vì sao chọn phương án này
+└── projects/app/        ← chính là repo này
+    └── documents/       ← LUẬT của surface: kiến trúc, quy ước, quy trình, hợp đồng API
+```
+
+- **Việc đến từ ticket trên board**, và *đường dẫn file ticket chính là spec*. Không có ticket
+  thì chưa có việc — nhờ PM ở `management/` mở trước.
+- **PM không viết code**; agent `app` thực thi, chỉ chạm `projects/app`, không chạy `git` trừ khi
+  được yêu cầu, và báo cáo lại theo khuôn [`documents/response-format.md`](documents/response-format.md).
+- **Đóng một việc cần đủ ba bằng chứng:** `npm run build` xanh · `npm run lint` sạch · mở dev server
+  xem đúng màn hình đã sửa (0 lỗi console). Dự án **chưa có test runner**.
+- Tiến độ và lý do quyết định sống ở `management/`, **không** giữ bản sao trong repo này.
+
+Chi tiết: [`documents/coding-conventions.md`](documents/coding-conventions.md) §8 (phần riêng của
+surface này) và `../../management/pm-playbook.md` (quy trình chung của workspace).
+
 ## Tài liệu
 
-- [`docs/NHAT-KY-LAM-VIEC.md`](docs/NHAT-KY-LAM-VIEC.md) — **đọc file này đầu tiên khi quay lại dự án**: đang dở ở đâu, tiếp theo làm gì, vì sao code lại như hiện tại
-- [`CLAUDE.md`](CLAUDE.md) — bộ quy tắc làm việc, quy ước code (đọc trước khi đóng góp)
-- [`docs/PLAN.md`](docs/PLAN.md) — kế hoạch triển khai và tiến độ theo giai đoạn
+Bản đồ tài liệu: [`documents/00-index.md`](documents/00-index.md) — đọc gì trước khi làm gì.
+
+| Tài liệu | Nội dung |
+|---|---|
+| [`documents/architecture/01-overview.md`](documents/architecture/01-overview.md) | Kiến trúc: các lớp, luồng dữ liệu, phân tách state, routing, design token |
+| [`documents/coding-conventions.md`](documents/coding-conventions.md) | Quy ước viết code (bản rút gọn của `CLAUDE.md`); **§8: cách thức làm việc** — hàng rào phạm vi, sáu tình huống dừng lại hỏi, thanh bằng chứng |
+| [`documents/API_CONTRACT.md`](documents/API_CONTRACT.md) | Hợp đồng API — đầu bài bàn giao cho backend Spring Boot |
+| [`documents/response-format.md`](documents/response-format.md) | Khuôn báo cáo agent trả về PM |
+| [`CLAUDE.md`](CLAUDE.md) | Bộ quy tắc nạp tự động mỗi phiên — đọc trước khi đóng góp |
+
+API thật do backend cung cấp theo hợp đồng trên: **Swagger UI** tại
+<http://localhost:8080/swagger-ui/index.html> (chỉ có khi backend đang chạy).
 
 ## Ghi chú
 

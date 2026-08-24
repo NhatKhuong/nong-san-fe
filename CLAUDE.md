@@ -2,16 +2,21 @@
 
 Bộ quy tắc làm việc chung cho dự án. File này được nạp tự động vào ngữ cảnh mỗi phiên — mọi thay đổi code phải tuân theo.
 
+> **Dự án này là một surface trong workspace do `management/` điều phối, không làm việc trực tiếp.**
+> Việc đến từ ticket trên board ở `management/backlog/` · `management/bugs/`; đường dẫn file ticket
+> chính là spec. Quy trình chung của workspace nằm ở `../../management/pm-playbook.md`; phần riêng
+> của surface này ở §8 dưới đây. Xem [`documents/00-index.md`](documents/00-index.md) để biết đọc gì
+> trước khi làm gì.
+> **`documents/` là luật của surface này** — mâu thuẫn giữa ticket và tài liệu thì dừng lại báo PM.
+
 ---
 
 ## 1. Tổng quan dự án
 
 Website thương mại điện tử bán **nông sản sạch / thực phẩm hữu cơ**, tham khảo bố cục từ https://organic-food.monamedia.net/.
 
-- **Phạm vi hiện tại:** frontend đầy đủ (trang chủ, cửa hàng, chi tiết SP, giỏ hàng, checkout, tài khoản, wishlist, blog).
-- **Backend:** _chưa tồn tại_. Sẽ được xây bằng **Spring Boot** sau. Toàn bộ dữ liệu hiện lấy từ mock JSON.
-- **Kế hoạch & tiến độ:** xem [`docs/PLAN.md`](docs/PLAN.md).
-- **Bối cảnh & lịch sử:** xem [`docs/NHAT-KY-LAM-VIEC.md`](docs/NHAT-KY-LAM-VIEC.md) — đọc trước khi bắt đầu một phiên làm việc mới để biết đang dở ở đâu và vì sao các quyết định trước được đưa ra.
+- **Phạm vi hiện tại:** frontend đầy đủ (trang chủ, cửa hàng, chi tiết SP, giỏ hàng, checkout, tài khoản, wishlist, blog). Chưa có giao diện quản trị.
+- **Backend:** đang xây bằng **Spring Boot**. Frontend vẫn chạy bằng mock JSON; hợp đồng bàn giao nằm ở [`documents/API_CONTRACT.md`](documents/API_CONTRACT.md), API thật xem tại `http://localhost:8080/swagger-ui/index.html` khi backend chạy.
 
 ### Tech stack (đã chốt — không tự ý thay đổi)
 
@@ -118,12 +123,29 @@ npx tsc --noEmit     # chỉ kiểm tra type, chạy trước khi kết thúc m�
 
 ## 8. Quy trình làm việc
 
-- Bám sát [`docs/PLAN.md`](docs/PLAN.md), làm **tuần tự theo giai đoạn**.
-- **Hoàn thành hạng mục nào thì tick `- [x]` ngay hạng mục đó** trong `docs/PLAN.md` — không dồn đến cuối.
-- Xong cả giai đoạn: đổi `⬜` thành `✅` ở tiêu đề giai đoạn **và** cập nhật dòng tương ứng trong bảng tiến độ.
-- **Chạy `npm run build` trước khi coi một giai đoạn là hoàn thành** — đây mới là cổng kiểm tra thật. `npx tsc --noEmit` không đi vào các tsconfig được reference nên bỏ sót một số lỗi (xem sự cố #2 trong nhật ký).
-- Cuối mỗi phiên, cập nhật [`docs/NHAT-KY-LAM-VIEC.md`](docs/NHAT-KY-LAM-VIEC.md) theo hướng dẫn ở cuối file đó.
-- **Không tự ý thêm thư viện ngoài stack đã chốt** — hỏi trước.
+Quy trình chung của workspace (vai trò, vòng đời ticket, rubric tự quyết, harness delta) nằm ở
+`../../management/pm-playbook.md` — **không chép lại ở đây**. Phần riêng của surface này, bản đầy
+đủ: [`documents/coding-conventions.md`](documents/coding-conventions.md) §8.
+
+- **Việc đến từ board ở `management/`**, không đến thẳng project. Đường dẫn file ticket
+  (`management/backlog/NNNN-slug.md` hoặc `management/bugs/NNNN-slug.md`) **chính là spec** —
+  xây đúng chừng đó, không hơn. Tiến độ và lý do quyết định sống ở board, project không giữ bản sao.
+- **Đọc `documents/` trước khi sửa code.** Thứ tự: `architecture/01-overview.md` →
+  `coding-conventions.md`. Ticket mâu thuẫn tài liệu thì **dừng và báo PM**, không tự ứng biến.
+- **Hàng rào phạm vi:** chỉ chạm `projects/app`. Không sửa surface khác, không sửa hub, không sửa
+  board, **không chạy lệnh `git`** trừ khi được yêu cầu rõ ràng.
+- **Không nới phạm vi giữa chừng.** Phát hiện thêm vấn đề thì ghi vào `Notes` của báo cáo để PM
+  mở ticket mới — không âm thầm sửa kèm.
+- **Dừng lại hỏi khi:** đổi chữ ký hàm trong `src/api/`; thêm thư viện ngoài stack; đổi design token
+  hoặc màu; ticket mâu thuẫn tài liệu; phát sinh câu hỏi "A hay B?" ảnh hưởng người dùng; xoá/đổi tên
+  route hoặc xoá `src/mocks/`.
+- **Thanh bằng chứng — đủ cả ba mới được báo xong** (dự án **chưa có test runner**, đừng báo số test):
+  1. `npm run build` xanh — **đây mới là cổng kiểm tra thật**; `npx tsc --noEmit` không đi vào các
+     tsconfig được reference nên bỏ sót lỗi, không dùng thay thế.
+  2. `npm run lint` sạch, 0 cảnh báo.
+  3. Hành vi quan sát được: chạy `npm run dev`, mở đúng màn hình đã sửa, **0 lỗi console, 0 request hỏng**.
+- **Báo cáo về PM đúng khuôn** [`documents/response-format.md`](documents/response-format.md) — là dữ
+  liệu, không phải văn xuôi. Đóng việc luôn kèm dòng `Harness delta` ("None" hợp lệ, bỏ trống thì không).
 
 ---
 
