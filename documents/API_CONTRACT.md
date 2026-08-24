@@ -89,7 +89,7 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 
 ## B. Bảng endpoint
 
-45 endpoint. Tên hàm ở cột đầu là hàm frontend đang gọi — tìm trong `src/api/` để xem chi tiết.
+50 endpoint. Tên hàm ở cột đầu là hàm frontend đang gọi — tìm trong `src/api/` để xem chi tiết.
 
 ### B.1 Sản phẩm — `products.api.ts`
 
@@ -239,7 +239,7 @@ Toàn bộ nội dung trang Giới thiệu (câu chuyện, mốc thời gian, co
 
 ### B.12 Khu quản trị — `/admin/**` (khung, chưa chốt)
 
-> **Khung rỗng có chủ đích.** Bốn mục dưới đây được điền dần bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **Chưa mục nào thêm endpoint**, nên con số ở §F vẫn đúng — ai điền mục nào thì cập nhật §F trong cùng lần sửa.
+> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint, đã cộng vào §F); ba mục còn lại vẫn rỗng — ai điền mục nào thì cập nhật §F trong cùng lần sửa.
 
 Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
 
@@ -252,7 +252,21 @@ Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
 |---|---|---|---|---|---|
-| _chưa chốt_ | `/admin/products…` | — | — | 401, 403 | 🔒 admin |
+| `getAdminProducts` | `GET /admin/products` | query: `q`, `category`, `stockStatus`, `sort`, `page`, `limit` | `Paginated<Product>` | 401, 403 | 🔒 admin |
+| `getAdminProduct` | `GET /admin/products/{id}` | — | `Product` | 401, 403, 404 | 🔒 admin |
+| `createProduct` | `POST /admin/products` | `ProductPayload` | `Product` (201) | 400, 401, 403, 409 | 🔒 admin |
+| `updateProduct` | `PUT /admin/products/{id}` | `ProductPayload` | `Product` | 400, 401, 403, 404, 409 | 🔒 admin |
+| `deleteProduct` | `DELETE /admin/products/{id}` | — | `204 No Content` | 401, 403, 404 | 🔒 admin |
+
+Hàm nằm ở `src/api/adminProducts.api.ts`, **không** ở `products.api.ts`: hai namespace được gác bằng hai lớp bảo mật khác nhau, để chung file là mời một lời gọi ghi lọt ra ngoài hàng rào.
+
+- **Khoá theo `id`, không phải `slug`.** Khác hẳn `GET /products/{slug}` của trang cửa hàng. Admin sửa được chính cái slug, nên đường dẫn màn sửa (`/quan-tri/san-pham/:id/chinh-sua`) không được treo vào một trường có thể đổi — link đã lưu sẽ hỏng ngay sau lần Lưu đầu tiên.
+- **`stockStatus`** nhận `in_stock` · `low_stock` · `out_of_stock`, với `low_stock` là `0 < stock <= 10` (`LOW_STOCK_THRESHOLD` trong `lib/constants.ts`). Backend phải dùng **đúng con số đó**: lệch ngưỡng thì bộ lọc trả một tập còn nhãn trên từng dòng nói khác, và không có lỗi nào nổ ra.
+- **`q`** khớp `name` **hoặc** `slug` — rộng hơn `q` của `GET /products` (chỉ `name` + `shortDescription`), vì slug là thứ admin trực tiếp sửa.
+- **`ProductPayload.slug` bỏ trống thì backend tự sinh từ `name`** (bỏ dấu, nối bằng gạch ngang). Slug đã có người dùng → **409**, kèm `ProblemDetail` tiếng Việt; **không** tự thêm hậu tố `-1`. Slug đi thẳng lên URL công khai, một cái slug lặng lẽ khác thứ admin vừa gõ sẽ phá đúng cái link họ chuẩn bị chia sẻ.
+- **`rating`, `reviewCount`, `sold`, `createdAt` không nằm trong `ProductPayload`** — backend **bỏ qua** nếu client cố gửi (§C.3). Cho sửa nghĩa là số sao hiển thị sẽ mâu thuẫn với chính danh sách đánh giá ngay bên dưới nó.
+- **`images` là đường dẫn tương đối `/images/...`** ở **cả** request lẫn response (§A.5). Client không bao giờ gửi URL đã ghép `VITE_IMAGE_BASE_URL` lên — làm vậy là ghi gốc CDN xuống cơ sở dữ liệu.
+- **Chưa chốt — xoá cứng hay xoá mềm.** Sản phẩm bị xoá vẫn được các đơn hàng cũ tham chiếu, nên lớp mock hiện xoá **mềm**. Quyết định cuối cùng thuộc agent `api`; frontend không phụ thuộc vào lựa chọn nào, miễn `DELETE` trả 204 và sản phẩm biến mất khỏi `GET /products`.
 
 #### B.12.2 Đơn hàng — liệt kê chéo người dùng, đổi trạng thái
 
@@ -394,6 +408,7 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 - Hook trong `src/hooks/` — chỉ bọc hàm API bằng TanStack Query
 - Store Zustand — giỏ hàng và wishlist là dữ liệu của thiết bị, không đi qua API
 - `src/types/` — trừ khi backend thật sự trả shape khác, và khi đó phải cập nhật tài liệu này trước
+- `src/api/productStore.ts` — kho catalog của **lớp mock** (overlay `nss_mock_products` chồng lên `src/mocks/products.json`), cố ý không đặt tên `*.api.ts` vì không map sang endpoint nào. Khi ghép backend thì **xoá cả file** cùng `src/mocks/`, không sửa nó thành lời gọi HTTP
 
 ---
 
@@ -401,8 +416,8 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 | Con số | Giá trị |
 |---|---|
-| Endpoint | 45 |
-| File trong `src/api/` | 13 (12 file `.api.ts` + `client.ts`) |
+| Endpoint | 50 |
+| File trong `src/api/` | 15 (13 file `.api.ts` + `client.ts` + `productStore.ts` của lớp mock) |
 | Hàm chỉ chạy ở client | 2 — `getCurrentUserId()`, `calcShippingFee()` |
 | Kiểu dữ liệu | 12 file trong `src/types/` |
 | Chỗ hiển thị `error.message` cho người dùng | 24 |

@@ -120,6 +120,45 @@ ra ngoài. Hàm `migrate` phải **idempotent**.
 "dữ liệu localStorage cũ"**: ghi tay một bản ghi theo shape cũ, tải lại trang, và chứng minh
 người đang đăng nhập không bị văng ra. Xem `management/backlog/0002-*` làm mẫu.
 
+### 5.2 Ghi đè lên mock tĩnh — overlay, và MỘT điểm đọc duy nhất (bắt buộc)
+
+Khi một màn quản trị cần **sửa** dữ liệu vốn nằm trong `src/mocks/*.json` tĩnh:
+
+**1. Dùng overlay, không chụp cả danh sách.**
+
+```ts
+interface Overlay<T> {
+  created: T[]                       // id = Date.now()
+  updated: Record<string, Partial<T>>
+  deletedIds: number[]               // xoá MỀM
+}
+```
+
+File `*.json` là **seed và sẽ còn lớn tiếp**. Ai chụp cả danh sách xuống localStorage sẽ đóng
+băng nó — máy đó không bao giờ thấy bản ghi seed mới nữa. Overlay cho seed chảy qua và chỉ ghim
+đúng thứ người dùng đã sửa.
+
+**2. Mỗi tập mock có đúng MỘT điểm đọc, và mọi `*.api.ts` phải đi qua nó.**
+
+Mẫu đã dựng: `src/api/productStore.ts` → `readAllProducts()`. Sau ticket 0004, `products.json`
+chỉ còn được `import` ở **một** file duy nhất; `products.api.ts`, `categories.api.ts` và
+`orders.api.ts` đều gọi `readAllProducts()`.
+
+> **Vì sao đây là luật chứ không phải gợi ý:** trước 0004, `validateCart()` trong `orders.api.ts`
+> và `productCount` trong `categories.api.ts` đọc thẳng `products.json`. Nếu chỉ vá file API
+> chính, sản phẩm admin tạo ra sẽ **có trong catalog nhưng không thêm được vào giỏ** — build
+> xanh, lint sạch, màn hình đúng, console im. Chỉ vỡ khi có người thật bấm mua.
+>
+> Trước khi đóng một ticket có ghi dữ liệu mock, chạy `grep -rn "mocks/<tên>.json" src/` và
+> chứng minh **chỉ còn một kết quả**.
+
+**3. Store không phải là hợp đồng.** Đặt tên `xxxStore.ts`, **không** phải `xxx.api.ts` — nó bị
+xoá khi ghép backend. Ghi điều đó ở đầu file và ở §E.4 của `API_CONTRACT.md`.
+
+**4. `imageUrl()` chạy đúng một lần mỗi object.** Lưu **đường dẫn tương đối** xuống store; ghép
+base lúc đọc. Trộn patch thì chỉ map `patch.images` khi patch thật sự có `images`. Map hai lần
+**vô hình lúc dev** (base rỗng) và chỉ nổ khi bật CDN.
+
 ---
 
 ## 6. Ảnh (bắt buộc)
@@ -201,6 +240,18 @@ thành công**: có trang, có tiêu đề, không lỗi console. Phải kiểm 
 
 Bài học từ backlog 0003: ticket đã viết sẵn cả ba yêu cầu phủ định, nhưng thanh bằng chứng lúc đó
 không đòi phải chứng minh chúng — nên "gần đúng" và "đúng" nhìn giống hệt nhau.
+
+**Ticket nào có form ghi dữ liệu thì bắt buộc kiểm thêm: submit với MỌI ô tuỳ chọn để TRỐNG.**
+
+Đó là đường đi mặc định của người dùng thật, và là đường **duy nhất** `setValueAs` / `valueAsNumber`
+gặp giá trị `null`. Bài học từ backlog 0004: `setValueAs` chạy cả trên **giá trị mặc định** lúc
+`register`, nên `Number(null)` biến "không có giá khuyến mãi" thành `0` và form từ chối lưu với
+thông báo vô nghĩa. **Build xanh, lint sạch, màn hình đẹp, console im — mà bấm Lưu thì không lưu
+được.** Không có phép thử nào trong ba mức trên bắt được nó.
+
+**Lưu ý về nhánh `isError` ở lớp mock:** mock **không phát request nào**, nên "chặn mạng để xem
+ErrorState" là bất khả thi. Chứng minh nhánh lỗi bằng cách gọi với dữ liệu không tồn tại
+(ví dụ `/quan-tri/san-pham/999999/chinh-sua`), không phải bằng DevTools offline.
 
 ---
 
