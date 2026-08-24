@@ -335,6 +335,21 @@ Hai quy tắc rút ra:
    đều pass**. Chỉ ảnh mới bắt được. Kiểm DOM và xem ảnh là hai loại bằng chứng khác nhau, không
    loại nào thay được loại nào.
 
+**Biến thể thứ năm: `<select>` cắt chữ mà KHÔNG khai báo tràn — `scrollWidth` báo false âm.**
+
+Phép kiểm cắt chữ quen tay `el.scrollWidth > el.clientWidth` **không dùng được cho `<select>`**.
+Trình duyệt tự cắt nhãn của `<option>` đang chọn cho vừa ô, rồi vẫn khai `scrollWidth === clientWidth`
+— tức là "không tràn".
+
+Bằng chứng từ backlog 0009: ở viewport 900, cả **ba** Select của thanh lọc `/quan-tri/san-pham` đều
+trả `overflowing: false`, trong khi **ảnh chụp** cho thấy ô tồn kho hiện `"Mọi mức tồn kh"` — mất hẳn
+chữ `"o"` cuối của `"Mọi mức tồn kho"` (ô rộng 159.61px, còn phải trừ `pr-10` chừa chỗ cho chevron).
+Một dropdown cắt mất chính nhãn của nó khiến người dùng **đọc sai**, không phải chuyện thẩm mỹ.
+
+Quy tắc: **kiểm cắt chữ của `<select>` bằng ảnh chụp ở bề rộng nhỏ nhất, và chụp với tuỳ chọn có
+nhãn DÀI NHẤT đang được chọn** — không phải giá trị mặc định, vì mặc định thường là nhãn ngắn nhất
+(`"Mọi danh mục"`, `"Mới nhất"`). Không có phép kiểm DOM nào thay được ảnh ở đây.
+
 ---
 
 ## 9. Điều cấm

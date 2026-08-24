@@ -182,7 +182,7 @@ export default function AdminProductsPage() {
             event.preventDefault()
             setFilter('q', keyword.trim())
           }}
-          className="flex min-w-0 flex-[2_1_16rem] gap-2"
+          className="flex min-w-0 flex-[2_1_18rem] gap-2"
         >
           <Input
             aria-label="Tìm sản phẩm theo tên hoặc slug"
@@ -204,21 +204,21 @@ export default function AdminProductsPage() {
           options={categoryOptions}
           value={query.category ?? ''}
           onChange={(event) => setFilter('category', event.target.value)}
-          wrapperClassName="min-w-0 flex-[1_1_10rem]"
+          wrapperClassName="min-w-0 flex-[1_1_11rem]"
         />
         <Select
           aria-label="Lọc theo tồn kho"
           options={STOCK_OPTIONS}
           value={query.stockStatus ?? ''}
           onChange={(event) => setFilter('stock', event.target.value)}
-          wrapperClassName="min-w-0 flex-[1_1_9rem]"
+          wrapperClassName="min-w-0 flex-[1_1_11rem]"
         />
         <Select
           aria-label="Sắp xếp sản phẩm"
           options={SORT_OPTIONS}
           value={query.sort}
           onChange={(event) => setFilter('sort', event.target.value)}
-          wrapperClassName="min-w-0 flex-[1_1_10rem]"
+          wrapperClassName="min-w-0 flex-[1_1_11rem]"
         />
       </div>
 
