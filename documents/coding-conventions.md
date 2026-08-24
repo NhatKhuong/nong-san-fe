@@ -78,6 +78,16 @@ Vi phạm nhóm này sẽ khiến việc ghép backend Spring Boot phải sửa 
 - Chuỗi class dài / có điều kiện gom bằng `cn()` (`src/lib/utils.ts` — clsx + tailwind-merge).
 - Đổi màu thì **tính lại tương phản WCAG AA (≥ 4.5:1)** trước khi commit.
 
+**Chiều rộng của trường nhập đặt ở div bọc, không đặt ở trường.** Trong `Input` / `Select` /
+`Textarea`, `className` trỏ vào thẻ `<input>`/`<select>`; chiều rộng và mọi thuộc tính flex
+(`w-*`, `flex-*`, `ml-auto`, `basis-*`) phải đi qua `wrapperClassName`. Đặt `w-*` qua
+`className` **không có tác dụng** khi component là con của một flex container — div bọc vẫn
+`w-full` và nuốt trọn cả dòng.
+
+Kèm theo: **ticket nào đổi bố cục một hàng ngang thì phần Verify bắt buộc có một phép *đo*** —
+`getBoundingClientRect().top` của mọi phần tử trên hàng phải bằng nhau. "Mở ra nhìn thấy ổn"
+không phải bằng chứng: lỗi này đã lọt qua 5 lần nghiệm thu liên tiếp đúng vì chưa ai đo.
+
 ---
 
 ## 5. Dữ liệu & trạng thái hiển thị

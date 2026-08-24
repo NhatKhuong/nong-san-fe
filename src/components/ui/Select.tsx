@@ -12,14 +12,26 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
   /** Thông báo lỗi validate; hiển thị đỏ và gắn `aria-invalid`, giống `Input`/`Textarea`. */
   error?: string
   options: SelectOption[]
+  /** Class cho div bọc ngoài — chỗ DUY NHẤT đặt được chiều rộng / thuộc tính flex của trường. */
+  wrapperClassName?: string
 }
 
+/**
+ * Dropdown một lựa chọn, kèm label và thông báo lỗi.
+ *
+ * **`className` vào trường, `wrapperClassName` vào div bọc.** `className` gắn lên chính thẻ
+ * `<select>`; `wrapperClassName` gắn lên div bọc ngoài — nơi duy nhất đặt được chiều rộng và
+ * mọi thuộc tính flex (`w-*`, `flex-*`, `basis-*`, `ml-auto`). Đặt `w-*` qua `className` là
+ * **vô hiệu** khi component nằm trong một flex container: div bọc vẫn `w-full` nên nuốt trọn
+ * cả dòng, còn `w-*` chỉ thu nhỏ cái `<select>` bên trong div đã full-width đó.
+ */
 export default function Select({
   label,
   error,
   options,
   id,
   className,
+  wrapperClassName,
   required,
   ...props
 }: SelectProps) {
@@ -27,7 +39,7 @@ export default function Select({
   const selectId = id ?? generatedId
 
   return (
-    <div className="w-full">
+    <div className={cn('w-full', wrapperClassName)}>
       {label && (
         <label htmlFor={selectId} className="mb-1.5 block text-sm font-medium text-ink">
           {label}
