@@ -239,7 +239,7 @@ Toàn bộ nội dung trang Giới thiệu (câu chuyện, mốc thời gian, co
 
 ### B.12 Khu quản trị — `/admin/**` (khung, chưa chốt)
 
-> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint, đã cộng vào §F); ba mục còn lại vẫn rỗng — ai điền mục nào thì cập nhật §F trong cùng lần sửa.
+> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint) và **§B.12.2 đã chốt** (backlog 0005, 3 endpoint) — cả hai đã cộng vào §F; hai mục còn lại vẫn rỗng — ai điền mục nào thì cập nhật §F trong cùng lần sửa.
 
 Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
 
@@ -272,9 +272,33 @@ Hàm nằm ở `src/api/adminProducts.api.ts`, **không** ở `products.api.ts`:
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
 |---|---|---|---|---|---|
-| _chưa chốt_ | `/admin/orders…` | — | — | 401, 403 | 🔒 admin |
+| `getAdminOrders` | `GET /admin/orders` | query: `q`, `status`, `userId`, `page`, `limit` | `Paginated<Order>` | 401, 403 | 🔒 admin |
+| `getAdminOrderByCode` | `GET /admin/orders/{code}` | — | `Order` | 401, 403, 404 | 🔒 admin |
+| `updateOrderStatus` | `PATCH /admin/orders/{code}/status` | `{ status: OrderStatus }` | `Order` | 400, 401, 403, 404, **422** | 🔒 admin |
 
 > Song sinh với `GET /orders/me`. Hai endpoint tồn tại song song **chính là** cách giữ §C.4.1 không bị nới lỏng.
+
+Hàm nằm ở `src/api/adminOrders.api.ts`, **không** ở `orders.api.ts` — cùng lý do với §B.12.1: hai namespace được gác bằng hai lớp bảo mật khác nhau.
+
+- **Khoá theo `code`, không phải `id`.** Khớp URL `/quan-tri/don-hang/:code` và khớp `GET /orders/{code}` sẵn có. Mã đơn (`NSS-20260817-0001`) là thứ duy nhất nhân viên và khách cùng đọc được qua điện thoại; `id` không bao giờ rời khỏi cơ sở dữ liệu.
+- **`q`** khớp **mã đơn** hoặc **tên người nhận** hoặc **số điện thoại người nhận** — lấy từ `order.shipping`, **không** phải từ hồ sơ tài khoản: đơn của khách vãng lai không có tài khoản nào để tra, và người đặt hộ vẫn phải tìm ra đơn theo tên người nhận thật. So khớp tên **bỏ dấu** (`nguyen van an` khớp `Nguyễn Văn An`).
+- **`userId`** là bộ lọc hợp lệ **ở đây và chỉ ở đây** (§C.4.3b). `/orders/me` lấy chủ đơn từ claim `sub` của JWT và không bao giờ nhận tham số này.
+- **Không có `sort`.** Thứ tự cố định: `createdAt` giảm dần. Đơn mới là đơn cần xử lý; thêm ô sắp xếp chỉ tạo ra một cách để bỏ sót đơn mới.
+- **Không có endpoint xoá đơn, và cũng không được mở.** Đơn đã đặt là chứng từ. Sửa items/tiền của đơn cũng vậy — số tiền trên đơn là bản chụp tại thời điểm đặt (§C.1), sửa về sau là làm lệch chính thứ khách đã trả.
+
+**Luồng trạng thái hợp lệ — backend phải cưỡng chế, không phải client.**
+
+| Từ | Được chuyển sang |
+|---|---|
+| `pending` | `confirmed`, `cancelled` |
+| `confirmed` | `shipping`, `cancelled` |
+| `shipping` | `delivered`, `cancelled` |
+| `delivered` | — (trạng thái cuối) |
+| `cancelled` | — (trạng thái cuối) |
+
+- Chuyển ngoài bảng trên → **422** kèm `ProblemDetail` tiếng Việt. Kể cả `status` trùng trạng thái hiện tại cũng là 422: nó không nằm trong danh sách được phép.
+- `delivered` và `cancelled` **không quay lui được**: đã giao rồi thì không "chưa xác nhận" lại được, đã huỷ rồi thì phải tạo đơn mới.
+- Bảng này là bản sao của `ORDER_STATUS_TRANSITIONS` trong `src/lib/orderStatus.ts`. **Ô chọn ở giao diện chỉ liệt kê lựa chọn hợp lệ cho tiện tay — đó là tiện lợi, không phải hàng rào.** Lớp mock đã `throw` đúng ở hàm API chứ không chỉ ở component, và backend phải gác lại y hệt.
 
 #### B.12.3 Khách hàng — chỉ đọc
 
@@ -409,6 +433,7 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 - Store Zustand — giỏ hàng và wishlist là dữ liệu của thiết bị, không đi qua API
 - `src/types/` — trừ khi backend thật sự trả shape khác, và khi đó phải cập nhật tài liệu này trước
 - `src/api/productStore.ts` — kho catalog của **lớp mock** (overlay `nss_mock_products` chồng lên `src/mocks/products.json`), cố ý không đặt tên `*.api.ts` vì không map sang endpoint nào. Khi ghép backend thì **xoá cả file** cùng `src/mocks/`, không sửa nó thành lời gọi HTTP
+- `src/api/orderStore.ts` — kho đơn hàng của **lớp mock**, cùng khuôn và cùng số phận: overlay `nss_mock_orders` (đơn đặt trên máy này + patch trạng thái) chồng lên seed `src/mocks/orders.json`, là **điểm đọc duy nhất** của seed đó cho cả `orders.api.ts` lẫn `adminOrders.api.ts`. Cũng cố ý không đặt tên `*.api.ts`; khi ghép backend thì **xoá cả file**
 
 ---
 
@@ -416,8 +441,8 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 | Con số | Giá trị |
 |---|---|
-| Endpoint | 50 |
-| File trong `src/api/` | 15 (13 file `.api.ts` + `client.ts` + `productStore.ts` của lớp mock) |
+| Endpoint | 53 |
+| File trong `src/api/` | 17 (14 file `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock) |
 | Hàm chỉ chạy ở client | 2 — `getCurrentUserId()`, `calcShippingFee()` |
 | Kiểu dữ liệu | 12 file trong `src/types/` |
 | Chỗ hiển thị `error.message` cho người dùng | 24 |

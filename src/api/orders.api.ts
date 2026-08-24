@@ -2,24 +2,10 @@ import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from '@/lib/constants'
 import { delay } from '@/lib/utils'
 import { effectivePrice } from '@/lib/format'
 import { readAllProducts } from './productStore'
+import { readAllOrders, readOrderByCode, writeCreatedOrder } from './orderStore'
 import type { CartIssue, CartItem, CreateOrderPayload, Order } from '@/types'
 import { getCurrentUserId } from './auth.api'
 import { validateCoupon } from './coupons.api'
-
-const ORDERS_KEY = 'nss_mock_orders'
-
-function readOrders(): Order[] {
-  try {
-    const raw = localStorage.getItem(ORDERS_KEY)
-    return raw ? (JSON.parse(raw) as Order[]) : []
-  } catch {
-    return []
-  }
-}
-
-function writeOrders(orders: Order[]): void {
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders))
-}
 
 /** Sinh mã đơn dạng NSS-20260816-0007. */
 function generateOrderCode(sequence: number): string {
@@ -115,11 +101,17 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
   }
 
   const shippingFee = calcShippingFee(subtotal - discount)
-  const orders = readOrders()
+
+  /*
+   * Số thứ tự đếm trên **toàn bộ** đơn đang tồn tại, kể cả đơn seed: đếm riêng
+   * đơn của localStorage thì đơn đầu tiên đặt trên máy này lại mang số 0001
+   * trong khi bảng quản trị đã có 35 đơn — mã đơn trông như bị đặt trùng.
+   */
+  const sequence = readAllOrders().length + 1
 
   const order: Order = {
     id: Date.now(),
-    code: generateOrderCode(orders.length + 1),
+    code: generateOrderCode(sequence),
     // Lấy từ token chứ không nhận từ payload — mô phỏng đúng cách backend làm.
     userId: getCurrentUserId(),
     items: payload.items,
@@ -134,7 +126,7 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
     createdAt: new Date().toISOString(),
   }
 
-  writeOrders([order, ...orders])
+  writeCreatedOrder(order)
   return order
 }
 
@@ -144,13 +136,19 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
  * Lọc nghiêm ngặt theo `userId`: đơn đặt lúc chưa đăng nhập không thuộc về tài
  * khoản nào, chỉ tra cứu được bằng mã đơn qua `getOrderByCode`.
  *
+ * Đọc qua `orderStore` nên danh sách này gồm **cả đơn seed thuộc tài khoản đang
+ * đăng nhập** — tài khoản demo (`userId: 1`) vì vậy có sẵn lịch sử đơn, và
+ * trạng thái admin vừa đổi hiện ra ở đây ngay lần tải kế tiếp. Đơn của tài khoản
+ * khác vẫn bị lọc ra như cũ: hàng rào là `order.userId === userId`, không phải
+ * việc dữ liệu đến từ đâu.
+ *
  * Khi có backend: `const { data } = await client.get('/orders/me'); return data`
  */
 export async function getMyOrders(): Promise<Order[]> {
   await delay(500)
   const userId = getCurrentUserId()
   if (userId === null) return []
-  return readOrders().filter((order) => order.userId === userId)
+  return readAllOrders().filter((order) => order.userId === userId)
 }
 
 /**
@@ -159,7 +157,7 @@ export async function getMyOrders(): Promise<Order[]> {
  */
 export async function getOrderByCode(code: string): Promise<Order> {
   await delay(400)
-  const order = readOrders().find((item) => item.code === code)
+  const order = readOrderByCode(code)
   if (!order) throw new Error(`Không tìm thấy đơn hàng ${code}`)
   return order
 }
