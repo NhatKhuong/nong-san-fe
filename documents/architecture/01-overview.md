@@ -17,12 +17,16 @@ Tài liệu chi tiết nằm trong chính sub-project:
 
 ## 1. Trạng thái hiện tại
 
-- Đã hoàn thành giao diện dành cho người dùng, chưa có giao diện của trang admin để quản lý
+- Đã hoàn thành giao diện dành cho người dùng.
+- **Khu quản trị `/quan-tri`:** khung đã chạy — `AdminLayout`, sidebar 4 mục, 8 route, `DataTable`,
+  `ConfirmDialog`, và toàn bộ type / query key / hằng số dùng chung. **Tám màn còn là trang rỗng**,
+  nội dung thật thuộc backlog 0004–0007. Hợp đồng nội bộ đã chốt tại backlog 0003 và **không ticket
+  nào được sửa** `hooks/queryKeys.ts`, `types/admin.ts`, `lib/constants.ts` nữa.
 - **Giai đoạn kế tiếp — ghép Spring Boot:** hợp đồng [`API_CONTRACT.md`](../API_CONTRACT.md) đã viết
   xong; còn lại là bổ sung refresh token, bật proxy dev, đổi thân hàm trong `src/api/` từ mock sang
-  HTTP thật.
+  HTTP thật. Khu quản trị thêm một khoảng trống nữa: `/admin/**` ở §B.12 mới là khung, chưa chốt.
 - **Backend chưa tồn tại.** Mọi dữ liệu đến từ `src/mocks/*.json`, đọc qua lớp `src/api/`.
-- Quy mô: 20 page · 70 component · 13 API service · 18 hook · 4 store · 12 nhóm type · 9 file mock.
+- Quy mô: 28 page · 77 component · 13 API service · 18 hook · 4 store · 13 nhóm type · 9 file mock.
 
 ---
 
@@ -70,9 +74,9 @@ backend phải sửa lại toàn bộ component:
 
 | Lớp | Thư mục | Trách nhiệm |
 |---|---|---|
-| Route | `src/routes/` | `index.tsx` khai báo cây route; `lazyPages.ts` khai báo chunk tách theo trang |
+| Route | `src/routes/` | `index.tsx` khai báo hai cây route; `lazyPages.ts` / `adminLazyPages.ts` khai báo chunk tách theo trang; `adminRoutes.tsx` là cây của khu quản trị (§5.2) |
 | Page | `src/pages/` | Map 1-1 với route, là nơi gọi hook và ghép component |
-| Component | `src/components/` | `ui/` (dùng chung) · `layout/` · `home/` · `product/` · `filter/` · `cart/` · `account/` · `auth/` · `blog/` · `form/` |
+| Component | `src/components/` | `ui/` (dùng chung) · `layout/` · `admin/` · `home/` · `product/` · `filter/` · `cart/` · `account/` · `auth/` · `blog/` · `form/` |
 | Hook | `src/hooks/` | Wrapper TanStack Query theo domain + hook UI (`useDebounce`, `useFocusTrap`, `useMediaQuery`) + hook đọc/ghi filter trên URL |
 | API | `src/api/` | Service theo domain + `client.ts` (axios instance, JWT, xử lý 401) |
 | Store | `src/store/` | `cart` · `wishlist` · `auth` · `ui` — Zustand, ba store đầu `persist` vào localStorage |
@@ -110,13 +114,45 @@ Hai ranh giới đáng nhớ:
 
 - Đường dẫn khai báo tập trung tại `ROUTES` trong `src/lib/constants.ts` — **không hardcode
   chuỗi route** rải rác. Path là **tiếng Việt không dấu**: `/cua-hang`, `/san-pham/:slug`,
-  `/gio-hang`, `/thanh-toan`, `/tai-khoan`, `/yeu-thich`, `/tin-tuc`, `/gioi-thieu`, `/lien-he`.
+  `/gio-hang`, `/thanh-toan`, `/tai-khoan`, `/yeu-thich`, `/tin-tuc`, `/gioi-thieu`, `/lien-he`,
+  `/quan-tri`.
+
+### 5.1 Storefront
+
 - `MainLayout` là route cha (header + footer + `<Suspense>`), `ErrorPage` là `errorElement`.
   **Không** dùng `NotFoundPage` làm `errorElement` — mọi lỗi runtime sẽ hiện thành "404" sai lệch.
 - `HomePage`, `ErrorPage`, `NotFoundPage` nạp thẳng; **mọi trang còn lại lazy** và phải được
   khai báo trong `src/routes/lazyPages.ts` (thêm trang mới nhớ khai ở đây).
 - `/tai-khoan/*` bọc trong `ProtectedRoute` → `AccountLayout`. `/yeu-thich` **cố ý** không bảo vệ:
   thẻ sản phẩm cho bấm tim mà không cần đăng nhập, chặn trang xem lại sẽ mâu thuẫn.
+
+### 5.2 Khu quản trị — mục top-level thứ hai
+
+`createBrowserRouter` có **hai** mục top-level, không phải một. Khu quản trị là mục thứ hai,
+**sibling** với `MainLayout`, khai ở `src/routes/adminRoutes.tsx` (`adminRoute`) với chunk riêng ở
+`src/routes/adminLazyPages.ts`.
+
+Lý do nó không lồng dưới `MainLayout`: layout đó render `Header`/`Footer`/`TopBar`/`MiniCart`
+**vô điều kiện** và không có prop, context hay `handle` nào để tắt. Phương án thêm cờ
+`bare`/`hideChrome` đã bị loại — xem [ADR 0001](../../../management/decisions/0001-khu-quan-tri-nam-trong-app.md)
+cho cả ba phương án đã cân nhắc.
+
+Bốn điều bắt buộc nhớ khi sửa cây route này:
+
+- **Child `{ path: '*', element: <NotFoundPage /> }` cuối cây admin là BẮT BUỘC.** Thiếu nó thì
+  `/quan-tri/duong-dan-sai` rơi xuống splat của storefront và render 404 kèm nguyên header/footer
+  cửa hàng — sai mà nhìn thoáng qua tưởng đúng.
+- **`<Suspense>` bọc ngoài cũng bắt buộc**, vì `AdminRoute` và `AdminLayout` đều lazy và ở mục
+  top-level không còn layout nào đứng trên cung cấp khung chờ. Khung chờ thứ hai nằm trong
+  `AdminLayout` quanh `<Outlet />` để sidebar không nháy khi chuyển trang.
+- `AdminRoute` chặn theo `isAdmin`: chưa đăng nhập → `/dang-nhap` (kèm `state.from`), đã đăng nhập
+  nhưng sai vai trò → `/` (đăng nhập lại không đổi được vai trò). **Đây không phải bảo mật** —
+  hàng rào thật là filter Spring Security trên `/admin/**`, xem `API_CONTRACT.md` §C.4.3a.
+- Hằng số menu nằm ở `components/admin/adminNav.ts`, **không** trong file component.
+
+Hợp đồng nội bộ đã chốt ở backlog 0003: 8 route + 3 helper trong `lib/constants.ts`,
+`types/admin.ts`, `ProductPayload`, khối `queryKeys.admin.*`, `lib/orderStatus.ts`,
+`LOW_STOCK_THRESHOLD`. Ticket 0004–0007 dùng lại, **không sửa**.
 
 ---
 
@@ -185,8 +221,10 @@ npm run lint     # oxlint
   reference nên bỏ sót lỗi — đừng dùng nó thay thế.
 - **Dự án chưa có test runner.** Bằng chứng hoàn thành = build xanh + lint sạch + kiểm thử
   trình duyệt thật (0 lỗi console, 0 request hỏng). Thêm test framework phải hỏi Owner trước.
-- Ngân sách bundle: chunk chính ~423 KB (gzip 132 KB), 49 chunk. Vượt ngưỡng cảnh báo 500 KB
-  của Vite là tín hiệu phải xử lý, không phải bỏ qua.
+- Ngân sách bundle: chunk chính **426,76 KB (gzip 133,08 KB), 62 chunk** (mốc sau backlog 0003;
+  trước đó 423,11 KB / gzip 132,07 KB / 49 chunk). Vượt ngưỡng cảnh báo 500 KB của Vite là tín
+  hiệu phải xử lý, không phải bỏ qua. Khu quản trị nằm gần trọn trong chunk riêng — phần chạm vào
+  chunk chính chỉ là `adminRoutes.tsx` (khai báo cây route, `import` tĩnh từ `routes/index.tsx`).
 - Phụ thuộc mạng ngoài **duy nhất và có chủ đích**: iframe Google Maps ở trang Liên hệ.
 
 ---

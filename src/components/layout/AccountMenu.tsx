@@ -12,7 +12,7 @@ const ICON_BUTTON_CLASSES =
  * đã đăng nhập thì mở menu thả xuống.
  */
 export default function AccountMenu() {
-  const { user, isAuthenticated } = useCurrentUser()
+  const { user, isAuthenticated, isAdmin } = useCurrentUser()
   const { mutate: logout } = useLogout()
   const [isOpen, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -75,6 +75,18 @@ export default function AccountMenu() {
           <MenuLink to={ROUTES.ACCOUNT_ADDRESSES} onSelect={() => setOpen(false)}>
             Sổ địa chỉ
           </MenuLink>
+
+          {/*
+            Lối vào khu quản trị, chỉ hiện với tài khoản admin. Đây là **ẩn giao
+            diện cho gọn**, không phải kiểm quyền: `AdminRoute` chặn ở route và
+            hàng rào thật là filter Spring Security trên `/admin/**` (ADR 0002).
+            Khách gõ thẳng `/quan-tri` vẫn bị đá về trang chủ dù không thấy mục này.
+          */}
+          {isAdmin && (
+            <MenuLink to={ROUTES.ADMIN} onSelect={() => setOpen(false)}>
+              Quản trị
+            </MenuLink>
+          )}
 
           <button
             type="button"

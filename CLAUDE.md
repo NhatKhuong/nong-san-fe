@@ -15,7 +15,8 @@ Bộ quy tắc làm việc chung cho dự án. File này được nạp tự đ�
 
 Website thương mại điện tử bán **nông sản sạch / thực phẩm hữu cơ**, tham khảo bố cục từ https://organic-food.monamedia.net/.
 
-- **Phạm vi hiện tại:** frontend đầy đủ (trang chủ, cửa hàng, chi tiết SP, giỏ hàng, checkout, tài khoản, wishlist, blog). Chưa có giao diện quản trị.
+- **Phạm vi hiện tại:** frontend đầy đủ phần khách hàng (trang chủ, cửa hàng, chi tiết SP, giỏ hàng, checkout, tài khoản, wishlist, blog), **cộng khung khu quản trị `/quan-tri`** — layout, điều hướng và 8 route đã chạy, các màn còn là trang rỗng chờ backlog 0004–0007.
+- **Khu quản trị `/quan-tri`** là **mục router top-level thứ hai**, sibling với `MainLayout` chứ không lồng dưới nó, dùng `AdminLayout` riêng — xem `src/routes/adminRoutes.tsx` và ADR 0001. Thêm màn quản trị mới thì sửa `adminRoutes.tsx` + `adminLazyPages.ts`, đừng đụng cây route storefront. `AdminRoute` chỉ ẩn giao diện, **không phải bảo mật**: hàng rào thật là filter trên `/admin/**` ở backend (ADR 0002).
 - **Backend:** đang xây bằng **Spring Boot**. Frontend vẫn chạy bằng mock JSON; hợp đồng bàn giao nằm ở [`documents/API_CONTRACT.md`](documents/API_CONTRACT.md), API thật xem tại `http://localhost:8080/swagger-ui/index.html` khi backend chạy.
 
 ### Tech stack (đã chốt — không tự ý thay đổi)

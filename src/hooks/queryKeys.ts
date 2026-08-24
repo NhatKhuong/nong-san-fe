@@ -1,4 +1,10 @@
-import type { PostQuery, ProductQuery } from '@/types'
+import type {
+  AdminOrderQuery,
+  AdminProductQuery,
+  AdminUserQuery,
+  PostQuery,
+  ProductQuery,
+} from '@/types'
 
 /** Query key tập trung một chỗ để invalidate cache không bị lệch chuỗi. */
 export const queryKeys = {
@@ -61,5 +67,39 @@ export const queryKeys = {
     provinces: ['locations', 'provinces'] as const,
     districts: (provinceCode: string) => ['locations', 'districts', provinceCode] as const,
     wards: (districtCode: string) => ['locations', 'wards', districtCode] as const,
+  },
+
+  /*
+   * Khu quản trị — CHỐT TRỌN KHỐI ở backlog 0003, ticket 0004–0007 không sửa
+   * thêm. Bốn ticket đó chạy song song; mỗi ticket tự thêm vài dòng vào đây là
+   * conflict chắc chắn, và tệ hơn, hai ticket có thể chọn hai chuỗi khác nhau
+   * cho cùng một tập dữ liệu.
+   *
+   * Tiền tố `'admin'` tách hẳn khỏi `products` / `orders` của phần khách hàng
+   * dù đôi khi trỏ tới cùng bản ghi: hai bên gọi hai endpoint khác nhau
+   * (`/orders/me` với `/admin/orders`, §C.4.3b) và trả về những tập khác nhau,
+   * nên trộn khoá là một tài khoản admin đăng xuất sẽ để lại dữ liệu chéo
+   * người dùng trong cache của phần khách hàng.
+   *
+   * `all` là gốc để `invalidateQueries({ queryKey: queryKeys.admin.all })` quét
+   * sạch cả khu sau một lần ghi.
+   */
+  admin: {
+    all: ['admin'] as const,
+    products: {
+      list: (query: AdminProductQuery) => ['admin', 'products', 'list', query] as const,
+      detail: (id: number) => ['admin', 'products', 'detail', id] as const,
+    },
+    orders: {
+      list: (query: AdminOrderQuery) => ['admin', 'orders', 'list', query] as const,
+      /** Khoá là **mã đơn** (`Order.code`), khớp tham số `:code` trên đường dẫn. */
+      detail: (code: string) => ['admin', 'orders', 'detail', code] as const,
+    },
+    users: {
+      list: (query: AdminUserQuery) => ['admin', 'users', 'list', query] as const,
+      detail: (id: number) => ['admin', 'users', 'detail', id] as const,
+    },
+    /** `days` nằm trong khoá vì đổi khoảng thời gian là một tập số liệu khác. */
+    overview: (days: number) => ['admin', 'overview', days] as const,
   },
 } as const

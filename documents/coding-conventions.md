@@ -56,8 +56,13 @@ Vi phạm nhóm này sẽ khiến việc ghép backend Spring Boot phải sửa 
 - File chứa component **chỉ export component**. Hằng số / style / option tách ra file riêng
   (`buttonStyles.ts`, `paymentOptions.ts`, `lazyPages.ts`) — trộn lẫn sẽ làm React Fast Refresh
   mất tác dụng và oxlint (`react/only-export-components`) sẽ cảnh báo.
-- Thêm trang mới: khai `lazy()` trong `src/routes/lazyPages.ts` rồi gắn vào `routes/index.tsx`,
-  không `import` thẳng.
+- Thêm trang mới: khai `lazy()` rồi gắn vào cây route, **không `import` thẳng**. Có **hai** cây,
+  chọn đúng cây:
+  - **Trang storefront** → `src/routes/lazyPages.ts` + `src/routes/index.tsx`
+  - **Trang quản trị** → `src/routes/adminLazyPages.ts` + `src/routes/adminRoutes.tsx`
+
+  Đừng thêm route quản trị vào cây storefront: nó sẽ kéo theo header/footer/mini-cart của cửa hàng
+  (xem `architecture/01-overview.md` §5.2).
 
 ---
 
@@ -183,6 +188,19 @@ Dừng đúng lúc rẻ hơn nhiều so với làm xong rồi phải gỡ.
    **0 lỗi console, 0 request hỏng**. Build xanh mà màn hình trắng vẫn là hỏng.
 
 Muốn thêm framework test (Vitest / React Testing Library) phải hỏi Owner — đó là thay đổi stack.
+
+**Ticket nào có "KHÔNG được xuất hiện X" trong phần Verify thì bằng chứng phải là một khẳng định
+phủ định kiểm được, không phải "màn hình nhìn đúng".** Các lỗi nguy hiểm nhất đều **trông giống
+thành công**: có trang, có tiêu đề, không lỗi console. Phải kiểm thẳng thứ đáng lẽ vắng mặt:
+
+| Yêu cầu | Bằng chứng đạt | Bằng chứng KHÔNG đạt |
+|---|---|---|
+| Không có chrome cửa hàng | `document.querySelector('footer') === null` | "nhìn không thấy footer" |
+| Customer bị đá về trang chủ | `location.pathname === '/'` | "bị chuyển hướng" (về `/dang-nhap` cũng là chuyển hướng) |
+| 404 nằm trong layout quản trị | 404 hiện **và** sidebar quản trị vẫn còn | "hiện trang 404" |
+
+Bài học từ backlog 0003: ticket đã viết sẵn cả ba yêu cầu phủ định, nhưng thanh bằng chứng lúc đó
+không đòi phải chứng minh chúng — nên "gần đúng" và "đúng" nhìn giống hệt nhau.
 
 ---
 
