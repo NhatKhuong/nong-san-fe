@@ -1,8 +1,8 @@
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from '@/lib/constants'
 import { delay } from '@/lib/utils'
 import { effectivePrice } from '@/lib/format'
-import productsJson from '@/mocks/products.json'
-import type { CartIssue, CartItem, CreateOrderPayload, Order, Product } from '@/types'
+import { readAllProducts } from './productStore'
+import type { CartIssue, CartItem, CreateOrderPayload, Order } from '@/types'
 import { getCurrentUserId } from './auth.api'
 import { validateCoupon } from './coupons.api'
 
@@ -52,7 +52,13 @@ export function calcShippingFee(subtotal: number): number {
 export async function validateCart(items: CartItem[]): Promise<CartIssue[]> {
   await delay(400)
 
-  const products = productsJson as Product[]
+  /*
+   * Đọc qua `productStore` chứ KHÔNG đọc thẳng `products.json`: sản phẩm admin
+   * vừa tạo phải thêm được vào giỏ, và tồn kho admin vừa sửa phải chặn được
+   * đúng lúc. Đọc hai nguồn khác nhau là kiểu hỏng tệ nhất — build xanh, danh
+   * sách sản phẩm đúng, chỉ vỡ khi có người thật bấm mua.
+   */
+  const products = readAllProducts()
   const issues: CartIssue[] = []
 
   for (const item of items) {

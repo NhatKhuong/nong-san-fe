@@ -1,17 +1,22 @@
-import productsJson from '@/mocks/products.json'
 import categoriesJson from '@/mocks/categories.json'
 import { PRODUCTS_PER_PAGE } from '@/lib/constants'
 import { delay } from '@/lib/utils'
 import { effectivePrice } from '@/lib/format'
-import { imageUrl } from '@/lib/image'
+import { readAllProducts } from './productStore'
 import type { Paginated, Product, ProductQuery } from '@/types'
 
-// Giải đường dẫn ảnh một lần lúc nạp module — mọi hàm bên dưới trả về lát cắt
-// của mảng này nên không hàm nào phải tự nhớ gọi imageUrl().
-const products = (productsJson as Product[]).map((product) => ({
-  ...product,
-  images: product.images.map(imageUrl),
-}))
+/*
+ * KHÔNG dựng lại `const products = ...` ở cấp module.
+ *
+ * Trước ticket 0004, danh sách sản phẩm được dựng một lần lúc nạp module — mọi
+ * hàm dưới đây trả về lát cắt của đúng mảng đó. Từ khi khu quản trị ghi được
+ * vào catalog, một mảng như vậy là bản sao cũ ngay sau lần Lưu đầu tiên: màn
+ * quản trị hiện dữ liệu mới còn cửa hàng vẫn hiện dữ liệu cũ trong cùng phiên.
+ *
+ * `readAllProducts()` đọc lại seed + overlay ở mỗi lần gọi (~40 phần tử, lại
+ * nằm sau `delay()` bên dưới) và đã giải sẵn đường dẫn ảnh, nên không hàm nào ở
+ * đây phải tự nhớ gọi `imageUrl()`.
+ */
 const categories = categoriesJson as { id: number; slug: string; parentId: number | null }[]
 
 /** Danh mục cha kèm toàn bộ id danh mục con, để lọc "Rau củ" ra cả rau ăn lá và củ quả. */
@@ -114,7 +119,7 @@ export async function getProducts(query: ProductQuery = {}): Promise<Paginated<P
   await delay()
   const page = query.page ?? 1
   const limit = query.limit ?? PRODUCTS_PER_PAGE
-  const filtered = applySort(applyFilters(products, query), query.sort)
+  const filtered = applySort(applyFilters(readAllProducts(), query), query.sort)
   return paginate(filtered, page, limit)
 }
 
@@ -124,7 +129,7 @@ export async function getProducts(query: ProductQuery = {}): Promise<Paginated<P
  */
 export async function getProductBySlug(slug: string): Promise<Product> {
   await delay()
-  const product = products.find((item) => item.slug === slug)
+  const product = readAllProducts().find((item) => item.slug === slug)
   if (!product) throw new Error(`Không tìm thấy sản phẩm "${slug}"`)
   return product
 }
@@ -140,6 +145,7 @@ export async function getProductBySlug(slug: string): Promise<Product> {
 export async function getProductsByIds(ids: number[]): Promise<Product[]> {
   await delay(250)
   if (ids.length === 0) return []
+  const products = readAllProducts()
   return ids
     .map((id) => products.find((product) => product.id === id))
     .filter((product): product is Product => product !== undefined)
@@ -151,6 +157,7 @@ export async function getProductsByIds(ids: number[]): Promise<Product[]> {
  */
 export async function getRelatedProducts(slug: string, limit = 4): Promise<Product[]> {
   await delay(200)
+  const products = readAllProducts()
   const current = products.find((item) => item.slug === slug)
   if (!current) return []
   return products
@@ -165,12 +172,14 @@ export async function getRelatedProducts(slug: string, limit = 4): Promise<Produ
 export async function searchSuggestions(keyword: string, limit = 5): Promise<Product[]> {
   await delay(150)
   if (!keyword.trim()) return []
-  return applyFilters(products, { q: keyword }).slice(0, limit)
+  return applyFilters(readAllProducts(), { q: keyword }).slice(0, limit)
 }
 
 /** Khoảng giá thấp nhất – cao nhất, dùng khởi tạo thanh lọc giá ở trang cửa hàng. */
 export async function getPriceRange(): Promise<{ min: number; max: number }> {
   await delay(100)
-  const prices = products.map((product) => effectivePrice(product.price, product.salePrice))
+  const prices = readAllProducts().map((product) =>
+    effectivePrice(product.price, product.salePrice),
+  )
   return { min: Math.min(...prices), max: Math.max(...prices) }
 }

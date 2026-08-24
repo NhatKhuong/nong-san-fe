@@ -221,10 +221,11 @@ npm run lint     # oxlint
   reference nên bỏ sót lỗi — đừng dùng nó thay thế.
 - **Dự án chưa có test runner.** Bằng chứng hoàn thành = build xanh + lint sạch + kiểm thử
   trình duyệt thật (0 lỗi console, 0 request hỏng). Thêm test framework phải hỏi Owner trước.
-- Ngân sách bundle: chunk chính **426,76 KB (gzip 133,08 KB), 62 chunk** (mốc sau backlog 0003;
-  trước đó 423,11 KB / gzip 132,07 KB / 49 chunk). Vượt ngưỡng cảnh báo 500 KB của Vite là tín
-  hiệu phải xử lý, không phải bỏ qua. Khu quản trị nằm gần trọn trong chunk riêng — phần chạm vào
-  chunk chính chỉ là `adminRoutes.tsx` (khai báo cây route, `import` tĩnh từ `routes/index.tsx`).
+- Ngân sách bundle: chunk chính **427,11 KB (gzip 133,25 KB), 66 chunk** — mốc sau backlog 0004.
+  Diễn biến: 423,11 KB / 49 chunk (trước khu quản trị) → 426,76 KB / 62 chunk (0003) →
+  427,11 KB / 66 chunk (0004). Vượt ngưỡng cảnh báo 500 KB của Vite là tín hiệu phải xử lý, không
+  phải bỏ qua. Khu quản trị nằm gần trọn trong chunk riêng — phần chạm vào chunk chính chỉ là
+  `adminRoutes.tsx` (khai báo cây route, `import` tĩnh từ `routes/index.tsx`).
 - Phụ thuộc mạng ngoài **duy nhất và có chủ đích**: iframe Google Maps ở trang Liên hệ.
 
 ---
