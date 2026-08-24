@@ -45,7 +45,120 @@ const DEMO_ADMIN: StoredUser = {
   password: '123456',
 }
 
-const SEED_USERS: StoredUser[] = [DEMO_USER, DEMO_ADMIN]
+/**
+ * Khách hàng mẫu — nguồn dữ liệu của màn `/quan-tri/khach-hang`.
+ *
+ * **Id 3–7 bị ghim, không được đổi.** Seed đơn hàng của backlog 0005 (đọc qua
+ * `orderStore.ts`) đã gán `userId` theo đúng năm id này — 3 (5 đơn) · 4 (4) ·
+ * 5 (4) · 6 (4) · 7 (4). Gieo id khác thì link "Xem hồ sơ khách hàng #n" ở màn
+ * chi tiết đơn trỏ tới một hồ sơ không tồn tại: đơn vẫn hiện đúng, chỉ có cái
+ * link là chết — hỏng đúng ở chỗ không lộ ra trên màn hình nào.
+ *
+ * Họ tên / email / SĐT của năm người đó **chép nguyên từ khối `shipping` của
+ * chính các đơn ấy**. Bịa tên khác thì màn hình tự mâu thuẫn với chính nó: đơn
+ * ghi "Lê Thị Bích · 0912345678" mà hồ sơ khách #3 lại mang tên khác.
+ *
+ * Id 8–12 là khách **chưa có đơn nào** — có chủ đích: đó là nhánh "khách hàng
+ * chưa mua gì" của màn chi tiết, và không có bản ghi nào như vậy thì `EmptyState`
+ * của khối lịch sử đơn không bao giờ được nhìn thấy trước lúc bàn giao.
+ *
+ * Mật khẩu để giống hai tài khoản demo: lớp mock cần một chuỗi ở trường đó, và
+ * `toPublicUser()` cắt nó đi trước khi bất cứ thứ gì rời khỏi file này.
+ */
+const SEED_CUSTOMERS: StoredUser[] = [
+  {
+    id: 3,
+    fullName: 'Lê Thị Bích',
+    email: 'bich.le@example.com',
+    phone: '0912345678',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 4,
+    fullName: 'Trần Minh Khoa',
+    email: 'khoa.tran@example.com',
+    phone: '0987654321',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 5,
+    fullName: 'Phạm Thu Hà',
+    email: 'ha.pham@example.com',
+    phone: '0356789012',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 6,
+    fullName: 'Võ Quốc Bảo',
+    email: 'bao.vo@example.com',
+    phone: '0778901234',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 7,
+    fullName: 'Đặng Kim Ngân',
+    email: 'ngan.dang@example.com',
+    phone: '0898765432',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 8,
+    fullName: 'Ngô Hải Yến',
+    email: 'yen.ngo@example.com',
+    phone: '0345678901',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 9,
+    fullName: 'Lý Tuấn Kiệt',
+    email: 'kiet.ly@example.com',
+    phone: '0369852147',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 10,
+    fullName: 'Trương Mỹ Duyên',
+    email: 'duyen.truong@example.com',
+    phone: '0384567123',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 11,
+    fullName: 'Dương Anh Tú',
+    email: 'tu.duong@example.com',
+    phone: '0794561238',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+  {
+    id: 12,
+    fullName: 'Cao Thanh Trúc',
+    email: 'truc.cao@example.com',
+    phone: '0865321479',
+    avatar: null,
+    role: 'customer',
+    password: '123456',
+  },
+]
+
+const SEED_USERS: StoredUser[] = [DEMO_USER, DEMO_ADMIN, ...SEED_CUSTOMERS]
 
 /**
  * Đọc danh sách user: **đọc → chuẩn hoá → bảo đảm → ghi lại**.
@@ -58,7 +171,10 @@ const SEED_USERS: StoredUser[] = [DEMO_USER, DEMO_ADMIN]
  * 1. parse những gì đang có (hỏng thì coi như rỗng),
  * 2. backfill `role: 'customer'` cho bản ghi cũ — mặc định về **quyền thấp
  *    nhất**, không ai bị nâng quyền nhầm,
- * 3. bảo đảm hai tài khoản demo có mặt,
+ * 3. bảo đảm **mọi** bản ghi trong `SEED_USERS` có mặt — hai tài khoản demo và
+ *    mười khách hàng mẫu của backlog 0006. Bước này chạy ở **mỗi lần đọc**, nên
+ *    máy đã chạy dự án từ trước (khoá `nss_mock_users` đã tồn tại, chỉ có đúng
+ *    một bản ghi) vẫn nhận đủ khách mới mà không phải xoá localStorage,
  * 4. chỉ ghi lại khi thật sự có gì đó thay đổi.
  *
  * Đối chiếu tài khoản gieo theo **cả id lẫn email**: nếu ai đó đã đăng ký trùng
@@ -101,6 +217,23 @@ function writeUsers(users: StoredUser[]): void {
 /** Bỏ password trước khi trả ra ngoài — mô phỏng đúng cách backend trả DTO. */
 function toPublicUser({ password: _password, ...user }: StoredUser): User {
   return user
+}
+
+/**
+ * Toàn bộ tài khoản, **đã bỏ `password`** — điểm đọc duy nhất của
+ * `nss_mock_users` dành cho các file khác trong `src/api/`.
+ *
+ * Chỉ chạy ở client và **không map sang endpoint nào**: `adminUsers.api.ts` cần
+ * đọc kho tài khoản mà kho đó nằm trong file này, nên hàm này đóng vai trò
+ * `productStore.ts` / `orderStore.ts` của tập `nss_mock_users`. Khi ghép Spring
+ * Boot thì xoá nó cùng lúc với `getCurrentUserId()` (`API_CONTRACT.md` §E.3).
+ *
+ * Trả `User[]` chứ **không** trả `StoredUser[]`: đi qua `toPublicUser()` ngay
+ * tại ranh giới này thì không lời gọi nào ở nơi khác còn cầm được `password`,
+ * kể cả khi ai đó quên map. Chặn bằng kiểu rẻ hơn chặn bằng trí nhớ.
+ */
+export function readPublicUsers(): User[] {
+  return readUsers().map(toPublicUser)
 }
 
 function issueToken(user: User): string {
