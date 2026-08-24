@@ -18,15 +18,21 @@ Tài liệu chi tiết nằm trong chính sub-project:
 ## 1. Trạng thái hiện tại
 
 - Đã hoàn thành giao diện dành cho người dùng.
-- **Khu quản trị `/quan-tri`:** khung đã chạy — `AdminLayout`, sidebar 4 mục, 8 route, `DataTable`,
-  `ConfirmDialog`, và toàn bộ type / query key / hằng số dùng chung. **Tám màn còn là trang rỗng**,
-  nội dung thật thuộc backlog 0004–0007. Hợp đồng nội bộ đã chốt tại backlog 0003 và **không ticket
-  nào được sửa** `hooks/queryKeys.ts`, `types/admin.ts`, `lib/constants.ts` nữa.
+- **Khu quản trị `/quan-tri` — đã xong giai đoạn 1** (backlog 0002–0008). `AdminLayout` + sidebar
+  4 mục + 8 route, cả bốn màn đều có nội dung thật: **Tổng quan** (4 ô chỉ số + 2 biểu đồ Recharts)
+  · **Sản phẩm** (CRUD đầy đủ) · **Đơn hàng** (xem + đổi trạng thái) · **Khách hàng** (chỉ đọc).
+  Hợp đồng nội bộ chốt tại backlog 0003: **không ticket nào được sửa** `hooks/queryKeys.ts`,
+  `types/admin.ts`, `lib/constants.ts` nữa.
 - **Giai đoạn kế tiếp — ghép Spring Boot:** hợp đồng [`API_CONTRACT.md`](../API_CONTRACT.md) đã viết
-  xong; còn lại là bổ sung refresh token, bật proxy dev, đổi thân hàm trong `src/api/` từ mock sang
-  HTTP thật. Khu quản trị thêm một khoảng trống nữa: `/admin/**` ở §B.12 mới là khung, chưa chốt.
+  xong, kể cả §B.12 cho `/admin/**`; còn lại là bổ sung refresh token, bật proxy dev, đổi thân hàm
+  trong `src/api/` từ mock sang HTTP thật, và xoá ba store mock (`productStore` · `orderStore` ·
+  `readPublicUsers`).
 - **Backend chưa tồn tại.** Mọi dữ liệu đến từ `src/mocks/*.json`, đọc qua lớp `src/api/`.
-- Quy mô: 28 page · 77 component · 13 API service · 18 hook · 4 store · 13 nhóm type · 9 file mock.
+- Quy mô: 28 page · 87 component · 19 file trong `src/api/` (16 service + 3 store mock) · 22 hook ·
+  4 store · 13 nhóm type · 10 file mock.
+  > Con số ở dòng trên lệch dần qua từng ticket vì không có gì buộc ai đếm lại. Đếm bằng lệnh chứ
+  > đừng sửa theo trí nhớ: `find src/pages -name '*.tsx' | wc -l` · `find src/components -name '*.tsx' | wc -l`
+  > · `ls src/api/*.ts | wc -l` · `ls src/hooks/*.ts | wc -l`.
 
 ---
 
@@ -42,6 +48,7 @@ Tài liệu chi tiết nằm trong chính sub-project:
 | HTTP | Axios (instance dùng chung `src/api/client.ts`) |
 | Form | React Hook Form + Zod (`@hookform/resolvers`) |
 | Slider | Swiper |
+| Biểu đồ | Recharts v3 — **chỉ** trong `src/components/admin/dashboard/`, chỉ `pages/admin/AdminOverviewPage.tsx` import ([ADR 0003](../../../management/decisions/0003-them-recharts-vao-stack.md)) |
 | Icon | lucide-react |
 | Lint | oxlint (`.oxlintrc.json`) |
 
@@ -221,11 +228,18 @@ npm run lint     # oxlint
   reference nên bỏ sót lỗi — đừng dùng nó thay thế.
 - **Dự án chưa có test runner.** Bằng chứng hoàn thành = build xanh + lint sạch + kiểm thử
   trình duyệt thật (0 lỗi console, 0 request hỏng). Thêm test framework phải hỏi Owner trước.
-- Ngân sách bundle: chunk chính **427,11 KB (gzip 133,25 KB), 66 chunk** — mốc sau backlog 0004.
+- Ngân sách bundle: chunk chính **426,38 KB (gzip 133,13 KB), 75 chunk** — mốc sau backlog 0007.
   Diễn biến: 423,11 KB / 49 chunk (trước khu quản trị) → 426,76 KB / 62 chunk (0003) →
-  427,11 KB / 66 chunk (0004). Vượt ngưỡng cảnh báo 500 KB của Vite là tín hiệu phải xử lý, không
-  phải bỏ qua. Khu quản trị nằm gần trọn trong chunk riêng — phần chạm vào chunk chính chỉ là
-  `adminRoutes.tsx` (khai báo cây route, `import` tĩnh từ `routes/index.tsx`).
+  427,11 KB / 66 chunk (0004) → 427,43 KB / 73 chunk (trước 0007) → 426,38 KB / 75 chunk (0007).
+  Vượt ngưỡng cảnh báo 500 KB của Vite là tín hiệu phải xử lý, không phải bỏ qua. Khu quản trị nằm
+  gần trọn trong chunk riêng — phần chạm vào chunk chính chỉ là `adminRoutes.tsx` (khai báo cây
+  route, `import` tĩnh từ `routes/index.tsx`).
+- **Recharts nằm ngoài chunk chính, và đó là điều kiện của [ADR 0003](../../../management/decisions/0003-them-recharts-vao-stack.md).**
+  Thư viện đi trọn vào chunk của `AdminOverviewPage` (**383,16 KB / gzip 110,48 KB**) vì đó là
+  module duy nhất import nó, mà trang đó đã `lazy()`. Phép kiểm khi đóng bất kỳ ticket nào chạm
+  tới biểu đồ: `grep -l recharts dist/assets/*.js` phải trả về **đúng một** file, và file đó
+  **không** được là entry chunk mà `dist/index.html` trỏ tới. Mất điều kiện ấy thì mọi khách hàng
+  tải thêm ~110 KB gzip cho một màn họ không bao giờ mở.
 - Phụ thuộc mạng ngoài **duy nhất và có chủ đích**: iframe Google Maps ở trang Liên hệ.
 
 ---

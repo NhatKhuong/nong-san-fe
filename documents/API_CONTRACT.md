@@ -89,7 +89,7 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 
 ## B. Bảng endpoint
 
-50 endpoint. Tên hàm ở cột đầu là hàm frontend đang gọi — tìm trong `src/api/` để xem chi tiết.
+56 endpoint. Tên hàm ở cột đầu là hàm frontend đang gọi — tìm trong `src/api/` để xem chi tiết.
 
 ### B.1 Sản phẩm — `products.api.ts`
 
@@ -239,7 +239,7 @@ Toàn bộ nội dung trang Giới thiệu (câu chuyện, mốc thời gian, co
 
 ### B.12 Khu quản trị — `/admin/**` (khung, chưa chốt)
 
-> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint), **§B.12.2 đã chốt** (backlog 0005, 3 endpoint) và **§B.12.3 đã chốt** (backlog 0006, 2 endpoint; định nghĩa "khách hàng" chốt ở backlog 0008) — cả ba đã cộng vào §F; **§B.12.4 vẫn rỗng** — ai điền mục đó thì cập nhật §F trong cùng lần sửa.
+> **Khung điền dần.** Bốn mục dưới đây được điền bởi các ticket dựng khu quản trị; đặt sẵn khung ở đây để mọi endpoint quản trị rơi vào đúng một chỗ thay vì mọc rải rác trong bảng B. **§B.12.1 đã chốt** (backlog 0004, 5 endpoint), **§B.12.2 đã chốt** (backlog 0005, 3 endpoint) và **§B.12.3 đã chốt** (backlog 0006, 2 endpoint; định nghĩa "khách hàng" chốt ở backlog 0008) và **§B.12.4 đã chốt** (backlog 0007, 1 endpoint) — cả bốn đã cộng vào §F. Khung này giờ đã đầy; thêm endpoint quản trị mới thì mở mục §B.12.5 và cập nhật §F trong cùng lần sửa.
 
 Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
 
@@ -323,9 +323,41 @@ Hàm nằm ở `src/api/adminUsers.api.ts`, **không** ở `auth.api.ts` — cù
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
 |---|---|---|---|---|---|
-| _chưa chốt_ | `/admin/stats…` | — | — | 401, 403 | 🔒 admin |
+| `getAdminOverview` | `GET /admin/stats/overview` | query: `days` (**bỏ trống ⇒ 30**) | `AdminOverview` | 400, 401, 403 | 🔒 admin |
 
 > Số liệu tổng hợp **do backend tính**, cùng lý do với §C.3: gộp ở client nghĩa là tải toàn bộ đơn hàng của mọi khách về trình duyệt.
+
+Hàm nằm ở `src/api/adminStats.api.ts`, shape trả về là `AdminOverview` trong `src/types/admin.ts`. Đây là **endpoint chỉ đọc và sẽ luôn chỉ đọc**: số liệu ở đây được *suy ra* từ đơn hàng, sản phẩm và tài khoản, không phải một bản ghi ai đó sửa được. Một endpoint ghi vào `/admin/stats/**` là dấu hiệu số liệu đang được nhập tay ở đâu đó thay vì tính ra.
+
+**Ba định nghĩa dưới đây là phần dễ tranh cãi nhất của mục này — chúng được viết ra chính vì thế.**
+
+- **`revenue` = tổng `total` của mọi đơn KHÔNG ở trạng thái `cancelled`**, trong `days` ngày gần nhất. Đơn đã huỷ **vẫn** được tính vào `orderCount` và vào cột `cancelled` của `ordersByStatus` — nó đã xảy ra — nhưng không phải tiền cửa hàng thu được. Đây là con số sẽ có người tranh cãi, nên nó nằm ở đây thay vì để mỗi client tự đoán.
+- **`customerCount` chỉ đếm tài khoản `role == "customer"`** (Owner chốt 2026-08-24, backlog 0008). **Đây phải là đúng tập mà `GET /admin/customers` của §B.12.3 trả về khi không kèm tham số `role`** — hai chỗ này là hai chỗ duy nhất trong tài liệu đếm người dùng, và chúng phải đếm **cùng một tập**. Định nghĩa "khách hàng" được ghim ở §B.12.3; đọc mục đó trước khi đổi bất cứ thứ gì ở đây, và ai đổi định nghĩa ở §B.12.3 thì sửa cả mục này trong cùng lần sửa. Lệch nhau thì bảng `/quan-tri/khach-hang` ghi 11 dòng còn ô chỉ số ghi 12, không có lỗi nào nổ ra và không chỗ nào nói ra là vì sao.
+- **`lowStockCount` = số sản phẩm có `0 < stock <= 10`** — `LOW_STOCK_THRESHOLD` trong `lib/constants.ts`, **đúng con số** mà bộ lọc `stockStatus=low_stock` (§B.12.1) và nhãn tồn kho trên từng dòng đang dùng. Lệch ngưỡng thì ô chỉ số nói một đằng, danh sách lọc ra một nẻo.
+
+**Chuỗi thời gian phải DÀY, zero-filled bởi backend.**
+
+- `revenueByDay` có **đúng `days` phần tử**, sắp tăng dần theo ngày, `date` dạng `YYYY-MM-DD`; ngày không có đơn trả `revenue: 0` chứ **không** bị bỏ qua.
+- `ordersByStatus` có **đủ cả 5 trạng thái**, kể cả trạng thái đang có `count: 0`.
+- Không zero-fill thì **mọi** client — web, Android, iOS — phải tự dựng lại khung ngày y hệt nhau: đường biểu đồ nối thẳng qua khoảng trống và đọc thành "doanh thu đều", còn cột trạng thái nhảy chỗ mỗi lần tải lại. Recharts (và mọi thư viện chart khác) **không vẽ gì cho một cột `count: 0`** — client phải tự thêm `minPointSize` để cột đó có mặt; đó là việc của client, nhưng nó chỉ làm được khi mốc rỗng thật sự có trong dữ liệu.
+
+**Cái gì theo khoảng, cái gì không.**
+
+| Trường | Phụ thuộc `days`? |
+|---|---|
+| `revenue`, `orderCount`, `revenueByDay`, `ordersByStatus` | ✅ — cả bốn nằm trong **cùng một** khoảng |
+| `customerCount`, `lowStockCount` | ❌ — ảnh chụp hiện tại |
+
+`customerCount` không có chiều thời gian vì `User` **không có `createdAt`** (§B.12.3, cùng lý do khiến danh sách khách hàng không có `sort`); tồn kho thì chỉ có giá trị "ngay lúc này". Ngược lại, `orderCount` **bắt buộc** dùng cùng khoảng với `revenue`: hai ô đứng cạnh nhau trên cùng một màn mà một ô đếm mọi thời kỳ còn ô kia chỉ 30 ngày là hai con số mâu thuẫn nhau ngay trước mắt người đọc.
+
+**Hai bất biến kiểm được từ chính response** — vi phạm là backend tính sai, không phải client hiển thị sai:
+
+- `revenue == sum(revenueByDay[].revenue)`
+- `orderCount == sum(ordersByStatus[].count)`
+
+**Ngày tính theo múi giờ của cửa hàng, không phải UTC.** Đơn đặt lúc 20:00 giờ Việt Nam phải rơi vào đúng ngày đó, không bị đẩy sang hôm trước — nếu không thì cột "Ngày đặt" ở `/quan-tri/don-hang` và biểu đồ ở màn Tổng quan lệch nhau một ngày.
+
+**`days` là preset, không phải khoảng ngày tuỳ ý.** Giao diện hiện chỉ có hai nút 7 và 30 (backlog 0007 chốt lọc theo khoảng tuỳ ý là non-goal). Backend nhận `days` ngoài dải hợp lý → **400**; đừng âm thầm kẹp giá trị, một khoảng khác thứ người dùng yêu cầu là một câu trả lời sai im lặng.
 
 ---
 
@@ -455,10 +487,10 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 | Con số | Giá trị |
 |---|---|
-| Endpoint | 55 |
-| File trong `src/api/` | 18 (15 file `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock) |
+| Endpoint | 56 |
+| File trong `src/api/` | 19 (16 file `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock) |
 | Hàm chỉ chạy ở client | 3 — `getCurrentUserId()`, `calcShippingFee()`, `readPublicUsers()` |
 | Kiểu dữ liệu | 12 file trong `src/types/` |
-| Chỗ hiển thị `error.message` cho người dùng | 33 |
+| Chỗ hiển thị `error.message` cho người dùng | 34 |
 
 Thêm endpoint mới thì cập nhật cả bảng B **và** con số ở đây — lệch nhau nghĩa là có hàm chưa được ghi.
