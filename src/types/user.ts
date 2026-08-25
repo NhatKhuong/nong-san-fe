@@ -69,6 +69,18 @@ export interface ChangePasswordPayload {
 }
 
 /**
+ * Dữ liệu đặt lại mật khẩu qua email — `ResetPasswordRequest` của backend.
+ *
+ * `token` là chuỗi trong query string của link email (`/dat-lai-mat-khau?token=…`),
+ * **không** phải access token của phiên đăng nhập: endpoint này công khai và người
+ * gọi theo định nghĩa là người **chưa** đăng nhập được (§B.4 điều 7).
+ */
+export interface ResetPasswordPayload {
+  token: string
+  newPassword: string
+}
+
+/**
  * Người dùng đúng như backend trả về (`UserResponse` của Swagger).
  *
  * **Không có `role`** — đúng 5 trường. Vai trò chỉ nằm trong claim của JWT và

@@ -10,7 +10,7 @@ interface AuthCardProps {
   footerLinkTo?: string
 }
 
-/** Khung chung cho ba trang đăng nhập / đăng ký / quên mật khẩu. */
+/** Khung chung cho bốn trang đăng nhập / đăng ký / quên mật khẩu / đặt lại mật khẩu. */
 export default function AuthCard({
   title,
   description,

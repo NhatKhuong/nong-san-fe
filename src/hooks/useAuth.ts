@@ -5,6 +5,7 @@ import {
   login,
   logout,
   register,
+  resetPassword,
   updateProfile,
 } from '@/api/auth.api'
 import { getMyOrders } from '@/api/orders.api'
@@ -74,6 +75,17 @@ export function useLogout() {
 
 export function useForgotPassword() {
   return useMutation({ mutationFn: forgotPassword })
+}
+
+/**
+ * Đặt lại mật khẩu bằng token trong email.
+ *
+ * **Cố ý KHÔNG `setUser` và KHÔNG đụng tới phiên** — khác `useLogin`/`useRegister`:
+ * `204` không trả token, và tự đăng nhập bằng một token dùng-một-lần là biến nó
+ * thành phiên đăng nhập. Trang gọi điều hướng về `/dang-nhap` sau khi thành công.
+ */
+export function useResetPassword() {
+  return useMutation({ mutationFn: resetPassword })
 }
 
 export function useUpdateProfile() {

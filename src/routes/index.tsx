@@ -25,6 +25,7 @@ import {
   ProfilePage,
   ProtectedRoute,
   RegisterPage,
+  ResetPasswordPage,
   ShopPage,
   WishlistPage,
 } from './lazyPages'
@@ -69,6 +70,17 @@ export const router = createBrowserRouter([
       { path: ROUTES.LOGIN, element: <LoginPage /> },
       { path: ROUTES.REGISTER, element: <RegisterPage /> },
       { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
+
+      /*
+       * Đích của link trong email đặt lại mật khẩu — CÔNG KHAI, cố ý nằm ngoài
+       * `ProtectedRoute`: người quên mật khẩu theo định nghĩa là người **không
+       * đăng nhập được**. Bọc nó lại sẽ đá chính người cần nó về `/dang-nhap`,
+       * nơi họ đang mắc kẹt.
+       *
+       * Token đi trong **query string** (`?token=…`), không phải đoạn path — vì
+       * vậy không khai `:token` ở đây, trang đọc bằng `useSearchParams`.
+       */
+      { path: ROUTES.RESET_PASSWORD, element: <ResetPasswordPage /> },
 
       /*
        * Khu vực tài khoản: `ProtectedRoute` chặn khi chưa đăng nhập, `AccountLayout`

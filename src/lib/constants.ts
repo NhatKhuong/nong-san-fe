@@ -9,6 +9,7 @@ export const ROUTES = {
   LOGIN: '/dang-nhap',
   REGISTER: '/dang-ky',
   FORGOT_PASSWORD: '/quen-mat-khau',
+  RESET_PASSWORD: '/dat-lai-mat-khau',
   ACCOUNT: '/tai-khoan',
   ACCOUNT_ORDERS: '/tai-khoan/don-hang',
   ACCOUNT_ADDRESSES: '/tai-khoan/dia-chi',
