@@ -24,6 +24,7 @@ export type {
 } from './user'
 export type {
   Order,
+  OrderItem,
   OrderStatus,
   PaymentMethod,
   ShippingInfo,
