@@ -274,7 +274,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const user = toPublicUser(matched)
   const token = issueToken(user)
   setAuthToken(token)
-  return { user, token }
+  return { user, token, refreshToken: `mock-refresh.${btoa(String(user.id))}.${Date.now()}` }
 }
 
 /**
@@ -308,7 +308,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
   const user = toPublicUser(newUser)
   const token = issueToken(user)
   setAuthToken(token)
-  return { user, token }
+  return { user, token, refreshToken: `mock-refresh.${btoa(String(user.id))}.${Date.now()}` }
 }
 
 /**

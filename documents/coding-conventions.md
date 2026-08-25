@@ -116,6 +116,17 @@ Với state đi qua `persist` của Zustand thì dùng `version` + `migrate` (xe
 **không** ép đăng xuất: `migrate` mặc định về quyền thấp nhất và không đá người đang làm việc dở
 ra ngoài. Hàm `migrate` phải **idempotent**.
 
+> **Reload toàn trang chạy lại `onRehydrateStorage`; điều hướng trong router thì không.**
+>
+> Đổi một `window.location.href` thành `navigate()` **không bao giờ là thay đổi trung tính**: nó
+> bỏ luôn mọi logic khởi động mà lần reload vẫn âm thầm chạy hộ. Bài học từ backlog 0010 —
+> `clearSession()` xoá token nhưng bản cache `user` của Zustand chỉ được dọn bởi
+> `onRehydrateStorage`, thứ chỉ chạy khi tải lại trang. Bỏ reload đi thì `selectIsAuthenticated`
+> vẫn báo "đang đăng nhập", `LoginPage` đá người dùng ngược lại trang cũ, và **không có lỗi nào
+> nổ ra**. Ai đổi kiểu điều hướng thì phải tự hỏi *"lần reload này đang dọn hộ những gì?"* rồi
+> nói ra tường minh — **ở nơi sở hữu dữ liệu**, không phải trong một layout: mỗi cây router
+> top-level là một chỗ dễ bỏ sót (`/quan-tri` không đi qua `MainLayout`, xem ADR 0001).
+
 **Ticket nào đổi shape của một type dùng chung thì phần Verify bắt buộc có một điểm kiểm
 "dữ liệu localStorage cũ"**: ghi tay một bản ghi theo shape cũ, tải lại trang, và chứng minh
 người đang đăng nhập không bị văng ra. Xem `management/backlog/0002-*` làm mẫu.
@@ -325,6 +336,35 @@ Hai quy tắc rút ra:
    đều pass**. Chỉ ảnh mới bắt được. Kiểm DOM và xem ảnh là hai loại bằng chứng khác nhau, không
    loại nào thay được loại nào.
 
+**Biến thể thứ năm, ở tầng dưới cùng: công cụ QA có thể chạy trong ISOLATED WORLD.**
+
+Bốn biến thể trên nói về *khẳng định sai chỗ*. Cái này nói về **việc bạn đang nói chuyện với một
+bản sao** — khẳng định đúng đến mấy cũng không cứu được.
+
+Công cụ tự động hoá trình duyệt (patchright, và Playwright khi dùng `addInitScript` / world riêng)
+chạy `page.evaluate` trong một world tách biệt với trang. Trong world đó:
+
+| Dùng chung với trang | KHÔNG dùng chung |
+|---|---|
+| `document`, DOM, `localStorage`, `location`, `history` | `window.<thuộc tính tự đặt>` |
+| | **`await import('/src/...')` — tạo BẢN SAO module, state cấp module là của riêng nó** |
+
+Hậu quả rất khó đoán ra: một listener đăng ký ở cấp module trong ứng dụng sẽ **không bao giờ**
+nhận được sự kiện do probe của bạn phát ra, vì hai bên đang giữ hai instance khác nhau của cùng
+một file. Bài học từ backlog 0010: mất bốn lượt chạy để phát hiện "listener của `MainLayout`
+không chạy" là ảo giác của công cụ, còn bug thật thì nằm chỗ khác hẳn.
+
+Hai quy tắc:
+
+1. **Muốn chạm đúng instance mà ứng dụng đang dùng thì phải chạy trong main world** —
+   `page.addScriptTag({ type: 'module', content: … })` chèn `<script>` vào chính trang.
+2. **Truyền kết quả ra ngoài bằng DOM**, thứ duy nhất hai world cùng thấy — ghi vào
+   `textContent` của một node rồi đọc lại. Đừng dùng `window.__ketQua`; nó sẽ luôn `undefined`
+   và trông y hệt "code không chạy".
+
+Dấu hiệu nhận biết: probe báo sự kiện đã phát, `document`/`localStorage` đổi đúng như mong đợi,
+nhưng **phần ứng dụng đáng lẽ phản ứng lại thì im lặng** — và im lặng không kèm một lỗi nào.
+
 ---
 
 ## 9. Điều cấm
@@ -338,4 +378,4 @@ Hai quy tắc rút ra:
 
 ---
 
-*Cập nhật lần cuối: 2026-08-24 — giữ mốc này đúng trong chính lần sửa nội dung.*
+*Cập nhật lần cuối: 2026-08-25 — giữ mốc này đúng trong chính lần sửa nội dung.*
