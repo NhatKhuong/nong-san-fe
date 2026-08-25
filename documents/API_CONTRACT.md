@@ -73,6 +73,10 @@ Backend **map `Page<T>` của Spring Data sang dạng dưới đây** thay vì t
 
 Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 
+**Khi kết quả rỗng: `total = 0` ⇒ `totalPages = 0`**, không phải `1`. Chốt 2026-08-25 — ô trống này đã làm hai bên tự chọn khác nhau (lớp mock dùng `Math.max(1, …)`, backend dùng `0`). Chọn theo backend vì **`0` và `1` vẽ ra y hệt nhau trên giao diện**: `components/ui/Pagination.tsx` mở đầu bằng `if (totalPages <= 1) return null`, và cả sáu chỗ gọi đều đi qua component đó. Đổi sang `1` thì phải sửa **mọi** endpoint phân trang để đổi lấy đúng một con số không ai nhìn thấy.
+
+`page` vượt số trang ⇒ `items: []` và `total`/`totalPages` giữ nguyên giá trị thật — **không phải `404`**.
+
 ### A.5 Kiểu dữ liệu
 
 | Loại | Quy ước | Ví dụ |
@@ -144,17 +148,21 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 | `register` | `POST /auth/register` | `RegisterPayload` | `AuthResponse` | 409 email trùng | ⬜ |
 | `refreshSession` | `POST /auth/refresh` | `{ refreshToken }` | `AuthResponse` | 401 hết hạn | ⬜ |
 | `logout` | `POST /auth/logout` | `{ refreshToken }` | `204` | — | ✅ |
-| `forgotPassword` | `POST /auth/forgot-password` | `{ email }` | `204` | 400 | ⬜ |
-| `updateProfile` | `PUT /auth/me` | `Partial<User>` | `User` | 404, 409 email trùng | ✅ |
-| `changePassword` | `PUT /auth/password` | `ChangePasswordPayload` | `204` | 401, 422 sai mật khẩu cũ | ✅ |
+| `forgotPassword` | `POST /auth/forgot-password` | `{ email }` | `204` | **422**, **429** quá nhiều lần | ⬜ |
+| `updateProfile` | `PUT /auth/me` | `{ fullName?, email?, phone? }` | `User` | 401, 404, 409 email trùng, **422** | ✅ |
+| `changePassword` | `PUT /auth/password` | `ChangePasswordPayload` | `204` | 401, 404, **422** sai mật khẩu cũ | ✅ |
+| `resetPassword` | `POST /auth/reset-password` | `{ token, newPassword }` | `204` | **422** | ⬜ |
 
-**Năm điều bắt buộc:**
+**Tám điều bắt buộc:**
 
 1. `User` trả về **không bao giờ chứa password** — kể cả dạng đã hash.
 2. `updateProfile` **không được cho phép ghi đè `id` hay `role`**, kể cả khi client gửi lên. Hai trường này bị chốt lại từ bản ghi cũ; sửa hồ sơ không được phép tự nâng quyền.
 3. `register` **luôn tạo tài khoản `role: "customer"` và bỏ qua mọi trường `role` gửi lên trong body.** `RegisterPayload` cố ý không khai `role`, nhưng backend vẫn phải tự bỏ qua nó — client gửi thừa một trường là chuyện không ngăn được. **Vai trò chỉ được gán ở phía server** (§C.4.2 và [ADR 0002](../../../management/decisions/0002-phan-quyen-role-va-namespace-admin.md)); nếu client tự chọn được vai trò thì ai cũng tự cấp quyền quản trị cho mình được.
 4. `logout` phải **thu hồi refresh token**, nếu không nó vẫn dùng được đến khi hết hạn dù người dùng đã thoát.
 5. `forgotPassword` **luôn trả 204**, kể cả khi email không tồn tại. Trả 404 sẽ biến endpoint này thành công cụ dò xem địa chỉ nào đã đăng ký.
+6. **Cùng một mã trạng thái là CHƯA ĐỦ — hai nhánh còn phải không phân biệt được qua **mọi kênh quan sát được**, kể cả **thời gian phản hồi**. Không phải lý thuyết: bản dựng đầu tiên của `forgot-password` trên backend thật tách được "email có thật" khỏi "email không có" ở median **25,2ms vs 9,3ms** (40 mẫu xen kẽ) — một oracle dò tài khoản hoàn chỉnh, nằm sau một mã `204` đúng suốt. Đã vá bằng cách đưa cả use case ra khỏi request thread. Luật này áp cho **cả `login`** (điều 1 của §B.4 cũ) và **`resetPassword`**.
+7. `resetPassword` gộp **ba ca hỏng** — token sai, hết hạn, đã dùng — thành **một `422` giống hệt nhau**. Tách ra là dựng lại đúng cái oracle ở điều 6. Token đi trong **query string** của link email (`/dat-lai-mat-khau?token=…`), không phải trong đường dẫn.
+8. `updateProfile` nhận **đúng ba trường** `fullName` / `email` / `phone` — **không có `avatar`**, dù `User` có trường đó. Hiện không màn hình nào cho sửa ảnh đại diện; muốn làm thì phải mở rộng endpoint trước. **`User` trả về từ `PUT /auth/me` KHÔNG chứa `role`** (đúng 5 trường `id, fullName, email, phone, avatar`) — client phải bồi `role` lại từ claim JWT, không thì người dùng sửa hồ sơ xong là **mất quyền admin trên giao diện**.
 
 `getCurrentUserId()` trong cùng file **không phải endpoint** — nó giải id từ token phía client. Khi ghép backend thật, id lấy từ JWT ở phía server.
 
@@ -226,14 +234,14 @@ Mock hiện chỉ có **10 tỉnh rút gọn**. Backend cấp bộ đầy đủ 
 | `getPromoBanners` | `GET /promo-banners` | — | `PromoBanner[]` | — | ⬜ |
 | `getTestimonials` | `GET /testimonials` | — | `Testimonial[]` | — | ⬜ |
 | `getBrands` | `GET /brands` | — | `Brand[]` | — | ⬜ |
-| `subscribeNewsletter` | `POST /newsletter/subscribe` | `{ email }` | `204` | 400 email sai | ⬜ |
+| `subscribeNewsletter` | `POST /newsletter/subscribe` | `{ email }` | `204` | **422** email sai | ⬜ |
 
 ### B.11 Giới thiệu & Liên hệ
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
 |---|---|---|---|---|---|
 | `getAboutContent` | `GET /about` | — | `AboutContent` | — | ⬜ |
-| `sendContactMessage` | `POST /contact` | `ContactPayload` | `ContactMessage` | 400 | ⬜ |
+| `sendContactMessage` | `POST /contact` | `ContactPayload` | `ContactMessage` | **422** | ⬜ |
 
 Toàn bộ nội dung trang Giới thiệu (câu chuyện, mốc thời gian, con số, cam kết) là **dữ liệu**, không viết cứng trong component — người vận hành sửa được mà không cần deploy.
 
@@ -254,8 +262,8 @@ Luật chung cho **mọi** endpoint trong mục này, không có ngoại lệ:
 |---|---|---|---|---|---|
 | `getAdminProducts` | `GET /admin/products` | query: `q`, `category`, `stockStatus`, `sort`, `page`, `limit` | `Paginated<Product>` | 401, 403 | 🔒 admin |
 | `getAdminProduct` | `GET /admin/products/{id}` | — | `Product` | 401, 403, 404 | 🔒 admin |
-| `createProduct` | `POST /admin/products` | `ProductPayload` | `Product` (201) | 400, 401, 403, 409 | 🔒 admin |
-| `updateProduct` | `PUT /admin/products/{id}` | `ProductPayload` | `Product` | 400, 401, 403, 404, 409 | 🔒 admin |
+| `createProduct` | `POST /admin/products` | `ProductPayload` | `Product` (201) | 401, 403, 409, **422** | 🔒 admin |
+| `updateProduct` | `PUT /admin/products/{id}` | `ProductPayload` | `Product` | 401, 403, 404, 409, **422** | 🔒 admin |
 | `deleteProduct` | `DELETE /admin/products/{id}` | — | `204 No Content` | 401, 403, 404 | 🔒 admin |
 
 Hàm nằm ở `src/api/adminProducts.api.ts`, **không** ở `products.api.ts`: hai namespace được gác bằng hai lớp bảo mật khác nhau, để chung file là mời một lời gọi ghi lọt ra ngoài hàng rào.
@@ -266,7 +274,22 @@ Hàm nằm ở `src/api/adminProducts.api.ts`, **không** ở `products.api.ts`:
 - **`ProductPayload.slug` bỏ trống thì backend tự sinh từ `name`** (bỏ dấu, nối bằng gạch ngang). Slug đã có người dùng → **409**, kèm `ProblemDetail` tiếng Việt; **không** tự thêm hậu tố `-1`. Slug đi thẳng lên URL công khai, một cái slug lặng lẽ khác thứ admin vừa gõ sẽ phá đúng cái link họ chuẩn bị chia sẻ.
 - **`rating`, `reviewCount`, `sold`, `createdAt` không nằm trong `ProductPayload`** — backend **bỏ qua** nếu client cố gửi (§C.3). Cho sửa nghĩa là số sao hiển thị sẽ mâu thuẫn với chính danh sách đánh giá ngay bên dưới nó.
 - **`images` là đường dẫn tương đối `/images/...`** ở **cả** request lẫn response (§A.5). Client không bao giờ gửi URL đã ghép `VITE_IMAGE_BASE_URL` lên — làm vậy là ghi gốc CDN xuống cơ sở dữ liệu.
-- **Chưa chốt — xoá cứng hay xoá mềm.** Sản phẩm bị xoá vẫn được các đơn hàng cũ tham chiếu, nên lớp mock hiện xoá **mềm**. Quyết định cuối cùng thuộc agent `api`; frontend không phụ thuộc vào lựa chọn nào, miễn `DELETE` trả 204 và sản phẩm biến mất khỏi `GET /products`.
+- **Đã chốt 2026-08-25 — `DELETE` là xoá MỀM.** Sản phẩm bị xoá vẫn được các đơn hàng cũ tham chiếu nên dòng ở lại trong bảng, chỉ tắt cờ. **Hệ quả Owner đã chấp nhận:** sản phẩm đã xoá biến mất khỏi **cả** `GET /products` **lẫn** `GET /admin/products`, và **không có đường khôi phục từ UI** — khôi phục ở tầng DB. **Không** thêm tham số xem hàng đã xoá.
+- **Slug của sản phẩm đã xoá mềm vẫn bị giữ chỗ** (ràng buộc duy nhất phủ toàn bảng), nên tạo lại cùng slug trả **409**. Là chủ ý: slug đi thẳng lên URL công khai và có thể còn link cũ trỏ tới.
+- **`slug` client gửi lên cũng bị `slugify`, không bị từ chối.** `"  Cà Rốt  Hữu Cơ ĐẶC BIỆT!!  "` ra `ca-rot-huu-co-dac-biet` và **201**, khớp hành vi `resolveSlug` của lớp mock.
+- **`sort` nhận đúng 5 giá trị** `newest` · `price_asc` · `price_desc` · `best_selling` · `rating`, mặc định `newest`. Giá sắp theo **giá sau giảm**, không phải `price`.
+- **`category` lọc theo slug và KÉO THEO danh mục con một cấp**; slug không tồn tại → **tập rỗng**, không phải toàn bộ danh sách.
+
+> **RÀNG BUỘC CHÉO — đọc trước khi nới bất kỳ luật validate nào về giá.**
+>
+> Công thức "giá sau giảm" của hai bên **không giống nhau**, và chúng chỉ trùng kết quả **nhờ một luật validate**:
+>
+> ```
+> Backend:  effective_price = COALESCE(sale_price, price)
+> Frontend: lib/format.ts → salePrice && salePrice < price ? salePrice : price
+> ```
+>
+> Hai công thức **lệch nhau khi `salePrice >= price`** — ca đó không xảy ra chỉ vì backend chặn bằng **422**. **Nới luật đó ở bất kỳ đâu — kể cả "cho phép giá khuyến mãi bằng giá gốc" nghe rất vô hại — sẽ làm `price_asc`/`price_desc` và `minPrice`/`maxPrice` lệch âm thầm**, đúng loại lỗi mà §B.1 đã cảnh báo. Sửa thì phải sửa **cả hai bên cùng lúc**.
 
 #### B.12.2 Đơn hàng — liệt kê chéo người dùng, đổi trạng thái
 
@@ -274,7 +297,7 @@ Hàm nằm ở `src/api/adminProducts.api.ts`, **không** ở `products.api.ts`:
 |---|---|---|---|---|---|
 | `getAdminOrders` | `GET /admin/orders` | query: `q`, `status`, `userId`, `page`, `limit` | `Paginated<Order>` | 401, 403 | 🔒 admin |
 | `getAdminOrderByCode` | `GET /admin/orders/{code}` | — | `Order` | 401, 403, 404 | 🔒 admin |
-| `updateOrderStatus` | `PATCH /admin/orders/{code}/status` | `{ status: OrderStatus }` | `Order` | 400, 401, 403, 404, **422** | 🔒 admin |
+| `updateOrderStatus` | `PATCH /admin/orders/{code}/status` | `{ status: OrderStatus }` | `Order` | 401, 403, 404, **422** | 🔒 admin |
 
 > Song sinh với `GET /orders/me`. Hai endpoint tồn tại song song **chính là** cách giữ §C.4.1 không bị nới lỏng.
 
@@ -323,7 +346,7 @@ Hàm nằm ở `src/api/adminUsers.api.ts`, **không** ở `auth.api.ts` — cù
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
 |---|---|---|---|---|---|
-| `getAdminOverview` | `GET /admin/stats/overview` | query: `days` (**bỏ trống ⇒ 30**) | `AdminOverview` | 400, 401, 403 | 🔒 admin |
+| `getAdminOverview` | `GET /admin/stats/overview` | query: `days` (**bỏ trống ⇒ 30**) | `AdminOverview` | 401, 403, **422** | 🔒 admin |
 
 > Số liệu tổng hợp **do backend tính**, cùng lý do với §C.3: gộp ở client nghĩa là tải toàn bộ đơn hàng của mọi khách về trình duyệt.
 
@@ -357,7 +380,7 @@ Hàm nằm ở `src/api/adminStats.api.ts`, shape trả về là `AdminOverview`
 
 **Ngày tính theo múi giờ của cửa hàng, không phải UTC.** Đơn đặt lúc 20:00 giờ Việt Nam phải rơi vào đúng ngày đó, không bị đẩy sang hôm trước — nếu không thì cột "Ngày đặt" ở `/quan-tri/don-hang` và biểu đồ ở màn Tổng quan lệch nhau một ngày.
 
-**`days` là preset, không phải khoảng ngày tuỳ ý.** Giao diện hiện chỉ có hai nút 7 và 30 (backlog 0007 chốt lọc theo khoảng tuỳ ý là non-goal). Backend nhận `days` ngoài dải hợp lý → **400**; đừng âm thầm kẹp giá trị, một khoảng khác thứ người dùng yêu cầu là một câu trả lời sai im lặng.
+**`days` là preset, không phải khoảng ngày tuỳ ý.** Giao diện hiện chỉ có hai nút 7 và 30 (backlog 0007 chốt lọc theo khoảng tuỳ ý là non-goal). Backend nhận `days` ngoài dải hợp lý → **422** kèm map `errors` (§A.3 — `days` là một trường, nên nó theo luật của trường); **đừng âm thầm kẹp giá trị**, một khoảng khác thứ người dùng yêu cầu là một câu trả lời sai im lặng.
 
 ---
 
@@ -485,12 +508,26 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 ## F. Đối chiếu nhanh
 
-| Con số | Giá trị |
-|---|---|
-| Endpoint | 56 |
-| File trong `src/api/` | 19 (16 file `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock) |
-| Hàm chỉ chạy ở client | 3 — `getCurrentUserId()`, `calcShippingFee()`, `readPublicUsers()` |
-| Kiểu dữ liệu | 12 file trong `src/types/` |
-| Chỗ hiển thị `error.message` cho người dùng | 34 |
+> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-25 ở backlog 0017.)*
 
-Thêm endpoint mới thì cập nhật cả bảng B **và** con số ở đây — lệch nhau nghĩa là có hàm chưa được ghi.
+| Con số | Giá trị | Lệnh đếm (chạy từ `projects/app/`) |
+|---|---|---|
+| Dòng endpoint trong bảng B | **57** | `grep -cE '^\\| \`[a-zA-Z]+\` \\| \`(GET\|POST\|PUT\|PATCH\|DELETE) ' documents/API_CONTRACT.md` |
+| Đường dẫn phân biệt (bỏ query) | **55** | hai dòng dùng lại đường cũ kèm query: `getProductsByIds` (`/products?ids=`) và `getRootCategories` (`/categories?root=true`) |
+| Hàm `export` trong `src/api/*.api.ts` | **59** | `grep -c '^export .*function' src/api/*.api.ts` → cộng lại |
+| File `.api.ts` | **16** | `ls src/api/*.api.ts \| wc -l` |
+| File trong `src/api/` | **19** | 16 `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock |
+| Hàm chỉ chạy ở client | **3** | `getCurrentUserId()` · `calcShippingFee()` · `readPublicUsers()` — có trong mã, **cố ý không có** trong bảng B |
+| Kiểu dữ liệu | **13** | `ls src/types/*.ts \| wc -l` |
+| Chỗ hiển thị `error.message` cho người dùng | **35** | `grep -rn "error.message\|err.message" src/ --include=*.tsx --include=*.ts \| wc -l` |
+
+**Ba con số trên khớp nhau chính xác, và đây là phép đối chiếu có răng:**
+
+```
+59 hàm export  −  3 hàm chỉ chạy ở client        =  56
+57 dòng bảng B −  1 (`resetPassword` chưa dựng ở FE)  =  56  ✅
+```
+
+Dư ra đúng một dòng: **`resetPassword`** có trong hợp đồng và **đã chạy trên backend**, nhưng chưa có hàm phía FE — xem `backlog/0018`. Khi 0018 xong, cả hai vế thành **57**. Ba hàm chỉ-chạy-ở-client thì **không bao giờ** xuất hiện ở bảng B.
+
+Thêm endpoint mới thì cập nhật cả bảng B **và** bảng này, rồi **chạy lại phép đối chiếu trên**. Lệch nghĩa là có hàm chưa được ghi, hoặc có dòng ghi mà không ai dựng.
