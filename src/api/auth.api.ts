@@ -1,4 +1,3 @@
-import { delay } from '@/lib/utils'
 import { client, clearSession, getAuthToken, getRefreshToken, setSession } from './client'
 import { getRoleFromToken, getUserIdFromToken } from '@/lib/jwt'
 import type {
@@ -339,71 +338,71 @@ export async function refreshSession(refreshToken: string): Promise<AuthResponse
 }
 
 /**
- * Gửi email đặt lại mật khẩu.
+ * Gửi email đặt lại mật khẩu — `POST /auth/forgot-password`.
  *
- * ⚠️ **Backend chưa có endpoint này** (Swagger 2026-08-25) — xem backlog/0014.
- * Thân hàm vẫn là mock; đừng tưởng nó đã nối backend chỉ vì các hàm quanh nó đã nối.
+ * **Luôn `204`, kể cả khi email không ứng với tài khoản nào** (§B.4 điều 5).
+ * Giao diện **không được phân nhánh theo kết quả**: mọi ca thành công phải hiện
+ * đúng **một** câu giống hệt nhau. Đoán thêm ở client là dựng lại đúng cái oracle
+ * dò tài khoản mà backend vừa phải đi vá (§B.4 điều 6).
+ *
+ * **`204` không có nghĩa là email đã tới nơi** — chỉ nghĩa là yêu cầu đã được nhận.
+ *
+ * Endpoint công khai và **có giới hạn tần suất** theo cả IP lẫn email đích: vượt
+ * ngưỡng trả `429`, mã mà `FALLBACK_BY_STATUS` (`lib/apiError.ts`) có câu riêng —
+ * đừng để nó rơi xuống chuỗi mặc định.
  */
 export async function forgotPassword(email: string): Promise<void> {
-  await delay(600)
-  if (!email.trim()) throw new Error('Vui lòng nhập email.')
+  await client.post('/auth/forgot-password', { email })
 }
 
 /**
- * Cập nhật thông tin cá nhân.
+ * Cập nhật thông tin cá nhân — `PUT /auth/me`.
  *
- * ⚠️ **Backend chưa có endpoint này** (Swagger 2026-08-25) — xem backlog/0014.
- * Thân hàm vẫn đọc/ghi `nss_mock_users`, nên hồ sơ sửa ở đây KHÔNG tới được server.
+ * **Thân request được dựng bằng danh sách trắng ĐÚNG BA TRƯỜNG**, không phải bằng
+ * cách trải `payload`. Ba lý do, cả ba đều là hợp đồng chứ không phải sở thích:
+ *
+ * 1. **`id` không đi lên.** Chủ sở hữu lấy **chỉ** từ claim `sub` của access token;
+ *    endpoint không nhận `userId` qua query / path / body (§C.4.1). `id` còn nằm
+ *    trong chữ ký là **di sản của thời mock** — chỗ gọi duy nhất (`ProfilePage`)
+ *    vẫn truyền nó, nhưng nó dừng lại ở đây. Đổi chữ ký thuộc diện phải hỏi Owner
+ *    (`coding-conventions.md` §8.1 điều 1), nên để lại cho một ticket riêng.
+ * 2. **`avatar` không đi lên.** `UpdateProfileRequest` đúng ba trường
+ *    `{fullName?, email?, phone?}` — không có `avatar`, dù `User` có (§B.4 điều 8).
+ *    Backend bỏ qua trong im lặng, nên gửi thừa sẽ không báo lỗi ở đâu cả.
+ * 3. **`role` không đi lên.** Vai trò chỉ được gán ở phía server (ADR 0002).
+ *
+ * **Phản hồi là `UserResponse` — đúng 5 trường, KHÔNG có `role`.** Phải bồi `role`
+ * lại từ claim của token đang dùng, y như `login`/`register` làm qua
+ * `toAuthResponse()`. Bỏ bước này thì `setUser` ghi đè bản cache bằng một `User`
+ * thiếu vai trò, và **người dùng admin vừa sửa hồ sơ xong là mất menu Quản trị**.
+ * Token không đổi sau khi sửa hồ sơ (kể cả khi đổi email), nên đọc lại vai trò từ
+ * `getAuthToken()` là đúng nguồn.
  */
 export async function updateProfile(payload: Partial<User> & { id: number }): Promise<User> {
-  await delay(500)
-  const users = readUsers()
-  const index = users.findIndex((user) => user.id === payload.id)
-  if (index === -1) throw new Error('Không tìm thấy tài khoản.')
-
-  const isEmailTaken = users.some(
-    (user) =>
-      user.id !== payload.id &&
-      user.email.toLowerCase() === (payload.email ?? '').trim().toLowerCase(),
-  )
-  if (isEmailTaken) throw new Error('Email này đã được tài khoản khác sử dụng.')
-
-  /*
-   * `id`, `role` và `password` không được phép ghi đè từ payload. `role` bị chốt
-   * lại y như `id`: sửa hồ sơ không được phép tự nâng quyền, và `PUT /auth/me`
-   * ở backend cũng phải bỏ qua trường này (ADR 0002).
-   */
-  const updated: StoredUser = {
-    ...users[index],
-    ...payload,
-    id: users[index].id,
-    role: users[index].role,
-  }
-  users[index] = updated
-  writeUsers(users)
-  return toPublicUser(updated)
+  const { data } = await client.put<ApiUser>('/auth/me', {
+    fullName: payload.fullName,
+    email: payload.email,
+    phone: payload.phone,
+  })
+  return { ...data, role: getRoleFromToken(getAuthToken()) }
 }
 
 /**
- * Đổi mật khẩu của tài khoản đang đăng nhập.
+ * Đổi mật khẩu của tài khoản đang đăng nhập — `PUT /auth/password`, trả `204`.
  *
- * ⚠️ **Backend chưa có endpoint này** (Swagger 2026-08-25) — xem backlog/0014.
- * Mật khẩu so ở đây là mật khẩu trong `nss_mock_users`, KHÔNG phải mật khẩu thật.
+ * Tài khoản lấy từ claim `sub`, **không** nhận `userId` (§C.4.1) — vì vậy payload
+ * đi thẳng lên, nó đã đúng hai trường của `ChangePasswordRequest`.
+ *
+ * **Sai `currentPassword` trả `422`, KHÔNG phải `401`.** Ranh giới này là cố ý:
+ * `client.ts` coi `401` là "access token chết" và sẽ tự gọi `/auth/refresh`, nên
+ * một lần gõ nhầm mật khẩu cũ mà trả `401` sẽ xoay vòng phiên vô cớ. Hai loại
+ * `422` phân biệt bằng khoá `errors`: lỗi validate **có** `errors` (hiện đúng ô
+ * nhập qua `ApiError.fieldErrors`), sai mật khẩu cũ **không có** (hiện ở banner).
+ *
+ * **Thành công thì backend thu hồi mọi refresh token của tài khoản TRỪ phiên đang
+ * gọi** (claim `sid`). Tab hiện tại **không** bị đăng xuất; tab/thiết bị khác sẽ
+ * hỏng ở lần gia hạn kế tiếp. Đó là hành vi đúng — đừng "chữa" nó ở client.
  */
 export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
-  await delay(600)
-
-  const userId = getCurrentUserId()
-  if (userId === null) throw new Error('Vui lòng đăng nhập lại.')
-
-  const users = readUsers()
-  const index = users.findIndex((user) => user.id === userId)
-  if (index === -1) throw new Error('Không tìm thấy tài khoản.')
-
-  if (users[index].password !== payload.currentPassword) {
-    throw new Error('Mật khẩu hiện tại không đúng.')
-  }
-
-  users[index] = { ...users[index], password: payload.newPassword }
-  writeUsers(users)
+  await client.put('/auth/password', payload)
 }

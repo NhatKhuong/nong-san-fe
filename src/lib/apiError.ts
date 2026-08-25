@@ -45,6 +45,14 @@ const FALLBACK_BY_STATUS: Record<number, string> = {
   404: 'Không tìm thấy dữ liệu bạn cần.',
   409: 'Dữ liệu vừa được thay đổi ở nơi khác, vui lòng tải lại rồi thử lại.',
   422: 'Dữ liệu gửi lên không hợp lệ, vui lòng kiểm tra lại các trường được đánh dấu.',
+  /*
+   * `429` là giới hạn tần suất, **không** phải lỗi phiên. Dùng lại câu của `401`
+   * ở đây sẽ đẩy người dùng đi đăng nhập lại cho một thứ mà đăng nhập không chữa
+   * được — thứ duy nhất chữa được là **chờ**. Câu chữ vì vậy phải nói ra đúng
+   * hành động đó. Endpoint đầu tiên chạm tới nó là `POST /auth/forgot-password`,
+   * có rate limit theo cả IP lẫn email đích.
+   */
+  429: 'Bạn đã gửi quá nhiều lần trong thời gian ngắn, vui lòng đợi vài phút rồi thử lại.',
 }
 
 const SERVER_MESSAGE = 'Hệ thống đang bận, vui lòng thử lại sau ít phút.'

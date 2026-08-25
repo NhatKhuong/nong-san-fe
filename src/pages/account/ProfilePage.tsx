@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormSetError } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Button from '@/components/ui/Button'
@@ -6,14 +6,38 @@ import Input from '@/components/ui/Input'
 import { PHONE_MESSAGE, PHONE_PATTERN } from '@/lib/validation'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useCurrentUser, useUpdateProfile } from '@/hooks/useAuth'
+import { ApiError } from '@/lib/apiError'
 
+/**
+ * Khớp `UpdateProfileRequest` của backend: `fullName ≤128, email ≤160, phone ≤20`,
+ * và cả ba **không được rỗng / toàn khoảng trắng** (`pattern: .*\S.*`).
+ *
+ * Trần cũ `fullName ≤60` là con số của thời mock — nó chặt hơn server, tức từ chối
+ * đúng những cái tên mà server sẵn sàng nhận. `PHONE_PATTERN` thì giữ nguyên vì nó
+ * chặt hơn ràng buộc `≤20` một cách có ích (đúng 10 chữ số), nên không bao giờ cho
+ * lọt thứ server sẽ từ chối — cùng lý do đã ghi ở `RegisterPage.tsx`.
+ */
 const profileSchema = z.object({
-  fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(60, 'Họ tên quá dài.'),
-  email: z.string().trim().email('Email không hợp lệ.'),
+  fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(128, 'Họ tên quá dài.'),
+  email: z.string().trim().email('Email không hợp lệ.').max(160, 'Email quá dài.'),
   phone: z.string().trim().regex(PHONE_PATTERN, PHONE_MESSAGE),
 })
 
 type ProfileFormValues = z.infer<typeof profileSchema>
+
+const PROFILE_FIELDS = ['fullName', 'email', 'phone'] as const
+
+function isProfileField(key: string): key is (typeof PROFILE_FIELDS)[number] {
+  return (PROFILE_FIELDS as readonly string[]).includes(key)
+}
+
+/** Xem JSDoc cùng tên trong `LoginPage.tsx` — cùng một khuôn, khác tập trường. */
+function applyFieldErrors(error: unknown, setError: UseFormSetError<ProfileFormValues>): void {
+  if (!(error instanceof ApiError) || !error.fieldErrors) return
+  for (const [field, message] of Object.entries(error.fieldErrors)) {
+    if (isProfileField(field)) setError(field, { type: 'server', message })
+  }
+}
 
 export default function ProfilePage() {
   const { user } = useCurrentUser()
@@ -22,6 +46,7 @@ export default function ProfilePage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -32,9 +57,18 @@ export default function ProfilePage() {
     },
   })
 
+  /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
+  const hasMappedFieldError =
+    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isProfileField)
+
   function onSubmit(values: ProfileFormValues) {
     if (!user) return
-    mutate({ id: user.id, ...values })
+    /*
+     * `id` vẫn nằm trong chữ ký của `updateProfile` (di sản thời mock) nhưng
+     * **không đi vào thân request**: `PUT /auth/me` lấy chủ sở hữu từ claim `sub`
+     * và không nhận `userId` qua bất kỳ kênh nào (§C.4.1). Xem JSDoc của hàm đó.
+     */
+    mutate({ id: user.id, ...values }, { onError: (err) => applyFieldErrors(err, setError) })
   }
 
   return (
@@ -73,7 +107,7 @@ export default function ProfilePage() {
             {...register('phone')}
           />
 
-          {error && (
+          {error && !hasMappedFieldError && (
             <p role="alert" className="text-sm text-danger">
               {error.message}
             </p>
