@@ -514,20 +514,22 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 |---|---|---|
 | Dòng endpoint trong bảng B | **57** | `grep -cE '^\\| \`[a-zA-Z]+\` \\| \`(GET\|POST\|PUT\|PATCH\|DELETE) ' documents/API_CONTRACT.md` |
 | Đường dẫn phân biệt (bỏ query) | **55** | hai dòng dùng lại đường cũ kèm query: `getProductsByIds` (`/products?ids=`) và `getRootCategories` (`/categories?root=true`) |
-| Hàm `export` trong `src/api/*.api.ts` | **59** | `grep -c '^export .*function' src/api/*.api.ts` → cộng lại |
+| Hàm `export` trong `src/api/*.api.ts` | **60** | `grep -c '^export .*function' src/api/*.api.ts` → cộng lại |
 | File `.api.ts` | **16** | `ls src/api/*.api.ts \| wc -l` |
 | File trong `src/api/` | **19** | 16 `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock |
 | Hàm chỉ chạy ở client | **3** | `getCurrentUserId()` · `calcShippingFee()` · `readPublicUsers()` — có trong mã, **cố ý không có** trong bảng B |
 | Kiểu dữ liệu | **13** | `ls src/types/*.ts \| wc -l` |
-| Chỗ hiển thị `error.message` cho người dùng | **35** | `grep -rn "error.message\|err.message" src/ --include=*.tsx --include=*.ts \| wc -l` |
+| Chỗ hiển thị `error.message` cho người dùng | **36** | `grep -rn "error.message\|err.message" src/ --include=*.tsx --include=*.ts \| wc -l` |
 
 **Ba con số trên khớp nhau chính xác, và đây là phép đối chiếu có răng:**
 
 ```
-59 hàm export  −  3 hàm chỉ chạy ở client        =  56
-57 dòng bảng B −  1 (`resetPassword` chưa dựng ở FE)  =  56  ✅
+60 hàm export  −  3 hàm chỉ chạy ở client  =  57
+57 dòng bảng B −  0 dòng chưa dựng ở FE     =  57  ✅
 ```
 
-Dư ra đúng một dòng: **`resetPassword`** có trong hợp đồng và **đã chạy trên backend**, nhưng chưa có hàm phía FE — xem `backlog/0018`. Khi 0018 xong, cả hai vế thành **57**. Ba hàm chỉ-chạy-ở-client thì **không bao giờ** xuất hiện ở bảng B.
+**Hai vế đã bằng nhau — không còn dòng nào dư.** `resetPassword` từng là ngoại lệ duy nhất: có trong hợp đồng, **đã chạy trên backend**, nhưng chưa có hàm phía FE. Backlog 0018 đã dựng nó (`src/api/auth.api.ts` → `resetPassword`), nên con số hàm `export` lên **60** và phép trừ mất đi số hạng `− 1`. Ba hàm chỉ-chạy-ở-client thì **không bao giờ** xuất hiện ở bảng B.
+
+> **Vì sao giữ lại đoạn này thay vì xoá:** ô trống trong §B.4 chính là thứ đã buộc backend phải **tự suy diễn** endpoint `POST /auth/reset-password` rồi ship (xem `backlog/0018`). Phép trừ ở trên là cái đáng lẽ đã bắt được nó — nó chỉ có răng khi số hạng lệch được **giải thích bằng tên một ticket đang mở**, không phải bằng một hằng số ai đó chỉnh cho khớp.
 
 Thêm endpoint mới thì cập nhật cả bảng B **và** bảng này, rồi **chạy lại phép đối chiếu trên**. Lệch nghĩa là có hàm chưa được ghi, hoặc có dòng ghi mà không ai dựng.

@@ -20,6 +20,7 @@ export type {
   LoginPayload,
   RegisterPayload,
   ChangePasswordPayload,
+  ResetPasswordPayload,
   AuthResponse,
 } from './user'
 export type {

@@ -6,6 +6,7 @@ import type {
   ChangePasswordPayload,
   LoginPayload,
   RegisterPayload,
+  ResetPasswordPayload,
   User,
   UserRole,
 } from '@/types'
@@ -405,4 +406,32 @@ export async function updateProfile(payload: Partial<User> & { id: number }): Pr
  */
 export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
   await client.put('/auth/password', payload)
+}
+
+/**
+ * Đặt lại mật khẩu bằng token trong email — `POST /auth/reset-password`, trả `204`.
+ *
+ * Bước hai của luồng `forgotPassword`. **Endpoint công khai**: người gọi theo định
+ * nghĩa là người không đăng nhập được, nên không có header `Authorization` và
+ * `token` ở đây là **token dùng-một-lần trong query string của link email**, không
+ * phải access token của phiên.
+ *
+ * **Ba ca hỏng — token sai, đã hết hạn, đã dùng — trả CÙNG MỘT `422` với CÙNG MỘT
+ * `detail`** (§B.4 điều 7). Giao diện **không được phân nhánh** để đoán ca nào đã
+ * xảy ra: tách ra là dựng lại đúng cái oracle dò tài khoản mà backend vừa phải đi
+ * vá ở `forgot-password` (§B.4 điều 6). Chuỗi hiển thị lấy thẳng từ `ApiError.message`.
+ *
+ * **`422`, KHÔNG phải `401`** — cùng ranh giới đã ghi ở `changePassword`: `client.ts`
+ * coi `401` là "access token chết" và sẽ gọi `/auth/refresh` cho một phiên không
+ * tồn tại. Hai loại `422` vẫn phân biệt bằng khoá `errors`: lỗi validate **có**
+ * (`ApiError.fieldErrors`), token không dùng được **không có** (hiện ở banner).
+ *
+ * **`204` KHÔNG trả token và hàm này KHÔNG gọi `setSession()`.** Đăng nhập giùm
+ * người dùng ở đây là biến một token dùng-một-lần thành một phiên đăng nhập; hơn
+ * nữa backend **thu hồi toàn bộ refresh token** của tài khoản khi đặt lại thành
+ * công (khác `PUT /auth/password` giữ lại phiên đang gọi), vì giả định phải là
+ * tài khoản đã bị chiếm. Nơi gọi điều hướng về trang đăng nhập.
+ */
+export async function resetPassword(payload: ResetPasswordPayload): Promise<void> {
+  await client.post('/auth/reset-password', payload)
 }
