@@ -1,5 +1,5 @@
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormSetError } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import AuthCard from '@/components/auth/AuthCard'
@@ -9,13 +9,41 @@ import PasswordInput from '@/components/ui/PasswordInput'
 import { ROUTES } from '@/lib/constants'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useCurrentUser, useLogin } from '@/hooks/useAuth'
+import { ApiError } from '@/lib/apiError'
 
+/**
+ * Khớp `LoginRequest` của backend — và **cố ý KHÁC schema đăng ký**.
+ *
+ * Spec đăng nhập là `password: minLength 0, maxLength 72` — **không có sàn 6**,
+ * trong khi đăng ký là `6..72`. Bê sàn 6 sang đây là dựng một hàng rào backend
+ * không có: nó không chặn được kẻ dò mật khẩu (họ có thừa cách gửi request), mà
+ * chỉ chặn đúng người dùng hợp lệ có mật khẩu cũ ngắn hơn 6 ký tự.
+ */
 const loginSchema = z.object({
-  email: z.string().trim().email('Email không hợp lệ.'),
-  password: z.string().min(1, 'Vui lòng nhập mật khẩu.'),
+  email: z.string().trim().email('Email không hợp lệ.').max(160, 'Email quá dài.'),
+  password: z.string().min(1, 'Vui lòng nhập mật khẩu.').max(72, 'Mật khẩu quá dài.'),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
+
+const LOGIN_FIELDS = ['email', 'password'] as const
+
+function isLoginField(key: string): key is (typeof LOGIN_FIELDS)[number] {
+  return (LOGIN_FIELDS as readonly string[]).includes(key)
+}
+
+/**
+ * Đưa `ApiError.fieldErrors` (map `tên trường → thông điệp` của `422`) về đúng ô
+ * nhập, thay vì dồn tất cả vào banner chung — người dùng phải thấy lỗi ngay cạnh
+ * ô sai. Khoá nào không phải trường của form này thì bỏ qua ở đây và vẫn hiện ở
+ * banner (xem `hasMappedFieldError`), để không có thông điệp nào biến mất im lặng.
+ */
+function applyFieldErrors(error: unknown, setError: UseFormSetError<LoginFormValues>): void {
+  if (!(error instanceof ApiError) || !error.fieldErrors) return
+  for (const [field, message] of Object.entries(error.fieldErrors)) {
+    if (isLoginField(field)) setError(field, { type: 'server', message })
+  }
+}
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -26,6 +54,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -38,8 +67,15 @@ export default function LoginPage() {
 
   if (isAuthenticated) return <Navigate to={from} replace />
 
+  /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
+  const hasMappedFieldError =
+    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isLoginField)
+
   function onSubmit(values: LoginFormValues) {
-    mutate(values, { onSuccess: () => navigate(from, { replace: true }) })
+    mutate(values, {
+      onSuccess: () => navigate(from, { replace: true }),
+      onError: (err) => applyFieldErrors(err, setError),
+    })
   }
 
   return (
@@ -86,7 +122,7 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {error && (
+          {error && !hasMappedFieldError && (
             <p role="alert" className="text-sm text-danger">
               {error.message}
             </p>
@@ -97,10 +133,23 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-5 rounded-lg bg-surface p-3 text-center text-xs text-ink-muted">
-          Tài khoản dùng thử: <strong className="text-ink">demo@nongsansach.vn</strong> / mật
-          khẩu <strong className="text-ink">123456</strong>
-        </p>
+        {/*
+          Hai tài khoản CÓ THẬT trong DB backend, đã xác minh đăng nhập được
+          (backlog 0011). Mật khẩu của hai tài khoản KHÁC NHAU — chép nhầm một
+          chuỗi ở đây sẽ ra `401` "Email hoặc mật khẩu không đúng.", đúng chuỗi mà
+          backend cũng trả khi tài khoản không tồn tại, nên người đọc sẽ kết luận
+          sai là tài khoản không có thật.
+        */}
+        <div className="mt-5 rounded-lg bg-surface p-3 text-center text-xs text-ink-muted">
+          <p>
+            Khách hàng: <strong className="text-ink">demo@nongsansach.vn</strong> / mật khẩu{' '}
+            <strong className="text-ink">123456</strong>
+          </p>
+          <p className="mt-1">
+            Quản trị: <strong className="text-ink">admin@nongsansach.vn</strong> / mật khẩu{' '}
+            <strong className="text-ink">admin123</strong>
+          </p>
+        </div>
       </AuthCard>
     </>
   )

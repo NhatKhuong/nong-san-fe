@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getAuthToken, onSessionExpired } from '@/api/client'
+import { getRoleFromToken } from '@/lib/jwt'
 import type { User, UserRole } from '@/types'
 
 interface AuthState {
@@ -54,9 +55,30 @@ export const useAuthStore = create<AuthState>()(
        * interceptor 401 xoá token rồi tải lại trang, nhưng `user` vẫn còn — giao
        * diện sẽ tưởng là đang đăng nhập. Token là nguồn chân lý, nên mất token
        * thì bỏ luôn bản cache user.
+       *
+       * Và khi token còn: **tính lại `role` từ chính token**, đừng tin giá trị đã
+       * persist. `nss_auth` nằm trong localStorage của máy người dùng — sửa nó
+       * thành `role: "admin"` mất năm giây. Đọc lại từ claim JWT mỗi lần rehydrate
+       * khiến chỉnh sửa đó không sống qua nổi một lần tải trang.
+       *
+       * Đây **không phải** hàng rào bảo mật — token cũng nằm trong cùng localStorage
+       * đó. Hàng rào thật là filter phía server (`AdminRoute.tsx`, ADR 0002). Giá trị
+       * của việc này là loại bỏ một trạng thái lệch: giao diện vẽ theo `role` nào thì
+       * server cũng đang thấy đúng `role` ấy.
        */
       onRehydrateStorage: () => (state) => {
-        if (state && state.user && !getAuthToken()) state.clear()
+        if (!state?.user) return
+
+        const token = getAuthToken()
+        if (!token) {
+          state.clear()
+          return
+        }
+
+        const roleFromToken = getRoleFromToken(token)
+        if (state.user.role !== roleFromToken) {
+          state.setUser({ ...state.user, role: roleFromToken })
+        }
       },
     },
   ),
