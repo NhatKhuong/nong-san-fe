@@ -1,6 +1,8 @@
 import { delay } from '@/lib/utils'
-import { clearAuthToken, getAuthToken, setAuthToken } from './client'
+import { client, clearSession, getAuthToken, getRefreshToken, setSession } from './client'
+import { getRoleFromToken, getUserIdFromToken } from '@/lib/jwt'
 import type {
+  ApiUser,
   AuthResponse,
   ChangePasswordPayload,
   LoginPayload,
@@ -236,8 +238,25 @@ export function readPublicUsers(): User[] {
   return readUsers().map(toPublicUser)
 }
 
-function issueToken(user: User): string {
-  return `mock-jwt.${btoa(String(user.id))}.${Date.now()}`
+/**
+ * Phản hồi xác thực **đúng như backend gửi**: `user` KHÔNG có `role`
+ * (`UserResponse` của Swagger đúng 5 trường). Vai trò chỉ nằm trong claim JWT.
+ */
+interface RawAuthResponse {
+  user: ApiUser
+  token: string
+  refreshToken: string
+}
+
+/**
+ * Lấp `User.role` bằng claim giải từ chính access token vừa nhận.
+ *
+ * `User.role` là **bắt buộc** (ADR 0002) nhưng backend không gửi nó; ADR 0004
+ * chốt nguồn thay thế là payload JWT, không verify chữ ký, chỉ để vẽ giao diện.
+ * Không đọc được thì `getRoleFromToken` mặc định `'customer'` — quyền thấp nhất.
+ */
+function toAuthResponse(data: RawAuthResponse): AuthResponse {
+  return { ...data, user: { ...data.user, role: getRoleFromToken(data.token) } }
 }
 
 /**
@@ -248,33 +267,20 @@ function issueToken(user: User): string {
  * đăng nhập (khách vãng lai vẫn đặt hàng được).
  */
 export function getCurrentUserId(): number | null {
-  const token = getAuthToken()
-  if (!token) return null
-  try {
-    const id = Number(atob(token.split('.')[1] ?? ''))
-    return Number.isInteger(id) ? id : null
-  } catch {
-    return null
-  }
+  return getUserIdFromToken(getAuthToken())
 }
 
 /**
- * Đăng nhập.
- * Khi có backend: `const { data } = await client.post('/auth/login', payload); setAuthToken(data.token); return data`
+ * Đăng nhập — `POST /auth/login`.
+ *
+ * Sai email và sai mật khẩu trả **cùng một** `401` với **cùng một** `detail`.
+ * Đó là chủ ý chống dò tài khoản: giao diện **không được đoán thêm** xem ca nào
+ * đã xảy ra. Chuỗi hiển thị lấy thẳng từ `ApiError.message`.
  */
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
-  await delay(600)
-  const matched = readUsers().find(
-    (user) =>
-      user.email.toLowerCase() === payload.email.trim().toLowerCase() &&
-      user.password === payload.password,
-  )
-  if (!matched) throw new Error('Email hoặc mật khẩu không đúng.')
-
-  const user = toPublicUser(matched)
-  const token = issueToken(user)
-  setAuthToken(token)
-  return { user, token, refreshToken: `mock-refresh.${btoa(String(user.id))}.${Date.now()}` }
+  const { data } = await client.post<RawAuthResponse>('/auth/login', payload)
+  setSession(data.token, data.refreshToken)
+  return toAuthResponse(data)
 }
 
 /**
@@ -284,45 +290,59 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
  * trường `role` gửi lên trong body**: vai trò chỉ được gán ở phía server, nếu
  * không thì ai cũng tự cấp quyền quản trị cho mình được (ADR 0002).
  *
- * Khi có backend: `const { data } = await client.post('/auth/register', payload); setAuthToken(data.token); return data`
+ * `POST /auth/register` **đăng nhập luôn**: trả `AuthResponse` chứ không phải
+ * `201` rỗng, nên không cần gọi `login()` nối đuôi.
+ *
+ * Vai trò vẫn do **server** gán (luôn `CUSTOMER`) — `RegisterPayload` cố ý không
+ * có `role`, và backend bỏ qua mọi trường `role` gửi lên (ADR 0002).
  */
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
-  await delay(600)
-  const users = readUsers()
-  const isTaken = users.some(
-    (user) => user.email.toLowerCase() === payload.email.trim().toLowerCase(),
-  )
-  if (isTaken) throw new Error('Email này đã được đăng ký.')
-
-  const newUser: StoredUser = {
-    id: Date.now(),
-    fullName: payload.fullName.trim(),
-    email: payload.email.trim().toLowerCase(),
-    phone: payload.phone.trim(),
-    avatar: null,
-    role: 'customer',
-    password: payload.password,
-  }
-  writeUsers([...users, newUser])
-
-  const user = toPublicUser(newUser)
-  const token = issueToken(user)
-  setAuthToken(token)
-  return { user, token, refreshToken: `mock-refresh.${btoa(String(user.id))}.${Date.now()}` }
+  const { data } = await client.post<RawAuthResponse>('/auth/register', payload)
+  setSession(data.token, data.refreshToken)
+  return toAuthResponse(data)
 }
 
 /**
- * Đăng xuất.
- * Khi có backend: `await client.post('/auth/logout')` rồi mới xoá token.
+ * Đăng xuất — `POST /auth/logout`, cần access token trong header **và**
+ * `{refreshToken}` trong body để server thu hồi đúng chuỗi đó.
+ *
+ * `clearSession()` nằm trong `finally`: phiên trên **máy này** phải sạch kể cả khi
+ * mạng hỏng. Lỗi của request bị nuốt có chủ đích — đăng xuất không được phép thất
+ * bại ở phía người dùng. Ném lỗi ra ngoài thì `onSuccess` của `useLogout` không
+ * chạy, giao diện vẫn hiện "đang đăng nhập" trong khi token đã bị xoá — trạng thái
+ * tệ hơn hẳn so với việc bỏ qua một chuỗi refresh không thu hồi được.
+ *
+ * Server trả `204` kể cả khi chuỗi đã bị thu hồi từ trước, nên ca gọi hai lần là vô hại.
  */
 export async function logout(): Promise<void> {
-  await delay(150)
-  clearAuthToken()
+  const refreshToken = getRefreshToken()
+  try {
+    await client.post('/auth/logout', { refreshToken })
+  } catch {
+    // Đã ghi lý do ở JSDoc: phiên phía client vẫn bị xoá ở `finally`.
+  } finally {
+    clearSession()
+  }
+}
+
+/**
+ * Gia hạn phiên — `POST /auth/refresh`, đổi một refresh token còn hạn lấy **cặp mới**.
+ *
+ * Có mặt để khớp `API_CONTRACT.md` §B.4. **`client.ts` KHÔNG gọi hàm này**: nó tự
+ * gọi `/auth/refresh` bằng một axios trần, vừa để tránh đệ quy interceptor vừa để
+ * khỏi tạo vòng import `client.ts` → `auth.api.ts` → `client.ts`.
+ */
+export async function refreshSession(refreshToken: string): Promise<AuthResponse> {
+  const { data } = await client.post<RawAuthResponse>('/auth/refresh', { refreshToken })
+  setSession(data.token, data.refreshToken)
+  return toAuthResponse(data)
 }
 
 /**
  * Gửi email đặt lại mật khẩu.
- * Khi có backend: `await client.post('/auth/forgot-password', { email })`
+ *
+ * ⚠️ **Backend chưa có endpoint này** (Swagger 2026-08-25) — xem backlog/0014.
+ * Thân hàm vẫn là mock; đừng tưởng nó đã nối backend chỉ vì các hàm quanh nó đã nối.
  */
 export async function forgotPassword(email: string): Promise<void> {
   await delay(600)
@@ -331,7 +351,9 @@ export async function forgotPassword(email: string): Promise<void> {
 
 /**
  * Cập nhật thông tin cá nhân.
- * Khi có backend: `const { data } = await client.put('/auth/me', payload); return data`
+ *
+ * ⚠️ **Backend chưa có endpoint này** (Swagger 2026-08-25) — xem backlog/0014.
+ * Thân hàm vẫn đọc/ghi `nss_mock_users`, nên hồ sơ sửa ở đây KHÔNG tới được server.
  */
 export async function updateProfile(payload: Partial<User> & { id: number }): Promise<User> {
   await delay(500)
@@ -364,7 +386,9 @@ export async function updateProfile(payload: Partial<User> & { id: number }): Pr
 
 /**
  * Đổi mật khẩu của tài khoản đang đăng nhập.
- * Khi có backend: `await client.put('/auth/password', payload)`
+ *
+ * ⚠️ **Backend chưa có endpoint này** (Swagger 2026-08-25) — xem backlog/0014.
+ * Mật khẩu so ở đây là mật khẩu trong `nss_mock_users`, KHÔNG phải mật khẩu thật.
  */
 export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
   await delay(600)

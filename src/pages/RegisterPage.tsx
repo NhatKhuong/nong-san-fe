@@ -1,5 +1,5 @@
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormSetError } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import AuthCard from '@/components/auth/AuthCard'
@@ -10,13 +10,25 @@ import { ROUTES } from '@/lib/constants'
 import { PHONE_MESSAGE, PHONE_PATTERN } from '@/lib/validation'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useCurrentUser, useRegister } from '@/hooks/useAuth'
+import { ApiError } from '@/lib/apiError'
 
+/**
+ * Khớp `RegisterRequest` của backend: `fullName ≤128, email ≤160, phone ≤20,
+ * password 6..72`.
+ *
+ * **KHÁC schema đăng nhập một cách có chủ đích** — đăng nhập không có sàn 6, xem
+ * JSDoc trong `LoginPage.tsx`. `PHONE_PATTERN` giữ nguyên vì nó chặt hơn ràng buộc
+ * `≤20` của server (đúng 10 chữ số), tức không bao giờ cho lọt thứ server sẽ từ chối.
+ */
 const registerSchema = z
   .object({
-    fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(60, 'Họ tên quá dài.'),
-    email: z.string().trim().email('Email không hợp lệ.'),
+    fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(128, 'Họ tên quá dài.'),
+    email: z.string().trim().email('Email không hợp lệ.').max(160, 'Email quá dài.'),
     phone: z.string().trim().regex(PHONE_PATTERN, PHONE_MESSAGE),
-    password: z.string().min(6, 'Mật khẩu cần ít nhất 6 ký tự.'),
+    password: z
+      .string()
+      .min(6, 'Mật khẩu cần ít nhất 6 ký tự.')
+      .max(72, 'Mật khẩu tối đa 72 ký tự.'),
     confirmPassword: z.string(),
   })
   .refine((values) => values.password === values.confirmPassword, {
@@ -26,6 +38,20 @@ const registerSchema = z
 
 type RegisterFormValues = z.infer<typeof registerSchema>
 
+const REGISTER_FIELDS = ['fullName', 'email', 'phone', 'password'] as const
+
+function isRegisterField(key: string): key is (typeof REGISTER_FIELDS)[number] {
+  return (REGISTER_FIELDS as readonly string[]).includes(key)
+}
+
+/** Xem JSDoc cùng tên trong `LoginPage.tsx` — cùng một lý do, khác tập trường. */
+function applyFieldErrors(error: unknown, setError: UseFormSetError<RegisterFormValues>): void {
+  if (!(error instanceof ApiError) || !error.fieldErrors) return
+  for (const [field, message] of Object.entries(error.fieldErrors)) {
+    if (isRegisterField(field)) setError(field, { type: 'server', message })
+  }
+}
+
 export default function RegisterPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useCurrentUser()
@@ -34,6 +60,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -42,8 +69,15 @@ export default function RegisterPage() {
 
   if (isAuthenticated) return <Navigate to={ROUTES.ACCOUNT} replace />
 
+  /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
+  const hasMappedFieldError =
+    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isRegisterField)
+
   function onSubmit({ confirmPassword: _confirm, ...payload }: RegisterFormValues) {
-    mutate(payload, { onSuccess: () => navigate(ROUTES.ACCOUNT, { replace: true }) })
+    mutate(payload, {
+      onSuccess: () => navigate(ROUTES.ACCOUNT, { replace: true }),
+      onError: (err) => applyFieldErrors(err, setError),
+    })
   }
 
   return (
@@ -95,7 +129,7 @@ export default function RegisterPage() {
             label="Mật khẩu"
             required
             autoComplete="new-password"
-            hint="Ít nhất 6 ký tự."
+            hint="Từ 6 đến 72 ký tự."
             error={errors.password?.message}
             {...register('password')}
           />
@@ -108,7 +142,7 @@ export default function RegisterPage() {
             {...register('confirmPassword')}
           />
 
-          {error && (
+          {error && !hasMappedFieldError && (
             <p role="alert" className="text-sm text-danger">
               {error.message}
             </p>

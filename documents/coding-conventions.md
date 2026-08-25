@@ -365,6 +365,49 @@ Hai quy tắc:
 Dấu hiệu nhận biết: probe báo sự kiện đã phát, `document`/`localStorage` đổi đúng như mong đợi,
 nhưng **phần ứng dụng đáng lẽ phản ứng lại thì im lặng** — và im lặng không kèm một lỗi nào.
 
+### Hai cái bẫy ở tầng selector — cùng một bệnh: phép thử xanh mà không chứng minh gì
+
+Năm biến thể trên nói về *khẳng định sai chỗ* và *bản sao module*. Hai cái dưới đây ở tầng thấp
+hơn nữa: **selector trúng một node có thật, chỉ là không phải node bạn nghĩ.** Cả hai đều đã làm
+mất nhiều lượt chạy thật (backlog 0011), nên chúng là luật chứ không phải mẹo.
+
+**1. Neo mọi selector vào `main` (hoặc một node gốc xác định). Đừng bao giờ để `document` trần.**
+
+Chrome dùng chung của trang chứa phần tử **cùng dạng** với thứ bạn đang nhắm. Cụ thể ở dự án này:
+`SearchBox` trong header **cũng là một `<form>`**, và nó đứng **trước** trong DOM.
+
+```js
+// ❌ trúng nút tìm kiếm ở header — nút chỉ có icon, không chữ
+document.querySelector('form button[type="submit"]')
+
+// ✅ neo vào vùng nội dung
+document.querySelector('main form button[type="submit"]')
+```
+
+**Dấu hiệu nhận biết là phần đắt nhất, nhớ kỹ nó:** bạn bấm nút và **không có request nào được
+phát, không lỗi console, không thông điệp validate nào hiện ra**. Nó trông y hệt "form từ chối
+submit" hoặc "zod chặn ở đâu đó", nên bạn sẽ đi soi validation — sai hướng hoàn toàn. Cách làm nó
+lộ ra trong một lượt: **in `textContent` của chính node vừa bấm**. Nút thật ghi "Đăng ký"; nút bạn
+vừa bấm trả về chuỗi rỗng.
+
+**2. Không đọc lỗi của một ô nhập qua `aria-describedby`. Đọc thẳng `#${id}-error`.**
+
+`components/ui/Input.tsx` cho `aria-describedby` trỏ sang node **hint** (`${id}-hint`) khi ô
+**không** có lỗi, và chỉ trỏ sang `${id}-error` khi có. Nghĩa là "ô này có nội dung mô tả" đúng
+**ngay từ lúc trang vừa mở**.
+
+```js
+// ❌ khi chưa có lỗi, cái này trả về chuỗi hint — luôn "có nội dung"
+document.getElementById(input.getAttribute('aria-describedby'))?.textContent
+
+// ✅ chỉ tồn tại khi ô thật sự có lỗi
+document.getElementById(input.id + '-error')?.textContent
+```
+
+Ca thật ở backlog 0011: lượt chạy đầu "pass" phép thử *"mật khẩu 5 ký tự phải báo lỗi ở đúng ô
+password"* bằng chuỗi **hint** `"Từ 6 đến 72 ký tự."` — một chuỗi có sẵn trên màn hình từ trước khi
+bấm nút, và cũng có sẵn khi form hoàn toàn hợp lệ.
+
 ---
 
 ## 9. Điều cấm
