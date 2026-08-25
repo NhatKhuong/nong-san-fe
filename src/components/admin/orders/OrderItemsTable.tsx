@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import DataTable from '@/components/ui/DataTable'
 import { productPath } from '@/lib/constants'
 import { formatVND } from '@/lib/format'
-import type { CartItem, Order } from '@/types'
+import type { Order, OrderItem } from '@/types'
 import type { DataTableColumn } from '@/components/ui/dataTable.types'
 
 interface OrderItemsTableProps {
@@ -18,7 +18,7 @@ interface OrderItemsTableProps {
  * và không có lỗi nào nổ ra.
  */
 export default function OrderItemsTable({ order }: OrderItemsTableProps) {
-  const columns: DataTableColumn<CartItem>[] = [
+  const columns: DataTableColumn<OrderItem>[] = [
     {
       key: 'product',
       header: 'Sản phẩm',

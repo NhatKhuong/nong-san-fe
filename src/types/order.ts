@@ -20,6 +20,16 @@ export interface ShippingInfo {
   note?: string
 }
 
+/**
+ * Một dòng hàng trên **chứng từ đơn hàng** — giống `CartItem` nhưng **không có
+ * `stock`**.
+ *
+ * Backend cố ý không trả tồn kho trên dòng hàng của đơn: tồn kho tại thời điểm
+ * đặt là con số vô nghĩa trên một chứng từ, và nó sẽ sai ngay khi có người khác
+ * mua. `CartItem.stock` chỉ phục vụ việc chặn tăng số lượng **trong giỏ**.
+ */
+export type OrderItem = Omit<CartItem, 'stock'>
+
 export interface Order {
   id: number
   /** Mã đơn hiển thị cho khách: "NSS-20260816-0001". */
@@ -31,7 +41,7 @@ export interface Order {
    * có trường tương ứng.
    */
   userId: number | null
-  items: CartItem[]
+  items: OrderItem[]
   shipping: ShippingInfo
   paymentMethod: PaymentMethod
   status: OrderStatus

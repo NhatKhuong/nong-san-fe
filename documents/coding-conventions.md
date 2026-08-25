@@ -408,6 +408,53 @@ Ca thật ở backlog 0011: lượt chạy đầu "pass" phép thử *"mật kh�
 password"* bằng chuỗi **hint** `"Từ 6 đến 72 ký tự."` — một chuỗi có sẵn trên màn hình từ trước khi
 bấm nút, và cũng có sẵn khi form hoàn toàn hợp lệ.
 
+### Phép thử nhiều ca nối nhau — hai cái bẫy khi bằng chứng là SỐ ĐẾM
+
+Các mục trên nói về *một* khẳng định sai chỗ. Mục này nói về kịch bản dài nhiều ca, nơi bằng chứng
+không còn là "thấy gì" mà là **"đếm được bao nhiêu"** — bao nhiêu lần gọi refresh, bao nhiêu lần
+phát lại request. Ở đó xuất hiện một dạng hỏng riêng: **con số sai mà vẫn trông hợp lý.** Cả hai
+bẫy dưới đây lấy từ backlog 0012.
+
+**1. Lọc request bằng `new URL(u).pathname.startsWith('/api/')` — KHÔNG dùng `includes('/api/')`.**
+
+Vite dev phục vụ **chính mã nguồn** của dự án dưới đường dẫn `/src/api/...`. Nên bộ lọc bằng
+`includes` trúng luôn `/src/api/client.ts`, `/src/api/orders.api.ts`… và đếm chúng như request
+backend.
+
+```js
+// ❌ trúng cả module do vite dev phục vụ
+page.on('request', (r) => { if (r.url().includes('/api/')) đếm(r) })
+
+// ✅ chỉ request thật sự đi tới backend
+const laGoiBackend = (u) => { try { return new URL(u).pathname.startsWith('/api/') } catch { return false } }
+```
+
+**Đây là phần đắt nhất, đừng bỏ qua: bẫy này KHÔNG BAO GIỜ làm phép thử đỏ.** Nó chỉ làm mọi con
+số to lên một cách vô hại — và với một ticket mà toàn bộ bằng chứng là số đếm, đó là dạng hỏng tệ
+nhất có thể có: bạn báo cáo "1 lần refresh, 12 lần gọi lại" bằng những con số chưa bao giờ đúng.
+
+**Dấu hiệu nhận biết:** in danh sách request ra và nhìn — có phần mở rộng `.ts` / `.tsx` trong đó,
+và tổng số lớn hơn nhiều so với số request bạn tin là mình vừa gây ra.
+
+**2. Helper đăng nhập phải `localStorage.clear()` TRƯỚC khi điều hướng.**
+
+`LoginPage` có `if (isAuthenticated) return <Navigate to={from} replace />`. Dùng lại một helper
+`dangNhap()` ở ca thứ hai — khi ca thứ nhất còn để lại phiên — thì trang đăng nhập **đá đi trước
+khi form kịp render**, và helper treo ở chỗ chờ `[name="password"]`.
+
+```js
+// ✅ sạch phiên trước, rồi mới vào trang đăng nhập
+await page.goto(BASE + '/'); await page.evaluate(() => localStorage.clear())
+await page.goto(BASE + '/dang-nhap')
+```
+
+Lỗi hiện ra là *"timeout chờ ô mật khẩu"* — đọc y hệt "trang đăng nhập hỏng", nên bạn sẽ đi soi
+`LoginPage`, sai hướng hoàn toàn.
+
+**Luật chung: phép thử nhiều ca nối nhau không được giả định trạng thái sạch từ ca trước.**
+Mỗi ca tự dựng lấy tiền đề của nó — localStorage, giỏ hàng, phiên đăng nhập — chứ đừng thừa hưởng
+thứ ca trước tình cờ để lại.
+
 ---
 
 ## 9. Điều cấm

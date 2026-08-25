@@ -1,163 +1,104 @@
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from '@/lib/constants'
-import { delay } from '@/lib/utils'
-import { effectivePrice } from '@/lib/format'
-import { readAllProducts } from './productStore'
-import { readAllOrders, readOrderByCode, writeCreatedOrder } from './orderStore'
+import { client } from './client'
 import type { CartIssue, CartItem, CreateOrderPayload, Order } from '@/types'
-import { getCurrentUserId } from './auth.api'
-import { validateCoupon } from './coupons.api'
 
-/** Sinh mã đơn dạng NSS-20260816-0007. */
-function generateOrderCode(sequence: number): string {
-  const now = new Date()
-  const datePart = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, '0'),
-    String(now.getDate()).padStart(2, '0'),
-  ].join('')
-  return `NSS-${datePart}-${String(sequence).padStart(4, '0')}`
+/**
+ * Thân dòng hàng đúng như `CartItemRequest` của backend — **đúng bốn trường**.
+ *
+ * `CartItem` ở client có tám trường; bốn trường còn lại (`slug`, `image`, `unit`,
+ * `originalPrice`) là bản chụp để vẽ giỏ hàng, và `stock` thì backend cố ý không
+ * nhận. Server tự tra bốn trường đó từ dữ liệu sản phẩm của nó khi dựng đơn, nên
+ * gửi thêm chỉ là gửi thừa — và gửi thừa một bản chụp cũ là cách âm thầm nhất để
+ * chứng từ ghi khác thứ server biết.
+ */
+function toCartItemRequest(item: CartItem): {
+  productId: number
+  name: string
+  quantity: number
+  price: number
+} {
+  return {
+    productId: item.productId,
+    name: item.name,
+    quantity: item.quantity,
+    price: item.price,
+  }
 }
 
 /**
  * Tính phí vận chuyển: miễn phí khi đơn đạt ngưỡng.
- * Backend sẽ là nguồn chân lý cho con số này, hàm ở đây chỉ để hiển thị trước.
+ *
+ * **Không phải endpoint** — chỉ là ước tính để hiển thị trước khi đặt. Con số
+ * chính thức nằm ở `Order.shippingFee` do backend trả về; chỗ nào cần số thật
+ * thì đọc trường đó, đừng gọi lại hàm này.
  */
 export function calcShippingFee(subtotal: number): number {
   return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE
 }
 
 /**
- * Đối chiếu giỏ hàng với dữ liệu sản phẩm mới nhất.
+ * Đối chiếu giỏ hàng với dữ liệu sản phẩm mới nhất — `POST /cart/validate`.
  *
  * `CartItem` là bản chụp lúc thêm vào giỏ, mà giỏ nằm trong localStorage nhiều
- * ngày — giá và tồn kho có thể đã đổi. Hàm này trả về danh sách vấn đề để trang
- * giỏ hàng cảnh báo người dùng trước khi đặt.
+ * ngày — giá và tồn kho có thể đã đổi. Backend trả danh sách vấn đề để trang giỏ
+ * hàng cảnh báo người dùng trước khi đặt; mảng rỗng nghĩa là giỏ hợp lệ.
  *
- * Khi có backend: `const { data } = await client.post('/cart/validate', { items }); return data`
+ * Công khai: khách vãng lai cũng phải kiểm được giỏ trước khi đặt.
  */
 export async function validateCart(items: CartItem[]): Promise<CartIssue[]> {
-  await delay(400)
-
-  /*
-   * Đọc qua `productStore` chứ KHÔNG đọc thẳng `products.json`: sản phẩm admin
-   * vừa tạo phải thêm được vào giỏ, và tồn kho admin vừa sửa phải chặn được
-   * đúng lúc. Đọc hai nguồn khác nhau là kiểu hỏng tệ nhất — build xanh, danh
-   * sách sản phẩm đúng, chỉ vỡ khi có người thật bấm mua.
-   */
-  const products = readAllProducts()
-  const issues: CartIssue[] = []
-
-  for (const item of items) {
-    const product = products.find((candidate) => candidate.id === item.productId)
-
-    // Sản phẩm bị gỡ khỏi hệ thống cũng coi như hết hàng.
-    if (!product || product.stock <= 0) {
-      issues.push({ productId: item.productId, name: item.name, type: 'out_of_stock' })
-      continue
-    }
-
-    if (item.quantity > product.stock) {
-      issues.push({
-        productId: item.productId,
-        name: item.name,
-        type: 'insufficient_stock',
-        availableStock: product.stock,
-      })
-    }
-
-    const currentPrice = effectivePrice(product.price, product.salePrice)
-    if (currentPrice !== item.price) {
-      issues.push({
-        productId: item.productId,
-        name: item.name,
-        type: 'price_changed',
-        currentPrice,
-        cartPrice: item.price,
-      })
-    }
-  }
-
-  return issues
+  const { data } = await client.post<CartIssue[]>('/cart/validate', {
+    items: items.map(toCartItemRequest),
+  })
+  return data
 }
 
 /**
- * Tạo đơn hàng mới.
- * Khi có backend: `const { data } = await client.post('/orders', payload); return data`
+ * Tạo đơn hàng mới — `POST /orders`, trả **201**.
+ *
+ * **Công khai**: khách vãng lai đặt hàng được. Chủ đơn do backend gán từ claim
+ * `sub` của JWT nếu có token — **client không gửi `userId` dưới bất kỳ hình thức
+ * nào** (§C.4.1: truyền `userId` lên ở đây là rò rỉ dữ liệu, không phải lỗi hiển
+ * thị). Đó cũng là lý do `CreateOrderPayload` không có trường tương ứng.
+ *
+ * ⚠️ Endpoint công khai nhưng trả `401` nếu client **có** gửi header
+ * `Authorization` với token hỏng. Nhánh 3/6 của interceptor (`client.ts`, 0010)
+ * là chỗ chữa: xoá phiên rồi phát lại một lần **không kèm header**, để một token
+ * chết còn sót trong localStorage không chặn được người không cần đăng nhập.
  */
 export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
-  await delay(900)
-
-  if (payload.items.length === 0) {
-    throw new Error('Giỏ hàng đang trống, không thể đặt hàng.')
-  }
-
-  const subtotal = payload.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-  let discount = 0
-  if (payload.couponCode) {
-    const coupon = await validateCoupon(payload.couponCode, subtotal)
-    discount =
-      coupon.type === 'percent' ? Math.round((subtotal * coupon.value) / 100) : coupon.value
-  }
-
-  const shippingFee = calcShippingFee(subtotal - discount)
-
-  /*
-   * Số thứ tự đếm trên **toàn bộ** đơn đang tồn tại, kể cả đơn seed: đếm riêng
-   * đơn của localStorage thì đơn đầu tiên đặt trên máy này lại mang số 0001
-   * trong khi bảng quản trị đã có 35 đơn — mã đơn trông như bị đặt trùng.
-   */
-  const sequence = readAllOrders().length + 1
-
-  const order: Order = {
-    id: Date.now(),
-    code: generateOrderCode(sequence),
-    // Lấy từ token chứ không nhận từ payload — mô phỏng đúng cách backend làm.
-    userId: getCurrentUserId(),
-    items: payload.items,
+  const { data } = await client.post<Order>('/orders', {
+    items: payload.items.map(toCartItemRequest),
     shipping: payload.shipping,
     paymentMethod: payload.paymentMethod,
-    status: 'pending',
-    subtotal,
-    discount,
-    shippingFee,
-    total: subtotal - discount + shippingFee,
     couponCode: payload.couponCode,
-    createdAt: new Date().toISOString(),
-  }
-
-  writeCreatedOrder(order)
-  return order
+  })
+  return data
 }
 
 /**
- * Lịch sử đơn hàng của tài khoản đang đăng nhập.
+ * Lịch sử đơn hàng của tài khoản đang đăng nhập — `GET /orders/me`.
  *
- * Lọc nghiêm ngặt theo `userId`: đơn đặt lúc chưa đăng nhập không thuộc về tài
- * khoản nào, chỉ tra cứu được bằng mã đơn qua `getOrderByCode`.
+ * **Mảng trần, KHÔNG phân trang** — đừng bọc vào `{items,total,...}`.
  *
- * Đọc qua `orderStore` nên danh sách này gồm **cả đơn seed thuộc tài khoản đang
- * đăng nhập** — tài khoản demo (`userId: 1`) vì vậy có sẵn lịch sử đơn, và
- * trạng thái admin vừa đổi hiện ra ở đây ngay lần tải kế tiếp. Đơn của tài khoản
- * khác vẫn bị lọc ra như cũ: hàng rào là `order.userId === userId`, không phải
- * việc dữ liệu đến từ đâu.
+ * Không nhận tham số nào: chủ đơn lấy **chỉ từ claim `sub`** của token. Đơn của
+ * khách vãng lai (`userId: null`) không bao giờ xuất hiện ở đây; muốn xem lại thì
+ * tra bằng mã đơn qua `getOrderByCode`.
  *
- * Khi có backend: `const { data } = await client.get('/orders/me'); return data`
+ * Mảng rỗng là **kết quả hợp lệ**, không phải lỗi.
  */
 export async function getMyOrders(): Promise<Order[]> {
-  await delay(500)
-  const userId = getCurrentUserId()
-  if (userId === null) return []
-  return readAllOrders().filter((order) => order.userId === userId)
+  const { data } = await client.get<Order[]>('/orders/me')
+  return data
 }
 
 /**
- * Chi tiết một đơn theo mã đơn.
- * Khi có backend: `const { data } = await client.get(`/orders/${code}`); return data`
+ * Chi tiết một đơn theo mã đơn — `GET /orders/{code}`.
+ *
+ * **Công khai**: đây là lối duy nhất để khách vãng lai xem lại đơn của mình, vì
+ * `getMyOrders` lọc nghiêm ngặt theo chủ sở hữu. Không tìm thấy → `404`, và
+ * `ApiError.message` đã mang sẵn `detail` tiếng Việt của backend.
  */
 export async function getOrderByCode(code: string): Promise<Order> {
-  await delay(400)
-  const order = readOrderByCode(code)
-  if (!order) throw new Error(`Không tìm thấy đơn hàng ${code}`)
-  return order
+  const { data } = await client.get<Order>(`/orders/${encodeURIComponent(code)}`)
+  return data
 }
