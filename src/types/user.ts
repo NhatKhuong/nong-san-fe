@@ -68,8 +68,27 @@ export interface ChangePasswordPayload {
   newPassword: string
 }
 
-/** Phản hồi đăng nhập/đăng ký — `token` sẽ là JWT thật khi ghép Spring Boot. */
+/**
+ * Người dùng đúng như backend trả về (`UserResponse` của Swagger).
+ *
+ * **Không có `role`** — đúng 5 trường. Vai trò chỉ nằm trong claim của JWT và
+ * được giải ở client bằng `getRoleFromToken()` (`src/lib/jwt.ts`). `User.role`
+ * của ADR 0002 vẫn **bắt buộc**; ticket này chỉ đổi *nguồn* của nó, không nới
+ * lỏng kiểu.
+ */
+export type ApiUser = Omit<User, 'role'>
+
+/**
+ * Phản hồi đăng nhập / đăng ký / gia hạn phiên.
+ *
+ * Trường access token tên là **`token`**, không phải `accessToken`.
+ *
+ * `refreshToken` **bắt buộc**: refresh của backend là xoay vòng, mỗi response cấp
+ * một cặp mới và thu hồi chuỗi cũ ngay trong cùng giao dịch — `client.ts` phải ghi
+ * đè **cả hai**, ghi thiếu một cái là lần gia hạn sau ăn `401` (ADR 0004).
+ */
 export interface AuthResponse {
   user: User
   token: string
+  refreshToken: string
 }

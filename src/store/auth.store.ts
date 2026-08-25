@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { getAuthToken } from '@/api/client'
+import { getAuthToken, onSessionExpired } from '@/api/client'
 import type { User, UserRole } from '@/types'
 
 interface AuthState {
@@ -61,6 +61,26 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 )
+
+/**
+ * `client.ts` báo phiên đã chết thật sự → dọn luôn bản cache user.
+ *
+ * Đăng ký ở cấp module, tại **nơi sở hữu dữ liệu**, chứ không nhét vào một
+ * component: `/quan-tri` là cây router top-level riêng (ADR 0001) và không đi qua
+ * `MainLayout`, nên đặt việc dọn ở layout sẽ bỏ sót nguyên khu quản trị.
+ *
+ * Trước đây việc này do `window.location.href` trong `client.ts` lo hộ một cách
+ * tình cờ: reload cả trang chạy lại `onRehydrateStorage` bên dưới, và chính nó
+ * xoá `user` khi token đã mất. Điều hướng trong router **không** chạy lại
+ * `onRehydrateStorage`, nên cơ chế dọn phải được nói ra tường minh — nếu không,
+ * `selectIsAuthenticated` vẫn báo "đang đăng nhập" và `LoginPage` sẽ đá người
+ * dùng ngược lại trang cũ.
+ *
+ * Chỉ xoá bản cache. Không đụng `migrate`, không tính lại `role`.
+ */
+onSessionExpired(() => {
+  useAuthStore.getState().clear()
+})
 
 export const selectIsAuthenticated = (state: AuthState): boolean => state.user !== null
 

@@ -13,9 +13,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    // Bật lại khi backend Spring Boot sẵn sàng để tránh CORS lúc dev.
-    // proxy: {
-    //   '/api': { target: 'http://localhost:8080', changeOrigin: true },
-    // },
+    // Backend Spring Boot chạy ở :8080. Proxy giữ mọi request `/api/...` cùng
+    // origin với trang (:5173) nên không dính CORS lúc dev — điều kiện để
+    // `VITE_API_BASE_URL` được để trống (API_CONTRACT.md §A.1).
+    proxy: {
+      '/api': { target: 'http://localhost:8080', changeOrigin: true },
+    },
   },
 })

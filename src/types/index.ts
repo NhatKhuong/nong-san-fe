@@ -14,6 +14,7 @@ export type { CartItem, CartSummary, CartIssue, Coupon } from './cart'
 export type {
   User,
   UserRole,
+  ApiUser,
   Address,
   AddressPayload,
   LoginPayload,
