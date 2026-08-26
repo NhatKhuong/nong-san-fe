@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -5,6 +6,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Textarea from '@/components/ui/Textarea'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 import type { Brand, Category, ProductPayload } from '@/types'
 
 /*
@@ -99,6 +101,29 @@ const productSchema = z
 
 type ProductFormValues = z.infer<typeof productSchema>
 
+/**
+ * Trường có ô nhập trên màn hình, đối chiếu với khoá `errors` của
+ * `POST/PUT /admin/products`. Payload sản phẩm **phẳng**, nên khoá của server về
+ * thẳng tên trường ở đây, không có tiền tố nào để bóc.
+ *
+ * `rating`, `reviewCount`, `sold` không có ô nhập (§C.3) — một `422` mang tên
+ * chúng phải rơi xuống banner chung chứ không được im lặng biến mất.
+ */
+const PRODUCT_FIELDS = [
+  'name',
+  'slug',
+  'price',
+  'salePrice',
+  'stock',
+  'categoryId',
+  'brandId',
+  'images',
+  'unit',
+  'origin',
+  'shortDescription',
+  'description',
+] as const
+
 interface ProductFormProps {
   /** Có giá trị là đang sửa, bỏ trống là thêm mới. `images` là đường dẫn tương đối. */
   defaultValues?: ProductPayload
@@ -134,6 +159,7 @@ export default function ProductForm({
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -154,6 +180,24 @@ export default function ProductForm({
       isBestSeller: defaultValues?.isBestSeller ?? false,
     },
   })
+
+  /*
+   * Nối `422` vào ô nhập bằng hiệu ứng, không bằng `onError` của mutation: form
+   * này là component **câm** (§3) — mutation nằm ở hai trang cha
+   * (`AdminProductNewPage`, `AdminProductEditPage`), tới đây `error` chỉ còn là
+   * một prop. Thêm một prop callback nữa để lấy `onError` sẽ bắt cả hai trang cha
+   * phải biết về chuyện gắn lỗi vào ô, thứ vốn là việc riêng của form.
+   *
+   * Phụ thuộc `error`: mỗi lần hỏng, TanStack Query cấp một đối tượng lỗi mới, và
+   * nó về `null` trong lúc `isPending` — nên hiệu ứng chạy đúng một lần cho mỗi
+   * lần submit hỏng, không lặp lại khi form render lại vì gõ phím.
+   */
+  useEffect(() => {
+    applyServerFieldErrors(error, setError, PRODUCT_FIELDS)
+  }, [error, setError])
+
+  /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
+  const hasMappedFieldError = hasServerFieldError(error, PRODUCT_FIELDS)
 
   const categoryOptions = [
     { value: '', label: '— Chọn danh mục —' },
@@ -337,7 +381,7 @@ export default function ProductForm({
         />
       </section>
 
-      {error && (
+      {error && !hasMappedFieldError && (
         <p role="alert" className="text-sm text-danger">
           {error.message}
         </p>

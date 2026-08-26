@@ -1,5 +1,5 @@
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useForm, type UseFormSetError } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import AuthCard from '@/components/auth/AuthCard'
@@ -10,7 +10,7 @@ import { ROUTES } from '@/lib/constants'
 import { PHONE_MESSAGE, PHONE_PATTERN } from '@/lib/validation'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useCurrentUser, useRegister } from '@/hooks/useAuth'
-import { ApiError } from '@/lib/apiError'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 
 /**
  * Khớp `RegisterRequest` của backend: `fullName ≤128, email ≤160, phone ≤20,
@@ -38,19 +38,11 @@ const registerSchema = z
 
 type RegisterFormValues = z.infer<typeof registerSchema>
 
+/**
+ * Trường có ô nhập trên màn hình. `confirmPassword` cố ý vắng mặt: nó không đi
+ * lên server nên không bao giờ có khoá `errors` nào mang tên đó.
+ */
 const REGISTER_FIELDS = ['fullName', 'email', 'phone', 'password'] as const
-
-function isRegisterField(key: string): key is (typeof REGISTER_FIELDS)[number] {
-  return (REGISTER_FIELDS as readonly string[]).includes(key)
-}
-
-/** Xem JSDoc cùng tên trong `LoginPage.tsx` — cùng một lý do, khác tập trường. */
-function applyFieldErrors(error: unknown, setError: UseFormSetError<RegisterFormValues>): void {
-  if (!(error instanceof ApiError) || !error.fieldErrors) return
-  for (const [field, message] of Object.entries(error.fieldErrors)) {
-    if (isRegisterField(field)) setError(field, { type: 'server', message })
-  }
-}
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -70,13 +62,12 @@ export default function RegisterPage() {
   if (isAuthenticated) return <Navigate to={ROUTES.ACCOUNT} replace />
 
   /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
-  const hasMappedFieldError =
-    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isRegisterField)
+  const hasMappedFieldError = hasServerFieldError(error, REGISTER_FIELDS)
 
   function onSubmit({ confirmPassword: _confirm, ...payload }: RegisterFormValues) {
     mutate(payload, {
       onSuccess: () => navigate(ROUTES.ACCOUNT, { replace: true }),
-      onError: (err) => applyFieldErrors(err, setError),
+      onError: (err) => applyServerFieldErrors(err, setError, REGISTER_FIELDS),
     })
   }
 

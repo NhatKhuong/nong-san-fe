@@ -1,5 +1,5 @@
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useForm, type UseFormSetError } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import AuthCard from '@/components/auth/AuthCard'
@@ -9,7 +9,7 @@ import PasswordInput from '@/components/ui/PasswordInput'
 import { ROUTES } from '@/lib/constants'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useCurrentUser, useLogin } from '@/hooks/useAuth'
-import { ApiError } from '@/lib/apiError'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 
 /**
  * Khớp `LoginRequest` của backend — và **cố ý KHÁC schema đăng ký**.
@@ -26,24 +26,8 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
+/** Trường của form này có ô nhập trên màn hình — xem JSDoc ở `lib/fieldErrors.ts`. */
 const LOGIN_FIELDS = ['email', 'password'] as const
-
-function isLoginField(key: string): key is (typeof LOGIN_FIELDS)[number] {
-  return (LOGIN_FIELDS as readonly string[]).includes(key)
-}
-
-/**
- * Đưa `ApiError.fieldErrors` (map `tên trường → thông điệp` của `422`) về đúng ô
- * nhập, thay vì dồn tất cả vào banner chung — người dùng phải thấy lỗi ngay cạnh
- * ô sai. Khoá nào không phải trường của form này thì bỏ qua ở đây và vẫn hiện ở
- * banner (xem `hasMappedFieldError`), để không có thông điệp nào biến mất im lặng.
- */
-function applyFieldErrors(error: unknown, setError: UseFormSetError<LoginFormValues>): void {
-  if (!(error instanceof ApiError) || !error.fieldErrors) return
-  for (const [field, message] of Object.entries(error.fieldErrors)) {
-    if (isLoginField(field)) setError(field, { type: 'server', message })
-  }
-}
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -68,13 +52,12 @@ export default function LoginPage() {
   if (isAuthenticated) return <Navigate to={from} replace />
 
   /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
-  const hasMappedFieldError =
-    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isLoginField)
+  const hasMappedFieldError = hasServerFieldError(error, LOGIN_FIELDS)
 
   function onSubmit(values: LoginFormValues) {
     mutate(values, {
       onSuccess: () => navigate(from, { replace: true }),
-      onError: (err) => applyFieldErrors(err, setError),
+      onError: (err) => applyServerFieldErrors(err, setError, LOGIN_FIELDS),
     })
   }
 
