@@ -19,6 +19,7 @@ import { useMyAddresses } from '@/hooks/useAddresses'
 import { useLocationNames } from '@/hooks/useLocations'
 import { ROUTES } from '@/lib/constants'
 import { formatVND } from '@/lib/format'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 import { PHONE_MESSAGE, PHONE_PATTERN } from '@/lib/validation'
 import { useCartStore } from '@/store/cart.store'
 import SeoMeta from '@/components/ui/SeoMeta'
@@ -37,6 +38,28 @@ const checkoutSchema = z.object({
 })
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>
+
+/**
+ * Trường có ô nhập trên màn hình, đối chiếu với khoá `errors` của `POST /orders`.
+ *
+ * **`provinceCode` và `districtCode` cố ý VẮNG MẶT, đây là quyết định chứ không
+ * phải sót.** Server báo lỗi theo tên trường của **payload**, mà payload gửi lên
+ * `province` / `district` là **tên** đơn vị hành chính (dẫn xuất qua
+ * `useLocationNames`), còn form giữ **mã**. Nên `shipping.province` bóc tiền tố ra
+ * là `province`, không round-trip về được `provinceCode`.
+ *
+ * Cho chúng rơi xuống banner chung là đúng: hai ô này là `<select>` mã, người dùng
+ * chỉ sửa được bằng cách chọn lại tỉnh/huyện, nên một câu tiếng Anh của Bean
+ * Validation dán cạnh ô cũng không nói thêm được gì. Đường còn lại — một bảng ánh
+ * xạ `province → provinceCode` — chính là thứ ticket cấm: bảng tra khoá từng cái
+ * một, phải sửa tay mỗi lần payload đổi hình.
+ *
+ * **`paymentMethod` cũng vắng mặt, cùng một luật:** `PaymentMethodPicker` không
+ * vẽ thông điệp lỗi nào, nên gắn vào đó là làm câu báo lỗi biến mất **và** tắt
+ * luôn banner đang định hiện nó — đúng thứ luật gốc cấm. Nó cùng loại với `token`
+ * ở `ResetPasswordPage`: khoá không có ô nào để bám thì phải rơi xuống banner.
+ */
+const CHECKOUT_FIELDS = ['fullName', 'phone', 'email', 'ward', 'street', 'note'] as const
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
@@ -69,6 +92,7 @@ export default function CheckoutPage() {
     watch,
     setValue,
     reset,
+    setError,
     formState: { errors },
   } = methods
 
@@ -153,23 +177,29 @@ export default function CheckoutPage() {
   // Vào thẳng trang thanh toán khi giỏ trống thì không có gì để đặt.
   if (items.length === 0 && !orderPlacedRef.current) return <Navigate to={ROUTES.CART} replace />
 
+  /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
+  const hasMappedFieldError = hasServerFieldError(error, CHECKOUT_FIELDS)
+
   function onSubmit(values: CheckoutFormValues) {
-    mutate({
-      items,
-      shipping: {
-        fullName: values.fullName,
-        phone: values.phone,
-        email: values.email,
-        province: provinceName,
-        district: districtName,
-        ward: values.ward,
-        street: values.street,
-        note: values.note || undefined,
+    mutate(
+      {
+        items,
+        shipping: {
+          fullName: values.fullName,
+          phone: values.phone,
+          email: values.email,
+          province: provinceName,
+          district: districtName,
+          ward: values.ward,
+          street: values.street,
+          note: values.note || undefined,
+        },
+        paymentMethod: values.paymentMethod,
+        // Chỉ gửi mã khi nó thực sự hợp lệ với đơn hiện tại.
+        couponCode: coupon ? couponCode : null,
       },
-      paymentMethod: values.paymentMethod,
-      // Chỉ gửi mã khi nó thực sự hợp lệ với đơn hiện tại.
-      couponCode: coupon ? couponCode : null,
-    })
+      { onError: (err) => applyServerFieldErrors(err, setError, CHECKOUT_FIELDS) },
+    )
   }
 
   return (
@@ -312,7 +342,7 @@ export default function CheckoutPage() {
               </div>
 
               <CartSummaryBox title="Thanh toán">
-                {error && (
+                {error && !hasMappedFieldError && (
                   <p role="alert" className="mb-3 text-sm text-danger">
                     {error.message}
                   </p>

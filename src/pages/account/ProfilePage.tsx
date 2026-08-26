@@ -1,4 +1,4 @@
-import { useForm, type UseFormSetError } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Button from '@/components/ui/Button'
@@ -6,7 +6,7 @@ import Input from '@/components/ui/Input'
 import { PHONE_MESSAGE, PHONE_PATTERN } from '@/lib/validation'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useCurrentUser, useUpdateProfile } from '@/hooks/useAuth'
-import { ApiError } from '@/lib/apiError'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 
 /**
  * Khớp `UpdateProfileRequest` của backend: `fullName ≤128, email ≤160, phone ≤20`,
@@ -27,18 +27,6 @@ type ProfileFormValues = z.infer<typeof profileSchema>
 
 const PROFILE_FIELDS = ['fullName', 'email', 'phone'] as const
 
-function isProfileField(key: string): key is (typeof PROFILE_FIELDS)[number] {
-  return (PROFILE_FIELDS as readonly string[]).includes(key)
-}
-
-/** Xem JSDoc cùng tên trong `LoginPage.tsx` — cùng một khuôn, khác tập trường. */
-function applyFieldErrors(error: unknown, setError: UseFormSetError<ProfileFormValues>): void {
-  if (!(error instanceof ApiError) || !error.fieldErrors) return
-  for (const [field, message] of Object.entries(error.fieldErrors)) {
-    if (isProfileField(field)) setError(field, { type: 'server', message })
-  }
-}
-
 export default function ProfilePage() {
   const { user } = useCurrentUser()
   const { mutate, isPending, isSuccess, error } = useUpdateProfile()
@@ -58,8 +46,7 @@ export default function ProfilePage() {
   })
 
   /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
-  const hasMappedFieldError =
-    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isProfileField)
+  const hasMappedFieldError = hasServerFieldError(error, PROFILE_FIELDS)
 
   function onSubmit(values: ProfileFormValues) {
     if (!user) return
@@ -68,7 +55,10 @@ export default function ProfilePage() {
      * **không đi vào thân request**: `PUT /auth/me` lấy chủ sở hữu từ claim `sub`
      * và không nhận `userId` qua bất kỳ kênh nào (§C.4.1). Xem JSDoc của hàm đó.
      */
-    mutate({ id: user.id, ...values }, { onError: (err) => applyFieldErrors(err, setError) })
+    mutate(
+      { id: user.id, ...values },
+      { onError: (err) => applyServerFieldErrors(err, setError, PROFILE_FIELDS) },
+    )
   }
 
   return (

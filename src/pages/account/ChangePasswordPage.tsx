@@ -1,11 +1,11 @@
-import { useForm, type UseFormSetError } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Button from '@/components/ui/Button'
 import PasswordInput from '@/components/ui/PasswordInput'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { useChangePassword } from '@/hooks/useAuth'
-import { ApiError } from '@/lib/apiError'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 
 /**
  * Khớp `ChangePasswordRequest` của backend: `currentPassword 0..72`,
@@ -40,19 +40,8 @@ const passwordSchema = z
 
 type PasswordFormValues = z.infer<typeof passwordSchema>
 
+/** `confirmPassword` không đi lên server nên không nằm trong tập này. */
 const PASSWORD_FIELDS = ['currentPassword', 'newPassword'] as const
-
-function isPasswordField(key: string): key is (typeof PASSWORD_FIELDS)[number] {
-  return (PASSWORD_FIELDS as readonly string[]).includes(key)
-}
-
-/** Xem JSDoc cùng tên trong `LoginPage.tsx` — cùng một khuôn, khác tập trường. */
-function applyFieldErrors(error: unknown, setError: UseFormSetError<PasswordFormValues>): void {
-  if (!(error instanceof ApiError) || !error.fieldErrors) return
-  for (const [field, message] of Object.entries(error.fieldErrors)) {
-    if (isPasswordField(field)) setError(field, { type: 'server', message })
-  }
-}
 
 export default function ChangePasswordPage() {
   const { mutate, isPending, isSuccess, error } = useChangePassword()
@@ -75,15 +64,14 @@ export default function ChangePasswordPage() {
    * `422` bằng chính sự có mặt của khoá `errors` — lỗi validate có, sai mật khẩu
    * cũ không có. Ca đó vì vậy hiện ở banner qua `detail`, đúng như mong muốn.
    */
-  const hasMappedFieldError =
-    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isPasswordField)
+  const hasMappedFieldError = hasServerFieldError(error, PASSWORD_FIELDS)
 
   function onSubmit({ currentPassword, newPassword }: PasswordFormValues) {
     mutate(
       { currentPassword, newPassword },
       {
         onSuccess: () => reset(),
-        onError: (err) => applyFieldErrors(err, setError),
+        onError: (err) => applyServerFieldErrors(err, setError, PASSWORD_FIELDS),
       },
     )
   }

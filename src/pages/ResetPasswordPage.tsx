@@ -1,5 +1,5 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { useForm, type UseFormSetError } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { KeyRound } from 'lucide-react'
@@ -9,7 +9,7 @@ import PasswordInput from '@/components/ui/PasswordInput'
 import SeoMeta from '@/components/ui/SeoMeta'
 import { ROUTES } from '@/lib/constants'
 import { useResetPassword } from '@/hooks/useAuth'
-import { ApiError } from '@/lib/apiError'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 
 /**
  * Khớp `ResetPasswordRequest` của backend: `newPassword 6..72`.
@@ -42,18 +42,6 @@ type ResetFormValues = z.infer<typeof resetSchema>
  * được" (loại `422` **không** có `errors`) cũng hiện ra.
  */
 const RESET_FIELDS = ['newPassword'] as const
-
-function isResetField(key: string): key is (typeof RESET_FIELDS)[number] {
-  return (RESET_FIELDS as readonly string[]).includes(key)
-}
-
-/** Xem JSDoc cùng tên trong `LoginPage.tsx` — cùng một khuôn, khác tập trường. */
-function applyFieldErrors(error: unknown, setError: UseFormSetError<ResetFormValues>): void {
-  if (!(error instanceof ApiError) || !error.fieldErrors) return
-  for (const [field, message] of Object.entries(error.fieldErrors)) {
-    if (isResetField(field)) setError(field, { type: 'server', message })
-  }
-}
 
 /**
  * Đích của link trong email đặt lại mật khẩu — `/dat-lai-mat-khau?token=…`.
@@ -92,8 +80,7 @@ export default function ResetPasswordPage() {
    * banner với **cùng một** `detail`, và giao diện **không được đoán thêm** ca nào
    * đã xảy ra (`API_CONTRACT.md` §B.4 điều 6 và 7).
    */
-  const hasMappedFieldError =
-    error instanceof ApiError && Object.keys(error.fieldErrors ?? {}).some(isResetField)
+  const hasMappedFieldError = hasServerFieldError(error, RESET_FIELDS)
 
   function onSubmit({ newPassword }: ResetFormValues) {
     mutate(
@@ -105,7 +92,7 @@ export default function ResetPasswordPage() {
          * dùng không nằm lại trong lịch sử — bấm Back sẽ chỉ dẫn về một `422`.
          */
         onSuccess: () => navigate(ROUTES.LOGIN, { replace: true }),
-        onError: (err) => applyFieldErrors(err, setError),
+        onError: (err) => applyServerFieldErrors(err, setError, RESET_FIELDS),
       },
     )
   }
