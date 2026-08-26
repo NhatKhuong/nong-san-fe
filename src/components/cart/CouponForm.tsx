@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, Tag, X } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import { ErrorState } from '@/components/ui/StateBlock'
 import { formatVND } from '@/lib/format'
 import { useActiveCoupons, useCoupon } from '@/hooks/useCart'
 import { useCartStore } from '@/store/cart.store'
@@ -11,7 +12,12 @@ export default function CouponForm() {
   const removeCoupon = useCartStore((state) => state.removeCoupon)
 
   const { couponCode, coupon, discount, isChecking, error } = useCoupon()
-  const { data: activeCoupons } = useActiveCoupons()
+  const {
+    data: activeCoupons,
+    isError: activeCouponsFailed,
+    error: activeCouponsError,
+    refetch: retryActiveCoupons,
+  } = useActiveCoupons()
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -83,6 +89,22 @@ export default function CouponForm() {
             Bỏ mã
           </button>
         </p>
+      )}
+
+      {/*
+        Nhánh lỗi CHỈ của dải chip gợi ý — cố ý không thay cả hộp mã giảm giá:
+        ô nhập phía trên phải dùng được tiếp để khách gõ tay mã vẫn áp được
+        (Owner chốt ở backlog 0022).
+      */}
+      {activeCouponsFailed && (
+        <div className="mt-3 border-t border-line pt-3">
+          <ErrorState
+            message={activeCouponsError?.message}
+            onRetry={() => {
+              void retryActiveCoupons()
+            }}
+          />
+        </div>
       )}
 
       {activeCoupons && activeCoupons.length > 0 && (

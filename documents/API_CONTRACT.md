@@ -204,6 +204,12 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 
 Frontend **chỉ lưu chuỗi mã** trong giỏ hàng, không lưu cả object `Coupon`, và xác thực lại mỗi khi giá trị đơn thay đổi. Lý do: giỏ hàng nằm trong localStorage nhiều ngày — áp mã lúc đơn 300k rồi xoá bớt hàng còn 100k thì mã phải hết hiệu lực ngay.
 
+Ba điều đo được từ `/v3/api-docs` + request thật (backlog 0022, 2026-08-26) mà bảng trên không ghi:
+
+- `ValidateCouponRequest`: `code` và `subtotal` đều **`required`**; `code` có **`maxLength: 32`**, `subtotal` là `int64`.
+- **Backend tự chuẩn hoá `code` về chữ HOA** — gửi `chaoban10` trả về `{"code":"CHAOBAN10", …}`. Client **không** nắn chữ trước khi gửi; `cart.store.applyCoupon` viết hoa là để hiển thị và để khoá cache ổn định, không phải để thay backend làm việc đó.
+- Cả `404` lẫn `422` trả `application/problem+json`, có `detail` tiếng Việt và **không** kèm map `errors` — đây là lỗi quy tắc nghiệp vụ, không phải lỗi validate theo ô.
+
 ### B.8 Đánh giá — `reviews.api.ts`
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
