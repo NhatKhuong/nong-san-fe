@@ -13,12 +13,18 @@ import type { Order, OrderStatus } from '@/types'
  *
  * ## Đây là ĐIỂM ĐỌC DUY NHẤT của seed `orders.json`
  *
- * `orders.api.ts` (`getMyOrders`, `getOrderByCode`, `createOrder`) và
- * `adminOrders.api.ts` (danh sách, chi tiết, đổi trạng thái) đều đi qua
- * `readAllOrders()`. Bỏ sót một chỗ là admin đổi trạng thái mà khách không thấy,
- * hoặc ngược lại — build vẫn xanh, màn hình vẫn đúng, chỉ lệch nhau giữa hai
- * khu vực (CLAUDE.md §5.2). Phép kiểm bắt buộc trước khi đóng ticket: tìm đường
- * dẫn seed đó trong `src/` phải chỉ ra **đúng một** dòng — chính dòng `import` ở
+ * **Và chỉ còn ĐÚNG MỘT người đọc: `adminStats.api.ts`** (`getAdminOverview`).
+ * `orders.api.ts` (`getMyOrders`, `getOrderByCode`, `createOrder`) đã lên
+ * backend thật ở backlog 0012, `adminOrders.api.ts` (danh sách, chi tiết, đổi
+ * trạng thái) ở backlog 0023 — cả hai **không còn đi qua `readAllOrders()`**.
+ *
+ * Hệ quả đang mở: số liệu màn Tổng quan tính từ **mock**, trong khi bảng đơn
+ * quản trị và lịch sử đơn của khách đọc **DB thật**. Đó là cửa sổ lệch đã biết
+ * và backlog 0027 là chỗ đóng nó lại. Chừng nào 0027 chưa xong thì **không được
+ * xoá file này hay `src/mocks/`** — xoá là làm vỡ trang tổng quan.
+ *
+ * Phép kiểm bắt buộc trước khi đóng ticket có chạm dữ liệu mock: tìm đường dẫn
+ * seed đó trong `src/` phải chỉ ra **đúng một** dòng — chính dòng `import` ở
  * đầu file này. (Câu văn này cố ý không viết ra đường dẫn đầy đủ, để chính nó
  * không lọt vào kết quả tìm kiếm.)
  *
@@ -49,7 +55,16 @@ const OVERLAY_KEY = 'nss_mock_orders'
 
 /** Phần chênh lệch giữa danh sách đơn đang thấy và `orders.json`. */
 interface OrderOverlay {
-  /** Đơn đặt trên chính máy này; ảnh trong `items` đã ghép base sẵn. */
+  /**
+   * Đơn đặt trên chính máy này; ảnh trong `items` đã ghép base sẵn.
+   *
+   * **Chỉ còn đường ĐỌC.** Hàm ghi vào nhánh này đã bị xoá ở backlog 0023 vì
+   * `createOrder` đi thẳng lên backend từ backlog 0012 — nhánh này giờ chỉ phục
+   * vụ đơn còn sót trong `nss_mock_orders` trên máy đã chạy dự án trước đó. Bỏ
+   * nó đi là làm biến mất đơn cũ khỏi màn Tổng quan mà không báo. (Cố ý không
+   * viết ra tên hàm đã xoá, để phép grep chứng minh nó biến mất không bị chính
+   * câu này làm nhiễu.)
+   */
   created: Order[]
   /**
    * Patch theo **mã đơn** (`Order.code`), không phải `id`.
@@ -163,13 +178,6 @@ export function readAllOrders(): Order[] {
 /** Một đơn theo **mã đơn** — cùng khoá với URL quản trị và `getOrderByCode()`. */
 export function readOrderByCode(code: string): Order | undefined {
   return readAllOrders().find((order) => order.code === code)
-}
-
-/** Ghi một đơn mới vào overlay, mới nhất trước. */
-export function writeCreatedOrder(order: Order): void {
-  const overlay = readOverlay()
-  overlay.created = [order, ...overlay.created]
-  writeOverlay(overlay)
 }
 
 /**

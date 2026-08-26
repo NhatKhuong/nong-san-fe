@@ -307,12 +307,19 @@ Hàm nằm ở `src/api/adminProducts.api.ts`, **không** ở `products.api.ts`:
 
 > Song sinh với `GET /orders/me`. Hai endpoint tồn tại song song **chính là** cách giữ §C.4.1 không bị nới lỏng.
 
+**✅ Đã ghép backend Spring Boot thật — backlog 0023, đo `/v3/api-docs` 2026-08-26 (28 operation).** Cả ba dòng trên khớp từng ô: tham số, mã lỗi, `security: bearerAuth`. `PaginatedResponseOrderResponse` = `{ items, total, page, limit, totalPages }` đúng `Paginated<T>`, và `UpdateOrderStatusRequest.status` là enum **đúng 5 giá trị** khớp `OrderStatus`.
+
+⚠️ **Phương thức là `PATCH`, không phải `PUT`** — bản mock trước 0023 không phát request nào nên ô này chưa bao giờ phải đúng. Lượt smoke của 0023 quan sát đúng một dòng `PATCH /api/admin/orders/{code}/status` khi admin đổi trạng thái.
+
 Hàm nằm ở `src/api/adminOrders.api.ts`, **không** ở `orders.api.ts` — cùng lý do với §B.12.1: hai namespace được gác bằng hai lớp bảo mật khác nhau.
 
 - **Khoá theo `code`, không phải `id`.** Khớp URL `/quan-tri/don-hang/:code` và khớp `GET /orders/{code}` sẵn có. Mã đơn (`NSS-20260817-0001`) là thứ duy nhất nhân viên và khách cùng đọc được qua điện thoại; `id` không bao giờ rời khỏi cơ sở dữ liệu.
 - **`q`** khớp **mã đơn** hoặc **tên người nhận** hoặc **số điện thoại người nhận** — lấy từ `order.shipping`, **không** phải từ hồ sơ tài khoản: đơn của khách vãng lai không có tài khoản nào để tra, và người đặt hộ vẫn phải tìm ra đơn theo tên người nhận thật. So khớp tên **bỏ dấu** (`nguyen van an` khớp `Nguyễn Văn An`).
 - **`userId`** là bộ lọc hợp lệ **ở đây và chỉ ở đây** (§C.4.3b). `/orders/me` lấy chủ đơn từ claim `sub` của JWT và không bao giờ nhận tham số này.
 - **Không có `sort`.** Thứ tự cố định: `createdAt` giảm dần. Đơn mới là đơn cần xử lý; thêm ô sắp xếp chỉ tạo ra một cách để bỏ sót đơn mới.
+- **`status` không nằm trong enum → `200` kèm trang RỖNG**, đo 2026-08-26 (backlog 0023): `GET /admin/orders?status=KHONGCOTHAT` trả `{"items":[],"total":0,"page":1,"limit":3,"totalPages":0}`. **Không phải `422`**, và cũng **không giống `/admin/products`** — chỗ đó bỏ qua tham số sai rồi trả *cả danh sách*. Hai endpoint cùng im lặng nhưng hỏng theo hai kiểu ngược nhau; đây là chỗ ghi lại sự thật đó thay vì để người sau đoán.
+  - **Ở tầng ứng dụng, giá trị bịa không bao giờ tới được server.** `AdminOrdersPage` đọc `status` từ URL qua `parseStatus()`, thứ chỉ nhận đúng 5 giá trị của `OrderStatus` và trả `undefined` cho mọi thứ khác — nên `/quan-tri/don-hang?status=KHONGCOTHAT` phát đi `?page=1&limit=12` **không kèm `status`**, bảng hiện **cả danh sách**, còn ô lọc tự về "Mọi trạng thái". URL vẫn ghi bộ lọc bịa trong khi bảng không lọc gì: **im lặng nằm ở client, không ở server.**
+  - Khi một tập rỗng *thật sự* về tới màn hình (ví dụ `q` không khớp gì), giao diện vẽ **`EmptyState`** — `<h2>` "Không có đơn hàng nào khớp" kèm gợi ý hành động, **không có `<table>`, không có phân trang**. Không phải một bảng trắng trông như đang lỗi.
 - **Không có endpoint xoá đơn, và cũng không được mở.** Đơn đã đặt là chứng từ. Sửa items/tiền của đơn cũng vậy — số tiền trên đơn là bản chụp tại thời điểm đặt (§C.1), sửa về sau là làm lệch chính thứ khách đã trả.
 
 **Luồng trạng thái hợp lệ — backend phải cưỡng chế, không phải client.**
@@ -326,8 +333,10 @@ Hàm nằm ở `src/api/adminOrders.api.ts`, **không** ở `orders.api.ts` — 
 | `cancelled` | — (trạng thái cuối) |
 
 - Chuyển ngoài bảng trên → **422** kèm `ProblemDetail` tiếng Việt. Kể cả `status` trùng trạng thái hiện tại cũng là 422: nó không nằm trong danh sách được phép.
+- **✅ Đã đo trên backend thật 2026-08-26** (backlog 0023): `confirmed → pending` trả `422` `"Không thể chuyển đơn hàng từ trạng thái \"Đã xác nhận\" sang \"Chờ xác nhận\"."`, và `confirmed → confirmed` cũng `422` với câu cùng khuôn — đúng cả hai vế của điều trên. Đơn **không đổi trạng thái** sau lượt bị từ chối.
 - `delivered` và `cancelled` **không quay lui được**: đã giao rồi thì không "chưa xác nhận" lại được, đã huỷ rồi thì phải tạo đơn mới.
-- Bảng này là bản sao của `ORDER_STATUS_TRANSITIONS` trong `src/lib/orderStatus.ts`. **Ô chọn ở giao diện chỉ liệt kê lựa chọn hợp lệ cho tiện tay — đó là tiện lợi, không phải hàng rào.** Lớp mock đã `throw` đúng ở hàm API chứ không chỉ ở component, và backend phải gác lại y hệt.
+- Bảng này là bản sao của `ORDER_STATUS_TRANSITIONS` trong `src/lib/orderStatus.ts`. **Ô chọn ở giao diện chỉ liệt kê lựa chọn hợp lệ cho tiện tay — đó là tiện lợi, không phải hàng rào.**
+- **Từ backlog 0023, client KHÔNG kiểm lại luật này nữa.** Lớp mock trước đây `throw` ngay trong `updateOrderStatus()`; bản gọi backend thật thì không, và đó là chủ ý: thêm một vòng kiểm ở client nghĩa là **nuốt mất chính câu `detail` của server**, thay nó bằng một câu client tự bịa ra từ một bản đơn có thể đã cũ. Ô chọn vẫn dựng từ `ORDER_STATUS_TRANSITIONS`, nhưng nó vẽ theo dữ liệu **đang cache**: khi đơn đã bị người khác đổi trong lúc màn hình đang mở, ô chọn mời một bước không còn hợp lệ, `PATCH` ăn `422`, và câu của server hiện nguyên văn ở chỗ vừa thao tác (`AdminOrderDetailPage`, khối `updateStatus.isError`). Lượt smoke của 0023 dựng đúng ca đó và quan sát được `p[role="alert"]` mang **đúng chuỗi `detail`** của server, không phải câu dự phòng `422` của `lib/apiError.ts`.
 
 #### B.12.3 Khách hàng — chỉ đọc
 
@@ -514,7 +523,9 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 ## F. Đối chiếu nhanh
 
-> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-25 ở backlog 0017.)*
+> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-26 ở backlog 0023 — cả 8 dòng, không sửa lẻ. Lần đo trước: 2026-08-25, backlog 0017.)*
+
+> **Cả 8 con số KHÔNG đổi sau backlog 0023, và dòng thứ ba là chỗ đáng nói.** Ticket đó **xoá một hàm `export`** (hàm ghi đơn mới vào overlay mock), nên con số 60 lẽ ra phải nhích. Nó không nhích — vì hàm bị xoá nằm trong `src/api/orderStore.ts`, mà **lệnh đếm chỉ quét `src/api/*.api.ts`**. Nói cho hết: `orderStore.ts` và `productStore.ts` **chưa bao giờ** được dòng này đếm, và đó là chủ ý (chúng không map sang endpoint nào, §E.4). Ghi lại ở đây để lần sau không có ai đi tìm một con số đáng lẽ phải đổi rồi kết luận nhầm là phép đếm hỏng.
 
 | Con số | Giá trị | Lệnh đếm (chạy từ `projects/app/`) |
 |---|---|---|
