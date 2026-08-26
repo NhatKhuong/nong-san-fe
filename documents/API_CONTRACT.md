@@ -556,9 +556,9 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 ## F. Đối chiếu nhanh
 
-> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-26 ở backlog 0024 — cả 8 dòng, không sửa lẻ; **cả 8 con số không đổi**, phép đối chiếu `60 − 3 = 57` vẫn cân. Lần đo trước: 2026-08-26, backlog 0023; trước nữa: 2026-08-25, backlog 0017.)*
+> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-26 ở backlog 0027 — **một con số nhích**: "File trong `src/api/`" 19 → 18 vì 0027 xoá `src/api/orderStore.ts` (điểm đọc mock cuối cùng của đơn hàng). "Hàm `export` trong `*.api.ts`" **không** nhích, đúng như 0023 đã đoán — file bị xoá không khớp mẫu `*.api.ts`; phép đối chiếu `60 − 3 = 57` vẫn cân. Lần đo trước: 2026-08-26, backlog 0024 — cả 8 dòng không đổi; trước nữa: 2026-08-26, backlog 0023; và 2026-08-25, backlog 0017.)*
 
-> **Cả 8 con số KHÔNG đổi sau backlog 0023, và dòng thứ ba là chỗ đáng nói.** Ticket đó **xoá một hàm `export`** (hàm ghi đơn mới vào overlay mock), nên con số 60 lẽ ra phải nhích. Nó không nhích — vì hàm bị xoá nằm trong `src/api/orderStore.ts`, mà **lệnh đếm chỉ quét `src/api/*.api.ts`**. Nói cho hết: `orderStore.ts` và `productStore.ts` **chưa bao giờ** được dòng này đếm, và đó là chủ ý (chúng không map sang endpoint nào, §E.4). Ghi lại ở đây để lần sau không có ai đi tìm một con số đáng lẽ phải đổi rồi kết luận nhầm là phép đếm hỏng.
+> **Cả 8 con số KHÔNG đổi sau backlog 0023, và dòng thứ ba là chỗ đáng nói.** Ticket đó **xoá một hàm `export`** (hàm ghi đơn mới vào overlay mock), nên con số 60 lẽ ra phải nhích. Nó không nhích — vì hàm bị xoá nằm trong `src/api/orderStore.ts`, mà **lệnh đếm chỉ quét `src/api/*.api.ts`**. Nói cho hết: `productStore.ts` (và `orderStore.ts` khi còn tồn tại) **chưa bao giờ** được dòng này đếm, và đó là chủ ý (chúng không map sang endpoint nào, §E.4). Ghi lại ở đây để lần sau không có ai đi tìm một con số đáng lẽ phải đổi rồi kết luận nhầm là phép đếm hỏng. **Cập nhật 0027:** `orderStore.ts` nay đã bị xoá hẳn (điểm đọc mock cuối của đơn hàng chuyển lên backend thật), nên nó rời khỏi con số "File trong `src/api/`" (19 → 18) nhưng vẫn **không** động tới con số hàm `export` — đúng lý do trên.
 
 | Con số | Giá trị | Lệnh đếm (chạy từ `projects/app/`) |
 |---|---|---|
@@ -566,7 +566,7 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 | Đường dẫn phân biệt (bỏ query) | **55** | hai dòng dùng lại đường cũ kèm query: `getProductsByIds` (`/products?ids=`) và `getRootCategories` (`/categories?root=true`) |
 | Hàm `export` trong `src/api/*.api.ts` | **60** | `grep -c '^export .*function' src/api/*.api.ts` → cộng lại |
 | File `.api.ts` | **16** | `ls src/api/*.api.ts \| wc -l` |
-| File trong `src/api/` | **19** | 16 `.api.ts` + `client.ts` + `productStore.ts` + `orderStore.ts` của lớp mock |
+| File trong `src/api/` | **18** | 16 `.api.ts` + `client.ts` + `productStore.ts` của lớp mock |
 | Hàm chỉ chạy ở client | **3** | `getCurrentUserId()` · `calcShippingFee()` · `readPublicUsers()` — có trong mã, **cố ý không có** trong bảng B |
 | Kiểu dữ liệu | **13** | `ls src/types/*.ts \| wc -l` |
 | Chỗ hiển thị `error.message` cho người dùng | **36** | `grep -rn "error.message\|err.message" src/ --include=*.tsx --include=*.ts \| wc -l` |
