@@ -193,7 +193,7 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 - `getOrderByCode` cũng công khai — đây là **lối duy nhất** để khách vãng lai xem lại đơn của mình, vì `getMyOrders` lọc nghiêm ngặt theo `userId`. Mã đơn (`NSS-20260817-0001`) vì vậy nên **khó đoán** ở môi trường thật; dạng tuần tự hiện tại chỉ hợp với mock.
 - `validateCart` trả về mảng vấn đề, rỗng nghĩa là giỏ hợp lệ. `out_of_stock` và `insufficient_stock` **chặn** thanh toán; `price_changed` chỉ cảnh báo.
 
-`calcShippingFee()` trong cùng file **không phải endpoint** — chỉ là ước tính hiển thị ở client (miễn phí từ 500.000 ₫, dưới ngưỡng là 30.000 ₫). Xem phần C.
+`calcShippingFee()` trong cùng file **không phải endpoint** — chỉ là ước tính hiển thị ở client (miễn phí từ 500.000 ₫, dưới ngưỡng là 30.000 ₫). Luật này **đã được đối chiếu với luật của server bằng đơn thật** ngày 2026-08-26 và hai bên khớp; số đo và ràng buộc chéo nằm ở **§C.5** — đọc trước khi đổi bất kỳ con số nào trong hai bên.
 
 ### B.7 Mã giảm giá — `coupons.api.ts`
 
@@ -455,6 +455,38 @@ Endpoint dưới `/admin/**` **cố ý truy vấn chéo người dùng** và b�
 
 > ⚠️ **`AdminRoute` ở frontend không phải bảo mật.** `src/components/auth/AdminRoute.tsx` chỉ ẩn màn hình cho gọn: `role` nó đọc nằm trong localStorage của chính máy người dùng, sửa `nss_auth` thành `role: "admin"` mất 5 giây. **Hàng rào thật duy nhất là filter ở §C.4.3a.** Rủi ro thật ở đây là nhầm lẫn — sẽ có người tưởng vòng chặn phía client có nghĩa gì đó.
 
+### C.5 Luật phí vận chuyển — hai đầu phải cùng một luật, và nay đã đo
+
+`calcShippingFee()` (`src/api/orders.api.ts`) là **ước tính hiển thị** trước khi đặt (§C.1); con số thật là `Order.shippingFee`. Tới 2026-08-26 **chưa ai đối chiếu hai luật** — chúng chỉ được *giả định* là giống nhau, và tín hiệu gián tiếp duy nhất là mã `FREESHIP` được mô hình hoá đúng bằng `SHIPPING_FEE`. Backlog 0024 đã đo: **năm đơn thật** đặt qua giao diện, mỗi đơn so **số trên `/thanh-toan` trước khi bấm Đặt hàng** với **`Order.*` trong response `POST /orders`**.
+
+| Đơn | `subtotal` | Mã | `discount` | Ship — màn hình | Ship — server | `total` màn hình / server |
+|---|---|---|---|---|---|---|
+| `NSS-20260826-0018` | 90.000 | — | 0 | 30.000 | **30.000** | 120.000 / 120.000 |
+| `NSS-20260826-0019` | 576.000 | — | 0 | 0 | **0** | 576.000 / 576.000 |
+| `NSS-20260826-0020` | 504.000 | `HUUCO50` | 50.000 | 30.000 | **30.000** | 484.000 / 484.000 |
+| `NSS-20260826-0021` | 500.000 | — | 0 | 0 | **0** | 500.000 / 500.000 |
+| `NSS-20260826-0022` | 499.000 | — | 0 | 30.000 | **30.000** | 529.000 / 529.000 |
+
+**Không lệch một đồng nào ở cả năm đơn.** Đó là một kết quả, không phải sự vắng mặt của kết quả: giả thuyết đối lập cho ra con số **khác** ở ba đơn cuối bảng, nên phép đo có răng.
+
+> **RÀNG BUỘC CHÉO — hai đầu đang cùng một luật; nới một bên là phải nới bên kia.**
+>
+> ```
+> Backend:  shippingFee = (subtotal − discount) >= 500.000 ? 0 : 30.000
+> Frontend: lib/constants.ts  FREE_SHIPPING_THRESHOLD = 500_000, SHIPPING_FEE = 30_000
+>           → orders.api.ts   calcShippingFee(subtotal − safeDiscount)   (hooks/useCart.ts)
+> ```
+>
+> Ba điểm dưới đây **đã đo, đừng suy diễn lại**:
+>
+> **(a) Ngưỡng đúng 500.000 ₫, so bằng `>=`.** Đơn 499.000 vẫn mất 30.000; đơn **đúng** 500.000 được miễn. Hai đơn đó tồn tại chỉ để chốt con số — nếu chỉ có đơn 90.000 và 576.000 thì ngưỡng mới bị kẹp trong một khoảng, chưa phải một con số.
+>
+> **(b) Phí dưới ngưỡng là 30.000 ₫.**
+>
+> **(c) Cơ sở tính là `subtotal − discount`, KHÔNG phải `subtotal`.** Đơn 504.000 ₫ áp `HUUCO50` (−50.000) vẫn **bị tính 30.000 ₫**, vì 454.000 chưa tới ngưỡng. Đây là ca **duy nhất** phân biệt được hai luật, và là ca không ai nghĩ tới: một đơn *trên* ngưỡng vẫn phải trả phí ship.
+>
+> Vì sao ghim: lệch ở đây **không làm nổ lỗi nào**. Không exception, không log đỏ, không request hỏng — khách chỉ thấy một con số ở `/thanh-toan` rồi bị trừ một con số khác. Backend đổi luật ship mà không đổi hai hằng số phía FE thì triệu chứng duy nhất là tiền. Đổi thì đổi **cả hai bên cùng lúc**, và đo lại bằng đúng ba ca (a)(b)(c) — đo bằng đơn thật, vì `Order.shippingFee` không đọc được ở chế độ chỉ-đọc.
+
 ---
 
 ## D. Bảy thay đổi hợp đồng đã tích luỹ
@@ -505,6 +537,7 @@ Thứ tự đề xuất: `categories` → `products` → `posts` (công khai, d�
 - [ ] Xoá thư mục `src/mocks/`
 - [ ] Xoá `getCurrentUserId()` trong `auth.api.ts` nếu không còn ai gọi
 - [ ] Xoá `readPublicUsers()` trong `auth.api.ts` — hàm **chỉ chạy ở client** (§F), đọc thẳng kho `nss_mock_users`. `adminUsers.api.ts` là nơi duy nhất gọi nó; khi hai hàm ở đó thành lời gọi HTTP thì nó không còn ai gọi và phải biến mất cùng `src/mocks/`. Để lại là để lại một đường đọc dữ liệu giả song song với backend thật
+- [ ] **`calcShippingFee()` trong `orders.api.ts` thì KHÔNG xoá — và đây là mục cố ý ngược với hai mục trên.** Nó cũng là hàm **chỉ chạy ở client** (§F), nên §E.3 thiếu hẳn một dòng về nó là một lệch có thật, đã nằm trong `decisions/CANDIDATES.md`; backlog 0024 vá bằng cách ghi ra **hướng giữ**, không phải hướng xoá. Lý do: hai hàm kia đọc **dữ liệu giả** (`nss_mock_users`, seed mock) nên chúng chết cùng `src/mocks/`; `calcShippingFee()` không đọc dữ liệu nào — nó chỉ áp một **luật hiển thị** lên con số client đã có, để giỏ hàng và `/thanh-toan` nói được phí ship **trước khi** đơn tồn tại. Backend không có endpoint nào trả con số đó trước lúc đặt, nên xoá nó là mất dòng phí ship khỏi hai màn hình chứ không phải dọn được nợ mock. Điều kiện để mục này lật thành "xoá": backend mở một endpoint báo giá phí ship cho giỏ chưa đặt. Chừng nào chưa có, giữ — và giữ kèm **§C.5**, chỗ ghim luật của server để lần sau BE đổi luật thì vỡ ra thành xung đột tài liệu thay vì vỡ âm thầm thành tiền
 - [ ] Kiểm tra `ApiError` hoạt động: gọi một endpoint sai chủ đích, xác nhận giao diện hiện **tiếng Việt** chứ không phải `"Request failed with status code 404"`
 - [ ] Chạy lại cả 7 bộ kiểm thử
 
@@ -523,7 +556,7 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 ## F. Đối chiếu nhanh
 
-> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-26 ở backlog 0023 — cả 8 dòng, không sửa lẻ. Lần đo trước: 2026-08-25, backlog 0017.)*
+> **Mọi con số dưới đây đi kèm lệnh đếm ra nó.** Một con số trong tài liệu mà không ai đếm lại được sẽ trôi, và hai con số lệch trong chính bảng này đã sống sót qua **bảy ticket** trước khi có người vấp phải. Đếm lại, đừng đọc lướt. *(Đo lại toàn bộ 2026-08-26 ở backlog 0024 — cả 8 dòng, không sửa lẻ; **cả 8 con số không đổi**, phép đối chiếu `60 − 3 = 57` vẫn cân. Lần đo trước: 2026-08-26, backlog 0023; trước nữa: 2026-08-25, backlog 0017.)*
 
 > **Cả 8 con số KHÔNG đổi sau backlog 0023, và dòng thứ ba là chỗ đáng nói.** Ticket đó **xoá một hàm `export`** (hàm ghi đơn mới vào overlay mock), nên con số 60 lẽ ra phải nhích. Nó không nhích — vì hàm bị xoá nằm trong `src/api/orderStore.ts`, mà **lệnh đếm chỉ quét `src/api/*.api.ts`**. Nói cho hết: `orderStore.ts` và `productStore.ts` **chưa bao giờ** được dòng này đếm, và đó là chủ ý (chúng không map sang endpoint nào, §E.4). Ghi lại ở đây để lần sau không có ai đi tìm một con số đáng lẽ phải đổi rồi kết luận nhầm là phép đếm hỏng.
 

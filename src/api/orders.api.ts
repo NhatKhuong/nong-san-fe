@@ -31,6 +31,14 @@ function toCartItemRequest(item: CartItem): {
  * **Không phải endpoint** — chỉ là ước tính để hiển thị trước khi đặt. Con số
  * chính thức nằm ở `Order.shippingFee` do backend trả về; chỗ nào cần số thật
  * thì đọc trường đó, đừng gọi lại hàm này.
+ *
+ * Luật ở đây và luật của server **đã được đo là khớp** (backlog 0024,
+ * 2026-08-26: năm đơn thật, không lệch một đồng) — kể cả ca khó nhất, đơn
+ * *trên* ngưỡng bị mã giảm giá kéo `subtotal − discount` xuống *dưới* ngưỡng.
+ * Sự khớp đó là thứ phải giữ, không phải thứ hiển nhiên: đổi hai hằng số bên
+ * dưới mà không đổi bên backend thì **không lỗi nào nổ ra**, chỉ có khách bị
+ * trừ một con số khác con số họ vừa nhìn thấy. Số đo và ràng buộc chéo:
+ * `documents/API_CONTRACT.md` §C.5.
  */
 export function calcShippingFee(subtotal: number): number {
   return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE

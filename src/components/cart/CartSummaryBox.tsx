@@ -44,6 +44,21 @@ export default function CartSummaryBox({
         <span className="font-heading text-2xl font-bold text-primary">{formatVND(total)}</span>
       </div>
 
+      {/*
+        Hộp này chỉ xuất hiện TRƯỚC khi đặt (giỏ hàng + thanh toán), nên mọi con
+        số ở đây do client tự tính — phí ship qua `calcShippingFee()`, một ước
+        tính, không phải con số của server (API_CONTRACT.md §C.1). Hai luật hiện
+        KHỚP nhau, đã đo bằng đơn thật (§C.5, backlog 0024) — nhưng đó là sự
+        khớp phải giữ, không phải điều hiển nhiên, và nếu một ngày nó lệch thì
+        không lỗi nào nổ ra: khách chỉ bị trừ khác con số vừa nhìn. Dòng nhãn
+        này là chỗ duy nhất người dùng được báo trước điều đó.
+        Sau khi đặt, `OrderSuccessPage` đọc thẳng `Order.*` và KHÔNG có nhãn này.
+      */}
+      <p className="mt-3 text-xs text-ink-muted">
+        Phí vận chuyển và tổng tiền ở đây là <strong className="font-medium">số tạm tính</strong>.
+        Con số chính thức là con số trên đơn hàng sau khi đặt.
+      </p>
+
       {children && <div className="mt-5">{children}</div>}
     </div>
   )
