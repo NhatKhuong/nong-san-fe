@@ -34,7 +34,7 @@ export default function AdminProductNewPage() {
 
       <AdminPageHeader
         title="Thêm sản phẩm"
-        description="Ảnh nhập bằng đường dẫn tương đối; màn hình này không tải ảnh lên."
+        description="Chọn nhiều ảnh từ máy — chỉ tải lên được khi chạy npm run dev cục bộ."
         action={
           <Link
             to={ROUTES.ADMIN_PRODUCTS}

@@ -193,7 +193,34 @@ base lúc đọc. Trộn patch thì chỉ map `patch.images` khi patch thật s�
 - Chuyển đường dẫn thành URL bằng `imageUrl()` (`src/lib/image.ts`), **gọi ở lớp `src/api/`,
   không gọi trong component**. Quên một chỗ sẽ không lộ ra lúc dev, chỉ vỡ khi deploy với CDN.
 - Thay ảnh thì **đổi luôn tên file** — file trong `public/` không được Vite gắn hash.
+  Quy tắc này áp cho ảnh **cũ**; ảnh mới upload qua cơ chế dưới đây luôn là file mới,
+  không áp dụng.
 - Ảnh luôn có `alt` mô tả bằng tiếng Việt và `loading="lazy"` (trừ ảnh above-the-fold).
+
+### 6.1 Upload ảnh sản phẩm từ máy — dev-only (backlog 0034)
+
+`ProductForm.tsx` (khu quản trị) cho chọn nhiều ảnh bằng `<input type="file" multiple>`
+thay vì gõ tay đường dẫn. Cơ chế:
+
+- **Middleware Vite dev**, `vite-plugins/upload-product-image.ts`, đăng ký qua
+  `configureServer` — **tuyệt đối không `configurePreviewServer`**. Đây là điều kiện
+  cứng để `vite preview`/`vite build` không bao giờ có endpoint này; không định nghĩa
+  hook đó là đủ, không cần cờ môi trường nào khác.
+- Client gửi **raw binary** qua `fetch` (`src/api/devImageUpload.ts`), không
+  `multipart/form-data` — giữ đúng luật "không thêm dependency ngoài stack đã chốt"
+  (§9): không `multer`/`busboy`/`formidable`.
+- **Quy ước thư mục theo danh mục gốc**, không theo từng sản phẩm:
+  `public/images/products/<slug-danh-mục-gốc>/`, khớp các thư mục đã có (`rau-cu/`,
+  `bo-trung/`…). `ProductForm.tsx` tự suy slug danh mục gốc từ `categoryId` đang chọn
+  bằng cách leo `Category.parentId` tới khi gặp `null` — dữ liệu `useCategories()` đã
+  đủ, không cần API riêng.
+- File middleware **không** đặt tên `*.api.ts` và hàm client-side **không** đặt tên
+  `*.api.ts` (`src/api/devImageUpload.ts`) — cố ý, đúng lệ `productStore.ts` cũ
+  (`API_CONTRACT.md` §E.4): đây không phải hợp đồng với backend Spring Boot, không
+  lọt vào phép đếm ở `API_CONTRACT.md` §F.
+- **Chỉ chạy khi `npm run dev` ở máy cục bộ.** Helper text trong `ProductForm.tsx`
+  phải nói rõ điều này; đây là giới hạn cố ý, không phải thiếu sót cần "hoàn thiện
+  sau" khi ghép backend thật.
 
 ---
 
@@ -493,4 +520,4 @@ nhãn DÀI NHẤT đang được chọn** — không phải giá trị mặc đ�
 
 ---
 
-*Cập nhật lần cuối: 2026-08-25 — giữ mốc này đúng trong chính lần sửa nội dung.*
+*Cập nhật lần cuối: 2026-08-31 — giữ mốc này đúng trong chính lần sửa nội dung.*

@@ -2,10 +2,13 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { uploadProductImagePlugin } from './vite-plugins/upload-product-image.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  // `uploadProductImagePlugin` chỉ đăng ký middleware qua `configureServer` — biến
+  // mất hoàn toàn khỏi `vite preview`/`vite build` (backlog 0034).
+  plugins: [react(), tailwindcss(), uploadProductImagePlugin()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
