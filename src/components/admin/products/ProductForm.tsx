@@ -270,6 +270,17 @@ export default function ProductForm({
   const rootCategorySlug =
     categoryId && !Number.isNaN(categoryId) ? findRootCategorySlug(categoryId, categories) : null
 
+  /**
+   * Chặn submit trong lúc còn ảnh đang tải lên.
+   *
+   * `values.images` (đổ bởi effect ngay dưới) chỉ chứa ảnh `status === 'done'` —
+   * nếu không chặn ở đây, bấm "Lưu" trong lúc ảnh thứ hai/ba còn đang tải sẽ
+   * **âm thầm rớt** ảnh đó khỏi payload: UI vẫn vẽ nó như đang tải, nhưng
+   * `POST`/`PUT /admin/products` đã bay đi không có nó. Mất dữ liệu không kèm
+   * lỗi nào — nguy hiểm hơn một validate rớt bình thường.
+   */
+  const hasUploadingImage = images.some((image) => image.status === 'uploading')
+
   // Đổ danh sách ảnh **đã tải xong** vào field `images` của form — nguồn chân lý
   // khi submit vẫn là `values.images` do zod validate, không phải `images` state
   // ở trên (state này còn giữ cả ảnh đang tải/lỗi để vẽ UI).
@@ -584,11 +595,21 @@ export default function ProductForm({
         </p>
       )}
 
-      <div className="flex justify-end gap-3">
+      <div className="flex items-center justify-end gap-3">
+        {hasUploadingImage && (
+          <p className="text-sm text-ink-muted" role="status">
+            Đang tải ảnh lên…
+          </p>
+        )}
         <Button variant="outline" onClick={onCancel} disabled={isPending}>
           Huỷ
         </Button>
-        <Button type="submit" isLoading={isPending}>
+        <Button
+          type="submit"
+          isLoading={isPending}
+          disabled={hasUploadingImage}
+          title={hasUploadingImage ? 'Đợi ảnh tải xong trước khi lưu.' : undefined}
+        >
           {submitLabel}
         </Button>
       </div>
