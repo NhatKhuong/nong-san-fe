@@ -1,185 +1,114 @@
-import categoriesJson from '@/mocks/categories.json'
 import { PRODUCTS_PER_PAGE } from '@/lib/constants'
-import { delay } from '@/lib/utils'
-import { effectivePrice } from '@/lib/format'
-import { readAllProducts } from './productStore'
+import { imageUrl } from '@/lib/image'
+import { client } from './client'
 import type { Paginated, Product, ProductQuery } from '@/types'
 
-/*
- * KHÔNG dựng lại `const products = ...` ở cấp module.
+/**
+ * Sản phẩm ở trang cửa hàng — `GET /products/**` (`documents/API_CONTRACT.md` §B.1).
  *
- * Trước ticket 0004, danh sách sản phẩm được dựng một lần lúc nạp module — mọi
- * hàm dưới đây trả về lát cắt của đúng mảng đó. Từ khi khu quản trị ghi được
- * vào catalog, một mảng như vậy là bản sao cũ ngay sau lần Lưu đầu tiên: màn
- * quản trị hiện dữ liệu mới còn cửa hàng vẫn hiện dữ liệu cũ trong cùng phiên.
+ * **Đã ghép backend Spring Boot thật (backlog 0032 §B.1).** Lọc, sắp xếp, phân
+ * trang và quan hệ danh mục cha–con đều do backend làm — không còn bản sao nào
+ * của những luật đó ở đây (trước 0032, `resolveCategoryIds()` tự dựng cây danh
+ * mục con ở client để lọc `category` kèm danh mục dưới; việc đó nay thuộc hẳn
+ * về backend, giống hệt cách `GET /admin/products?category=` đã làm).
  *
- * `readAllProducts()` đọc lại seed + overlay ở mỗi lần gọi (~40 phần tử, lại
- * nằm sau `delay()` bên dưới) và đã giải sẵn đường dẫn ảnh, nên không hàm nào ở
- * đây phải tự nhớ gọi `imageUrl()`.
+ * `client.ts` đã có `baseURL = '/api'` nên đường dẫn viết ở đây là `/products`.
  */
-const categories = categoriesJson as { id: number; slug: string; parentId: number | null }[]
 
-/** Danh mục cha kèm toàn bộ id danh mục con, để lọc "Rau củ" ra cả rau ăn lá và củ quả. */
-function resolveCategoryIds(categorySlug: string): number[] {
-  const matched = categories.find((category) => category.slug === categorySlug)
-  if (!matched) return []
-  const childIds = categories
-    .filter((category) => category.parentId === matched.id)
-    .map((category) => category.id)
-  return [matched.id, ...childIds]
-}
-
-/** Bỏ dấu để tìm kiếm "cam" khớp được với "Cam sành hữu cơ". */
-function normalize(text: string): string {
-  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-}
-
-function applyFilters(list: Product[], query: ProductQuery): Product[] {
-  let result = list
-
-  if (query.q) {
-    const keyword = normalize(query.q.trim())
-    result = result.filter(
-      (product) =>
-        normalize(product.name).includes(keyword) ||
-        normalize(product.shortDescription).includes(keyword),
-    )
-  }
-
-  if (query.category) {
-    const ids = resolveCategoryIds(query.category)
-    result = result.filter((product) => ids.includes(product.categoryId))
-  }
-
-  if (query.minPrice !== undefined) {
-    result = result.filter(
-      (product) => effectivePrice(product.price, product.salePrice) >= query.minPrice!,
-    )
-  }
-
-  if (query.maxPrice !== undefined) {
-    result = result.filter(
-      (product) => effectivePrice(product.price, product.salePrice) <= query.maxPrice!,
-    )
-  }
-
-  if (query.minRating !== undefined) {
-    result = result.filter((product) => product.rating >= query.minRating!)
-  }
-
-  if (query.inStockOnly) result = result.filter((product) => product.stock > 0)
-  if (query.onSaleOnly) result = result.filter((product) => product.salePrice !== null)
-  if (query.isFeatured) result = result.filter((product) => product.isFeatured)
-  if (query.isBestSeller) result = result.filter((product) => product.isBestSeller)
-
-  return result
-}
-
-function applySort(list: Product[], sort: ProductQuery['sort']): Product[] {
-  const sorted = [...list]
-  switch (sort) {
-    case 'price_asc':
-      return sorted.sort(
-        (a, b) =>
-          effectivePrice(a.price, a.salePrice) - effectivePrice(b.price, b.salePrice),
-      )
-    case 'price_desc':
-      return sorted.sort(
-        (a, b) =>
-          effectivePrice(b.price, b.salePrice) - effectivePrice(a.price, a.salePrice),
-      )
-    case 'best_selling':
-      return sorted.sort((a, b) => b.sold - a.sold)
-    case 'rating':
-      return sorted.sort((a, b) => b.rating - a.rating)
-    case 'newest':
-    default:
-      return sorted.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-  }
-}
-
-function paginate<T>(list: T[], page: number, limit: number): Paginated<T> {
-  const start = (page - 1) * limit
-  return {
-    items: list.slice(start, start + limit),
-    total: list.length,
-    page,
-    limit,
-    totalPages: Math.max(1, Math.ceil(list.length / limit)),
-  }
+/**
+ * Ảnh giải qua `imageUrl()` **tại lớp `src/api/`** (`coding-conventions.md` §6),
+ * khớp `adminProducts.api.ts`: backend trả đường dẫn tương đối `/images/...`
+ * (§A.5), client ghép base ở đây để không màn hình nào phải tự nhớ gọi.
+ */
+function withResolvedImages(product: Product): Product {
+  return { ...product, images: product.images.map(imageUrl) }
 }
 
 /**
- * Lấy danh sách sản phẩm có lọc, sắp xếp và phân trang.
- * Khi có backend: `const { data } = await client.get('/products', { params: query }); return data`
+ * Lấy danh sách sản phẩm có lọc, sắp xếp và phân trang — `GET /products`.
+ *
+ * `page`/`limit` gửi tường minh (mặc định backend cũng là `1`/`12`) để URL của
+ * request nói ra đúng trang đang xem. Các khoá còn lại là `undefined` khi
+ * không lọc và axios tự bỏ chúng khỏi query string.
+ *
+ * **Lọc và sắp xếp theo giá dùng `salePrice ?? price` (`effective_price`),
+ * không dùng `price` trần** — luật của backend (§B.1), FE không tự tính lại.
+ *
+ * `totalPages` khi tập rỗng là `0`, không phải `1` (§A.4).
  */
 export async function getProducts(query: ProductQuery = {}): Promise<Paginated<Product>> {
-  await delay()
-  const page = query.page ?? 1
-  const limit = query.limit ?? PRODUCTS_PER_PAGE
-  const filtered = applySort(applyFilters(readAllProducts(), query), query.sort)
-  return paginate(filtered, page, limit)
+  const { data } = await client.get<Paginated<Product>>('/products', {
+    params: {
+      q: query.q,
+      category: query.category,
+      minPrice: query.minPrice,
+      maxPrice: query.maxPrice,
+      minRating: query.minRating,
+      inStockOnly: query.inStockOnly,
+      onSaleOnly: query.onSaleOnly,
+      isFeatured: query.isFeatured,
+      isBestSeller: query.isBestSeller,
+      sort: query.sort,
+      page: query.page ?? 1,
+      limit: query.limit ?? PRODUCTS_PER_PAGE,
+    },
+  })
+
+  return { ...data, items: data.items.map(withResolvedImages) }
 }
 
 /**
- * Lấy chi tiết một sản phẩm theo slug.
- * Khi có backend: `const { data } = await client.get(`/products/${slug}`); return data`
+ * Lấy chi tiết một sản phẩm theo slug — `GET /products/{slug}`.
+ * Không tìm thấy → `404`.
  */
 export async function getProductBySlug(slug: string): Promise<Product> {
-  await delay()
-  const product = readAllProducts().find((item) => item.slug === slug)
-  if (!product) throw new Error(`Không tìm thấy sản phẩm "${slug}"`)
-  return product
+  const { data } = await client.get<Product>(`/products/${slug}`)
+  return withResolvedImages(data)
 }
 
 /**
  * Lấy nhiều sản phẩm theo danh sách id — dùng cho trang yêu thích.
  *
- * Giữ đúng thứ tự id truyền vào và **bỏ qua id không còn tồn tại**: sản phẩm có
- * thể đã bị gỡ khỏi catalog trong lúc id vẫn nằm trong localStorage của khách.
- *
- * Khi có backend: `const { data } = await client.get('/products', { params: { ids: ids.join(',') } }); return data`
+ * `GET /products?ids=1,2,3`. Backend giữ đúng thứ tự id truyền vào và bỏ qua
+ * id không còn tồn tại — sản phẩm có thể đã bị gỡ khỏi catalog trong lúc id
+ * vẫn nằm trong localStorage của khách.
  */
 export async function getProductsByIds(ids: number[]): Promise<Product[]> {
-  await delay(250)
   if (ids.length === 0) return []
-  const products = readAllProducts()
-  return ids
-    .map((id) => products.find((product) => product.id === id))
-    .filter((product): product is Product => product !== undefined)
+  const { data } = await client.get<Product[]>('/products', {
+    params: { ids: ids.join(',') },
+  })
+  return data.map(withResolvedImages)
 }
 
 /**
  * Sản phẩm liên quan — cùng danh mục, loại trừ chính nó.
- * Khi có backend: `const { data } = await client.get(`/products/${slug}/related`); return data`
+ * `GET /products/{slug}/related`.
  */
 export async function getRelatedProducts(slug: string, limit = 4): Promise<Product[]> {
-  await delay(200)
-  const products = readAllProducts()
-  const current = products.find((item) => item.slug === slug)
-  if (!current) return []
-  return products
-    .filter((item) => item.categoryId === current.categoryId && item.id !== current.id)
-    .slice(0, limit)
+  const { data } = await client.get<Product[]>(`/products/${slug}/related`, {
+    params: { limit },
+  })
+  return data.map(withResolvedImages)
 }
 
 /**
  * Gợi ý nhanh cho ô tìm kiếm ở header.
- * Khi có backend: `const { data } = await client.get('/products/suggest', { params: { q: keyword } }); return data`
+ * `GET /products/suggest`.
  */
 export async function searchSuggestions(keyword: string, limit = 5): Promise<Product[]> {
-  await delay(150)
   if (!keyword.trim()) return []
-  return applyFilters(readAllProducts(), { q: keyword }).slice(0, limit)
+  const { data } = await client.get<Product[]>('/products/suggest', {
+    params: { q: keyword, limit },
+  })
+  return data.map(withResolvedImages)
 }
 
-/** Khoảng giá thấp nhất – cao nhất, dùng khởi tạo thanh lọc giá ở trang cửa hàng. */
+/**
+ * Khoảng giá thấp nhất – cao nhất, dùng khởi tạo thanh lọc giá ở trang cửa hàng.
+ * `GET /products/price-range`.
+ */
 export async function getPriceRange(): Promise<{ min: number; max: number }> {
-  await delay(100)
-  const prices = readAllProducts().map((product) =>
-    effectivePrice(product.price, product.salePrice),
-  )
-  return { min: Math.min(...prices), max: Math.max(...prices) }
+  const { data } = await client.get<{ min: number; max: number }>('/products/price-range')
+  return data
 }

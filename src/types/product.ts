@@ -91,8 +91,13 @@ export interface Review {
   createdAt: string
 }
 
+/**
+ * `productId` KHÔNG nằm trong payload — path (`POST /products/{id}/reviews`)
+ * là nguồn chân lý duy nhất. Backend bỏ qua im lặng trường `productId` nếu
+ * client cố gửi trong body (0032 §B.8 điều 3, `BE-ADR-0008`): gửi kèm trường
+ * này từng ghi nhầm đánh giá sang sản phẩm khác dù response vẫn `201`.
+ */
 export interface CreateReviewPayload {
-  productId: number
   authorName: string
   rating: number
   content: string

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Star } from 'lucide-react'
@@ -7,6 +8,9 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import { useCreateReview } from '@/hooks/useReviews'
+import { useCurrentUser } from '@/hooks/useAuth'
+import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
+import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 const reviewSchema = z.object({
@@ -29,13 +33,20 @@ const reviewSchema = z.object({
 
 type ReviewFormValues = z.infer<typeof reviewSchema>
 
+/** Trường có ô nhập trên màn hình — dùng để nối `errors` của 422 vào đúng ô. */
+const REVIEW_FIELDS = ['authorName', 'rating', 'content'] as const
+
 export default function ReviewForm({ productId }: { productId: number }) {
   const [hoveredStar, setHoveredStar] = useState(0)
+  const { isAuthenticated } = useCurrentUser()
+  const navigate = useNavigate()
+  const location = useLocation()
   const { mutate, isPending, isSuccess, error } = useCreateReview(productId)
 
   const {
     register,
     handleSubmit,
+    setError,
     setValue,
     watch,
     reset,
@@ -46,14 +57,33 @@ export default function ReviewForm({ productId }: { productId: number }) {
   })
 
   const rating = watch('rating')
+  const hasMappedFieldError = hasServerFieldError(error, REVIEW_FIELDS)
 
   function onSubmit(values: ReviewFormValues) {
-    mutate({ productId, ...values }, { onSuccess: () => reset() })
+    mutate(values, {
+      onSuccess: () => reset(),
+      onError: (err) => applyServerFieldErrors(err, setError, REVIEW_FIELDS),
+    })
+  }
+
+  /**
+   * Gác đăng nhập lúc bấm "Gửi" — không ẩn form (Owner chốt 2026-08-26, xem
+   * 0032 §B.8 điều 1). Kiểm **trước** cả zod, đúng nghĩa "bấm Gửi mà chưa đăng
+   * nhập" bất kể form đang hợp lệ hay chưa — cùng mẫu `ProtectedRoute.tsx`
+   * đang gác route, tái dùng `useCurrentUser()`.
+   */
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (!isAuthenticated) {
+      event.preventDefault()
+      navigate(ROUTES.LOGIN, { state: { from: location.pathname } })
+      return
+    }
+    void handleSubmit(onSubmit)(event)
   }
 
   return (
     // `noValidate`: xem ghi chú cùng lý do trong CheckoutPage.tsx
-    <form noValidate onSubmit={handleSubmit(onSubmit)} className="rounded-xl bg-surface p-5">
+    <form noValidate onSubmit={handleFormSubmit} className="rounded-xl bg-surface p-5">
       <h3 className="text-base">Viết đánh giá của bạn</h3>
 
       <div className="mt-4">
@@ -106,7 +136,7 @@ export default function ReviewForm({ productId }: { productId: number }) {
         />
       </div>
 
-      {error && (
+      {error && !hasMappedFieldError && (
         <p role="alert" className="mt-3 text-sm text-danger">
           {error.message}
         </p>

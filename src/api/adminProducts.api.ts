@@ -19,8 +19,9 @@ import type { AdminProductQuery, Paginated, Product, ProductPayload } from '@/ty
  * `403` (sai vai trò) **không** kích hoạt đăng xuất: nó rơi thẳng xuống
  * `toApiError` trong `client.ts`, đúng như §B.12 đã chốt.
  *
- * Trang cửa hàng, đếm sản phẩm theo danh mục và trang tổng quan **vẫn đọc mock**
- * qua `productStore.ts` cho tới backlog 0019 — Owner đã chấp nhận cửa sổ lệch đó.
+ * Trang cửa hàng và đếm sản phẩm theo danh mục cũng đã lên backend thật từ
+ * backlog 0032 (§B.1/§B.2 của `0019`) — namespace này vẫn tách riêng vì lý do
+ * bảo mật ở trên, không phải vì hai bên còn đọc hai nguồn khác nhau.
  */
 
 /**
