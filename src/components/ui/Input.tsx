@@ -8,8 +8,19 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hint?: string
   /** Nút hoặc icon nằm sát mép phải bên trong ô, ví dụ nút hiện/ẩn mật khẩu. */
   endAdornment?: React.ReactNode
+  /** Class cho div bọc ngoài — chỗ DUY NHẤT đặt được chiều rộng / thuộc tính flex của trường. */
+  wrapperClassName?: string
 }
 
+/**
+ * Ô nhập một dòng, kèm label / hint / thông báo lỗi.
+ *
+ * **`className` vào trường, `wrapperClassName` vào div bọc.** `className` gắn lên chính thẻ
+ * `<input>`; `wrapperClassName` gắn lên div bọc ngoài — nơi duy nhất đặt được chiều rộng và
+ * mọi thuộc tính flex (`w-*`, `flex-*`, `basis-*`, `ml-auto`). Đặt `w-*` qua `className` là
+ * **vô hiệu** khi component nằm trong một flex container: div bọc vẫn `w-full` nên nuốt trọn
+ * cả dòng, còn `w-*` chỉ thu nhỏ cái `<input>` bên trong div đã full-width đó.
+ */
 export default function Input({
   label,
   error,
@@ -17,6 +28,7 @@ export default function Input({
   endAdornment,
   id,
   className,
+  wrapperClassName,
   required,
   ...props
 }: InputProps) {
@@ -25,7 +37,7 @@ export default function Input({
   const describedById = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
 
   return (
-    <div className="w-full">
+    <div className={cn('w-full', wrapperClassName)}>
       {label && (
         <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-ink">
           {label}
