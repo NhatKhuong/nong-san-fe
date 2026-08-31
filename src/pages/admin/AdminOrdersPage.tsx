@@ -127,7 +127,7 @@ export default function AdminOrdersPage() {
             event.preventDefault()
             setFilter('q', keyword.trim())
           }}
-          className="flex w-full gap-2 sm:w-80"
+          className="flex min-w-0 flex-[2_1_18rem] gap-2"
         >
           <Input
             aria-label="Tìm đơn theo mã đơn, tên hoặc số điện thoại người nhận"
@@ -149,7 +149,7 @@ export default function AdminOrdersPage() {
           options={STATUS_OPTIONS}
           value={query.status ?? ''}
           onChange={(event) => setFilter('status', event.target.value)}
-          className="w-full sm:w-52"
+          wrapperClassName="min-w-0 flex-[1_1_12rem]"
         />
       </div>
 

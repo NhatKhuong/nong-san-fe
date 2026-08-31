@@ -78,6 +78,16 @@ Vi phạm nhóm này sẽ khiến việc ghép backend Spring Boot phải sửa 
 - Chuỗi class dài / có điều kiện gom bằng `cn()` (`src/lib/utils.ts` — clsx + tailwind-merge).
 - Đổi màu thì **tính lại tương phản WCAG AA (≥ 4.5:1)** trước khi commit.
 
+**Chiều rộng của trường nhập đặt ở div bọc, không đặt ở trường.** Trong `Input` / `Select` /
+`Textarea`, `className` trỏ vào thẻ `<input>`/`<select>`; chiều rộng và mọi thuộc tính flex
+(`w-*`, `flex-*`, `ml-auto`, `basis-*`) phải đi qua `wrapperClassName`. Đặt `w-*` qua
+`className` **không có tác dụng** khi component là con của một flex container — div bọc vẫn
+`w-full` và nuốt trọn cả dòng.
+
+Kèm theo: **ticket nào đổi bố cục một hàng ngang thì phần Verify bắt buộc có một phép *đo*** —
+`getBoundingClientRect().top` của mọi phần tử trên hàng phải bằng nhau. "Mở ra nhìn thấy ổn"
+không phải bằng chứng: lỗi này đã lọt qua 5 lần nghiệm thu liên tiếp đúng vì chưa ai đo.
+
 ---
 
 ## 5. Dữ liệu & trạng thái hiển thị
@@ -454,6 +464,21 @@ Lỗi hiện ra là *"timeout chờ ô mật khẩu"* — đọc y hệt "trang 
 **Luật chung: phép thử nhiều ca nối nhau không được giả định trạng thái sạch từ ca trước.**
 Mỗi ca tự dựng lấy tiền đề của nó — localStorage, giỏ hàng, phiên đăng nhập — chứ đừng thừa hưởng
 thứ ca trước tình cờ để lại.
+
+**Biến thể thứ sáu: `<select>` cắt chữ mà KHÔNG khai báo tràn — `scrollWidth` báo false âm.**
+
+Phép kiểm cắt chữ quen tay `el.scrollWidth > el.clientWidth` **không dùng được cho `<select>`**.
+Trình duyệt tự cắt nhãn của `<option>` đang chọn cho vừa ô, rồi vẫn khai `scrollWidth === clientWidth`
+— tức là "không tràn".
+
+Bằng chứng từ backlog 0009: ở viewport 900, cả **ba** Select của thanh lọc `/quan-tri/san-pham` đều
+trả `overflowing: false`, trong khi **ảnh chụp** cho thấy ô tồn kho hiện `"Mọi mức tồn kh"` — mất hẳn
+chữ `"o"` cuối của `"Mọi mức tồn kho"` (ô rộng 159.61px, còn phải trừ `pr-10` chừa chỗ cho chevron).
+Một dropdown cắt mất chính nhãn của nó khiến người dùng **đọc sai**, không phải chuyện thẩm mỹ.
+
+Quy tắc: **kiểm cắt chữ của `<select>` bằng ảnh chụp ở bề rộng nhỏ nhất, và chụp với tuỳ chọn có
+nhãn DÀI NHẤT đang được chọn** — không phải giá trị mặc định, vì mặc định thường là nhãn ngắn nhất
+(`"Mọi danh mục"`, `"Mới nhất"`). Không có phép kiểm DOM nào thay được ảnh ở đây.
 
 ---
 

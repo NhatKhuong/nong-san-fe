@@ -100,7 +100,8 @@ export default function ShopPage() {
                   options={SORT_OPTIONS}
                   value={query.sort}
                   onChange={(event) => setParams({ sort: event.target.value })}
-                  className="h-9 w-44 text-sm"
+                  wrapperClassName="w-44"
+                  className="h-9 text-sm"
                 />
 
                 <div className="hidden items-center gap-1 sm:flex">
