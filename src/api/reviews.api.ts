@@ -1,97 +1,50 @@
-import reviewsJson from '@/mocks/reviews.json'
-import { delay } from '@/lib/utils'
+import { client } from './client'
 import type { CreateReviewPayload, Review, ReviewSummary } from '@/types'
-
-const USER_REVIEWS_KEY = 'nss_user_reviews'
-
-const seedReviews = reviewsJson as Review[]
-
-/** Đánh giá do người dùng gửi trong phiên, lưu localStorage giống cách orders.api.ts làm. */
-function readUserReviews(): Review[] {
-  try {
-    const raw = localStorage.getItem(USER_REVIEWS_KEY)
-    return raw ? (JSON.parse(raw) as Review[]) : []
-  } catch {
-    return []
-  }
-}
-
-function writeUserReviews(reviews: Review[]): void {
-  localStorage.setItem(USER_REVIEWS_KEY, JSON.stringify(reviews))
-}
-
-function allReviews(): Review[] {
-  return [...readUserReviews(), ...seedReviews]
-}
-
-function sortByNewest(list: Review[]): Review[] {
-  return [...list].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  )
-}
 
 /**
  * Danh sách đánh giá của một sản phẩm, mới nhất trước.
- * Khi có backend: `const { data } = await client.get(`/products/${productId}/reviews`); return data`
+ *
+ * `productId` là `id` số của sản phẩm — KHÁC `GET /products/{slug}` của trang
+ * cửa hàng. Backend không phân trang endpoint này (0032 §B.8); sản phẩm không
+ * tồn tại/đã xoá mềm trả 404, không phải mảng rỗng.
  */
 export async function getProductReviews(productId: number): Promise<Review[]> {
-  await delay(400)
-  return sortByNewest(allReviews().filter((review) => review.productId === productId))
+  const { data } = await client.get<Review[]>(`/products/${productId}/reviews`)
+  return data
 }
 
 /**
- * Tổng hợp điểm và phân bố sao của một sản phẩm.
+ * Tổng hợp điểm và phân bố sao của một sản phẩm — do backend tính (§C.3 của
+ * API_CONTRACT.md), không tự cộng lại từ danh sách đánh giá ở client.
  *
- * LƯU Ý: hàm này tính từ danh sách đánh giá, còn `Product.rating`/`reviewCount`
- * trong products.json là số cố định của dữ liệu mẫu — hai con số có thể lệch nhau.
- * Khi ghép Spring Boot, backend sẽ là nguồn chân lý duy nhất cho cả hai.
- *
- * Khi có backend: `const { data } = await client.get(`/products/${productId}/reviews/summary`); return data`
+ * `distribution` là object khoá chuỗi `'1'`…`'5'`, dùng thẳng để vẽ biểu đồ
+ * phân bố sao.
  */
 export async function getReviewSummary(productId: number): Promise<ReviewSummary> {
-  await delay(300)
-  const list = allReviews().filter((review) => review.productId === productId)
-
-  const distribution: ReviewSummary['distribution'] = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
-  let sum = 0
-
-  for (const review of list) {
-    const star = String(Math.round(review.rating)) as keyof ReviewSummary['distribution']
-    if (star in distribution) distribution[star] += 1
-    sum += review.rating
-  }
-
-  return {
-    average: list.length > 0 ? Number((sum / list.length).toFixed(1)) : 0,
-    total: list.length,
-    distribution,
-  }
+  const { data } = await client.get<ReviewSummary>(`/products/${productId}/reviews/summary`)
+  return data
 }
 
 /**
- * Gửi đánh giá mới.
- * Khi có backend: `const { data } = await client.post(`/products/${payload.productId}/reviews`, payload); return data`
+ * Gửi đánh giá mới. **Yêu cầu đăng nhập** (`BE-ADR-0008`, khác hợp đồng gốc
+ * §B.8 vốn ghi công khai) — `client.ts` tự gắn Bearer token khi đã đăng nhập.
+ * `ReviewForm` gác đăng nhập trước khi gọi hàm này (điều hướng `/dang-nhap`
+ * nếu chưa có phiên), nên ở đây không tự kiểm lại token.
+ *
+ * `productId` tách riêng khỏi `payload`: path là nguồn chân lý, backend bỏ
+ * qua im lặng một trường `productId` trong body (từng là lỗ ghi nhầm đánh giá
+ * sang sản phẩm khác — 0032 §B.8 điều 3), nên `CreateReviewPayload` cố ý
+ * không còn trường đó nữa.
+ *
+ * Lỗi: `401` chưa đăng nhập · `404` sản phẩm không tồn tại · `409` tài khoản
+ * này đã đánh giá sản phẩm này rồi (không có map `errors`, đi qua
+ * `error.message`) · `422` validate theo ô (content < 10 ký tự…), đi qua
+ * `applyServerFieldErrors()`.
  */
-export async function createReview(payload: CreateReviewPayload): Promise<Review> {
-  await delay(700)
-
-  const content = payload.content.trim()
-  if (content.length < 10) {
-    throw new Error('Nội dung đánh giá cần ít nhất 10 ký tự.')
-  }
-  if (payload.rating < 1 || payload.rating > 5) {
-    throw new Error('Vui lòng chọn số sao từ 1 đến 5.')
-  }
-
-  const review: Review = {
-    id: Date.now(),
-    productId: payload.productId,
-    authorName: payload.authorName.trim(),
-    rating: payload.rating,
-    content,
-    createdAt: new Date().toISOString().slice(0, 10),
-  }
-
-  writeUserReviews([review, ...readUserReviews()])
-  return review
+export async function createReview(
+  productId: number,
+  payload: CreateReviewPayload,
+): Promise<Review> {
+  const { data } = await client.post<Review>(`/products/${productId}/reviews`, payload)
+  return data
 }
