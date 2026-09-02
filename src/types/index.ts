@@ -30,6 +30,8 @@ export type {
   PaymentMethod,
   ShippingInfo,
   CreateOrderPayload,
+  PurchaseRequest,
+  PurchaseRequestStatus,
 } from './order'
 export type { Testimonial, Brand, HeroSlide, PromoBanner } from './marketing'
 export type { Province, District, Ward } from './location'

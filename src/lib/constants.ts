@@ -109,3 +109,17 @@ export const SHIPPING_FEE = 30_000
  * `CountdownPromo` tự ẩn khi mốc này đã trôi qua.
  */
 export const PROMO_END_DATE = '2026-12-31T23:59:59+07:00'
+
+/**
+ * Chu kỳ polling `GET /orders/requests/{requestId}` sau khi đặt hàng bất đồng
+ * bộ (`CheckoutPage`, `usePurchaseRequestStatus`). Đo thực tế trên backend:
+ * ca `SUCCESS`/`FAILED` thường xong trong 1-3 giây, nên 2 giây vừa đủ nhanh để
+ * không cảm giác treo, vừa không dội quá nhiều request khi Kafka xử lý chậm.
+ */
+export const PURCHASE_REQUEST_POLL_INTERVAL_MS = 2_000
+
+/**
+ * Sau ngần này mili-giây mà yêu cầu đặt hàng vẫn `PENDING`, hiện thêm câu "đang
+ * xử lý lâu hơn dự kiến" — KHÔNG dừng polling, chỉ báo cho người dùng biết.
+ */
+export const PURCHASE_REQUEST_SLOW_WARNING_MS = 60_000

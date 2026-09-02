@@ -195,6 +195,22 @@ Mặc định: `limit = 12` cho sản phẩm, `6` cho bài viết.
 
 `calcShippingFee()` trong cùng file **không phải endpoint** — chỉ là ước tính hiển thị ở client (miễn phí từ 500.000 ₫, dưới ngưỡng là 30.000 ₫). Luật này **đã được đối chiếu với luật của server bằng đơn thật** ngày 2026-08-26 và hai bên khớp; số đo và ràng buộc chéo nằm ở **§C.5** — đọc trước khi đổi bất kỳ con số nào trong hai bên.
 
+#### B.6a Đặt hàng bất đồng bộ (async purchase pipeline)
+
+| Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
+|---|---|---|---|---|---|
+| `createOrderAsync` | `POST /orders/async` | header **`Idempotency-Key` bắt buộc**; body y hệt `createOrder` (`CreateOrderPayload`) | `PurchaseRequest` (202) | 400 thiếu header, 422 (cùng bảng lỗi với `POST /orders`) | ⬜ |
+| `getPurchaseRequestStatus` | `GET /orders/requests/{requestId}` | — | `PurchaseRequest` | 404 | ⬜ |
+
+`PurchaseRequest = { requestId, status, orderCode, failureCode, failureMessage }`, `status` là một trong `PENDING` / `SUCCESS` / `FAILED`; `orderCode` chỉ có giá trị khi `SUCCESS`, `failureCode`/`failureMessage` chỉ có giá trị khi `FAILED`.
+
+- **`POST /orders/async` trả `202` NGAY**, không tạo đơn thật ở bước này — việc dựng đơn chạy bất đồng bộ qua Kafka phía backend. Client (`CheckoutPage`) phải polling `GET /orders/requests/{requestId}` cho tới khi có kết quả cuối; đo thực tế backlog 0041, ca `SUCCESS`/`FAILED` xong trong 1–3 giây. Chu kỳ poll của FE là **2 giây** (`PURCHASE_REQUEST_POLL_INTERVAL_MS`, `lib/constants.ts`), dừng ngay khi `status !== 'PENDING'`; sau **60 giây** vẫn `PENDING` thì FE chỉ hiện thêm câu "đang xử lý lâu hơn dự kiến" (`PURCHASE_REQUEST_SLOW_WARNING_MS`), **không** dừng poll và không có timeout cứng nào hủy yêu cầu.
+- **`Idempotency-Key` giữ nguyên khi phát lại CÙNG một lượt đặt hàng** (mất mạng, timeout khiến người dùng bấm lại) — server trả về đúng `requestId`/`status` của lần đầu, không tạo yêu cầu mới (đo thực tế: cùng khoá → cùng `requestId`, cùng `orderCode` khi đã `SUCCESS`). Một lượt đặt hàng MỚI (bấm "Thử lại" sau khi thấy `FAILED`) phải dùng khoá mới — **việc sinh và giữ khoá này là trách nhiệm của FE** (`crypto.randomUUID()` tại `CheckoutPage`), hàm `createOrderAsync` chỉ nhận khoá đã sinh sẵn làm tham số, không tự sinh.
+- **`failureMessage` đã là tiếng Việt do backend sinh sẵn** — FE hiển thị thẳng, không tự dịch hay soạn lại (đo thực tế: `EMPTY_ORDER` → `"Giỏ hàng đang trống, vui lòng thêm sản phẩm trước khi đặt hàng."`).
+- **Khi `SUCCESS`, FE điều hướng sang trang chi tiết đơn hàng hiện có bằng `orderCode`** (`OrderSuccessPage`, `?code=`), gọi lại `getOrderByCode` — không có màn hình chi tiết riêng cho luồng async.
+- **`requestId` là công khai có chủ ý** — token sinh ngẫu nhiên an toàn mật mã (`PR-<16 hex>`), không đoán được, cùng mô hình với mã đơn ở `getOrderByCode`.
+- **`POST /orders` (đồng bộ) vẫn còn và vẫn khớp bảng ở §B.6** — `createOrder()` không bị xoá, chỉ không còn được `CheckoutPage` gọi. Hai đường cùng tồn tại trên backend; FE hiện chỉ dùng nhánh async cho luồng đặt hàng của khách.
+
 ### B.7 Mã giảm giá — `coupons.api.ts`
 
 | Hàm frontend | Endpoint | Request | Response | Lỗi | Auth |
@@ -562,9 +578,9 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 
 | Con số | Giá trị | Lệnh đếm (chạy từ `projects/app/`) |
 |---|---|---|
-| Dòng endpoint trong bảng B | **57** | `grep -cE '^\\| \`[a-zA-Z]+\` \\| \`(GET\|POST\|PUT\|PATCH\|DELETE) ' documents/API_CONTRACT.md` |
-| Đường dẫn phân biệt (bỏ query) | **55** | hai dòng dùng lại đường cũ kèm query: `getProductsByIds` (`/products?ids=`) và `getRootCategories` (`/categories?root=true`) |
-| Hàm `export` trong `src/api/*.api.ts` | **60** | `grep -c '^export .*function' src/api/*.api.ts` → cộng lại |
+| Dòng endpoint trong bảng B | **59** | `grep -cE '^\\| \`[a-zA-Z]+\` \\| \`(GET\|POST\|PUT\|PATCH\|DELETE) ' documents/API_CONTRACT.md` |
+| Đường dẫn phân biệt (bỏ query) | **57** | hai dòng dùng lại đường cũ kèm query (`getProductsByIds` → `/products?ids=`, `getRootCategories` → `/categories?root=true`) không đếm thêm; §B.6a (backlog 0041) thêm hai đường mới `/orders/async` và `/orders/requests/{requestId}` |
+| Hàm `export` trong `src/api/*.api.ts` | **62** | `grep -c '^export .*function' src/api/*.api.ts` → cộng lại |
 | File `.api.ts` | **16** | `ls src/api/*.api.ts \| wc -l` |
 | File trong `src/api/` | **17** | 16 `.api.ts` + `client.ts` |
 | Hàm chỉ chạy ở client | **3** | `getCurrentUserId()` · `calcShippingFee()` · `readPublicUsers()` — có trong mã, **cố ý không có** trong bảng B |
@@ -574,9 +590,13 @@ Nếu thấy mình đang sửa những thứ này thì có gì đó sai:
 **Ba con số trên khớp nhau chính xác, và đây là phép đối chiếu có răng:**
 
 ```
-60 hàm export  −  3 hàm chỉ chạy ở client  =  57
-57 dòng bảng B −  0 dòng chưa dựng ở FE     =  57  ✅
+62 hàm export  −  3 hàm chỉ chạy ở client  =  59
+59 dòng bảng B −  0 dòng chưa dựng ở FE     =  59  ✅
 ```
+
+**Cập nhật backlog 0041 (UI polling đơn hàng bất đồng bộ):** thêm §B.6a — hai hàm `createOrderAsync` / `getPurchaseRequestStatus` trong `orders.api.ts` (không phải file mới), nên "Hàm `export`" 60 → 62 và "Dòng bảng B" 57 → 59 cùng lúc, phép trừ vẫn cân. "File `.api.ts`" và "File trong `src/api/`" **không đổi** — không có file `*.api.ts` mới.
+
+> **Hai số ở bảng trên KHÔNG được ticket này chỉnh, dù đo lại ra khác giá trị đang ghi:** `ls src/api/*.ts | wc -l` đo ra **18**, không phải 17 (đã lệch từ trước — `devImageUpload.ts` bị lệ ngoại trừ theo lời văn của coding-conventions.md §6.1 nhưng lệnh đếm không tự loại nó); và `grep -rn "error.message\|err.message" ...` đo ra **38**, không phải 36. Cả hai lệch này **có trước** backlog 0041 và không nằm trong phạm vi file `src/api/`/`orders.api.ts` mà ticket này chạm tới — ghi lại ở đây để PM mở việc đối chiếu riêng, không tự chỉnh số theo trí nhớ.
 
 **Hai vế đã bằng nhau — không còn dòng nào dư.** `resetPassword` từng là ngoại lệ duy nhất: có trong hợp đồng, **đã chạy trên backend**, nhưng chưa có hàm phía FE. Backlog 0018 đã dựng nó (`src/api/auth.api.ts` → `resetPassword`), nên con số hàm `export` lên **60** và phép trừ mất đi số hạng `− 1`. Ba hàm chỉ-chạy-ở-client thì **không bao giờ** xuất hiện ở bảng B.
 

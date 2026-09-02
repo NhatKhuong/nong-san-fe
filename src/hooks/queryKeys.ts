@@ -44,6 +44,8 @@ export const queryKeys = {
     all: ['orders'] as const,
     mine: ['orders', 'mine'] as const,
     detail: (code: string) => ['orders', 'detail', code] as const,
+    /** Trạng thái một yêu cầu đặt hàng bất đồng bộ, dùng khi polling. */
+    request: (requestId: string) => ['orders', 'request', requestId] as const,
   },
   addresses: {
     all: ['addresses'] as const,
