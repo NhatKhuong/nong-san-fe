@@ -8,22 +8,25 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
+import { ErrorState } from '@/components/ui/StateBlock'
 import AddressFields from '@/components/form/AddressFields'
 import CartSummaryBox from '@/components/cart/CartSummaryBox'
+import OrderProcessingPanel from '@/components/cart/OrderProcessingPanel'
 import PaymentMethodPicker from '@/components/cart/PaymentMethodPicker'
 import SavedAddressPicker from '@/components/cart/SavedAddressPicker'
-import { createOrder } from '@/api/orders.api'
+import { createOrderAsync } from '@/api/orders.api'
 import { useCartValidation, useCoupon } from '@/hooks/useCart'
 import { useCurrentUser } from '@/hooks/useAuth'
 import { useMyAddresses } from '@/hooks/useAddresses'
 import { useLocationNames } from '@/hooks/useLocations'
-import { ROUTES } from '@/lib/constants'
+import { usePurchaseRequestStatus } from '@/hooks/useOrders'
+import { PURCHASE_REQUEST_SLOW_WARNING_MS, ROUTES } from '@/lib/constants'
 import { formatVND } from '@/lib/format'
 import { applyServerFieldErrors, hasServerFieldError } from '@/lib/fieldErrors'
 import { PHONE_MESSAGE, PHONE_PATTERN } from '@/lib/validation'
 import { useCartStore } from '@/store/cart.store'
 import SeoMeta from '@/components/ui/SeoMeta'
-import type { PaymentMethod } from '@/types'
+import type { CreateOrderPayload, PaymentMethod } from '@/types'
 
 const checkoutSchema = z.object({
   fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(60, 'Họ tên quá dài.'),
@@ -164,17 +167,66 @@ export default function CheckoutPage() {
    */
   const orderPlacedRef = useRef(false)
 
+  /**
+   * Khoá idempotency của lượt đặt hàng đang xử lý — sinh MỘT LẦN mỗi lượt bấm
+   * "Đặt hàng" thật sự, giữ nguyên qua mọi lần phát lại của CÙNG lượt đó (mất
+   * mạng, timeout khiến người dùng bấm lại trong lúc chưa rõ kết quả). Chỉ đặt
+   * về `null` khi người dùng chủ động bắt đầu một lượt đặt hàng MỚI sau khi
+   * thấy `FAILED` (`handleRetryAfterFailure`) — đó phải là một `requestId`
+   * khác, không phải bản phát lại của yêu cầu đã hỏng.
+   */
+  const idempotencyKeyRef = useRef<string | null>(null)
+
+  /** `requestId` của lượt đặt hàng đang polling; `null` = còn ở màn hình form. */
+  const [activeRequestId, setActiveRequestId] = useState<string | null>(null)
+
   const { mutate, isPending, error } = useMutation({
-    mutationFn: createOrder,
-    onSuccess: (order) => {
-      orderPlacedRef.current = true
-      clearCart()
-      // `replace` để bấm Back không quay lại trang thanh toán với giỏ đã rỗng.
-      navigate(`${ROUTES.ORDER_SUCCESS}?code=${order.code}`, { replace: true })
+    mutationFn: (payload: CreateOrderPayload) => {
+      idempotencyKeyRef.current ??= crypto.randomUUID()
+      return createOrderAsync(payload, idempotencyKeyRef.current)
     },
+    onSuccess: (request) => setActiveRequestId(request.requestId),
   })
 
-  // Vào thẳng trang thanh toán khi giỏ trống thì không có gì để đặt.
+  const { data: purchaseRequest, error: pollError } = usePurchaseRequestStatus(activeRequestId)
+
+  const isFailed = purchaseRequest?.status === 'FAILED' || Boolean(pollError)
+  /** Đã gửi đi và chưa biết kết quả cuối (hoặc vừa `SUCCESS`, đang chờ điều hướng). */
+  const isProcessing = activeRequestId !== null && !isFailed
+
+  // Đơn thành công: dọn giỏ và điều hướng sang trang chi tiết đơn hàng bằng
+  // `orderCode`. Tách khỏi `onSuccess` của mutation vì kết quả cuối chỉ biết
+  // được qua polling, không phải qua response 202 của `createOrderAsync`.
+  useEffect(() => {
+    if (purchaseRequest?.status !== 'SUCCESS' || !purchaseRequest.orderCode) return
+    orderPlacedRef.current = true
+    clearCart()
+    // `replace` để bấm Back không quay lại trang thanh toán với giỏ đã rỗng.
+    navigate(`${ROUTES.ORDER_SUCCESS}?code=${purchaseRequest.orderCode}`, { replace: true })
+  }, [purchaseRequest, clearCart, navigate])
+
+  /** Sau ngần này thời gian vẫn `PENDING` thì báo "đang xử lý lâu hơn dự kiến". */
+  const [isSlow, setIsSlow] = useState(false)
+  useEffect(() => {
+    setIsSlow(false)
+    if (!activeRequestId) return
+    const timer = setTimeout(() => setIsSlow(true), PURCHASE_REQUEST_SLOW_WARNING_MS)
+    return () => clearTimeout(timer)
+  }, [activeRequestId])
+
+  /**
+   * "Thử lại" sau `FAILED`: quay lại màn hình form (dữ liệu đã nhập vẫn còn,
+   * vì `methods` không unmount) và bắt buộc sinh khoá idempotency MỚI — đây là
+   * một lượt đặt hàng khác, không phải phát lại lượt vừa hỏng.
+   */
+  function handleRetryAfterFailure() {
+    idempotencyKeyRef.current = null
+    setActiveRequestId(null)
+  }
+
+  // Vào thẳng trang thanh toán khi giỏ trống thì không có gì để đặt. Giỏ chỉ bị
+  // xoá sau khi có `SUCCESS` thật sự (xem effect ở trên), nên guard này không
+  // bao giờ ăn nhầm lúc đang polling hay lúc `FAILED`.
   if (items.length === 0 && !orderPlacedRef.current) return <Navigate to={ROUTES.CART} replace />
 
   /** Lỗi 422 theo từng ô đã hiện cạnh ô đó rồi thì không lặp lại ở banner chung. */
@@ -214,160 +266,171 @@ export default function CheckoutPage() {
       <div className="container-app py-8">
         <h1 className="mb-6 text-2xl sm:text-3xl">Thanh toán</h1>
 
-        {!isAuthenticated && (
-          <p className="mb-6 rounded-xl bg-surface px-4 py-3 text-sm text-ink-muted">
-            Bạn đang đặt hàng với tư cách khách.{' '}
-            <Link to={ROUTES.LOGIN} className="font-semibold text-primary hover:underline">
-              Đăng nhập
-            </Link>{' '}
-            để lưu địa chỉ và theo dõi đơn hàng sau này.
-          </p>
-        )}
+        {isProcessing ? (
+          <OrderProcessingPanel isSlow={isSlow} />
+        ) : isFailed ? (
+          <ErrorState
+            message={purchaseRequest?.failureMessage ?? pollError?.message}
+            onRetry={handleRetryAfterFailure}
+          />
+        ) : (
+          <>
+            {!isAuthenticated && (
+              <p className="mb-6 rounded-xl bg-surface px-4 py-3 text-sm text-ink-muted">
+                Bạn đang đặt hàng với tư cách khách.{' '}
+                <Link to={ROUTES.LOGIN} className="font-semibold text-primary hover:underline">
+                  Đăng nhập
+                </Link>{' '}
+                để lưu địa chỉ và theo dõi đơn hàng sau này.
+              </p>
+            )}
 
-        {/*
-          `noValidate` là bắt buộc: các input có thuộc tính `required` (giữ lại cho
-          trình đọc màn hình), nếu không tắt validate mặc định thì trình duyệt sẽ
-          chặn sự kiện submit và React Hook Form không bao giờ chạy — người dùng
-          nhận thông báo mặc định của trình duyệt thay vì thông điệp tiếng Việt.
-        */}
-        <FormProvider {...methods}>
-          <form
-            noValidate
-            onSubmit={handleSubmit(onSubmit)}
-            className="grid gap-8 lg:grid-cols-[1fr_360px]"
-          >
-            <div className="min-w-0 space-y-8">
-              <section>
-                <h2 className="mb-4 text-base">Thông tin người nhận</h2>
+            {/*
+              `noValidate` là bắt buộc: các input có thuộc tính `required` (giữ lại cho
+              trình đọc màn hình), nếu không tắt validate mặc định thì trình duyệt sẽ
+              chặn sự kiện submit và React Hook Form không bao giờ chạy — người dùng
+              nhận thông báo mặc định của trình duyệt thay vì thông điệp tiếng Việt.
+            */}
+            <FormProvider {...methods}>
+              <form
+                noValidate
+                onSubmit={handleSubmit(onSubmit)}
+                className="grid gap-8 lg:grid-cols-[1fr_360px]"
+              >
+                <div className="min-w-0 space-y-8">
+                  <section>
+                    <h2 className="mb-4 text-base">Thông tin người nhận</h2>
 
-                <SavedAddressPicker
-                  addresses={addresses ?? []}
-                  value={selectedAddressId}
-                  onChange={applyAddress}
-                />
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Input
-                    label="Họ và tên"
-                    required
-                    placeholder="Nguyễn Văn A"
-                    error={errors.fullName?.message}
-                    {...register('fullName')}
-                  />
-                  <Input
-                    label="Số điện thoại"
-                    required
-                    inputMode="tel"
-                    placeholder="0901234567"
-                    error={errors.phone?.message}
-                    {...register('phone')}
-                  />
-                  <div className="sm:col-span-2">
-                    <Input
-                      label="Email"
-                      required
-                      type="email"
-                      placeholder="ban@email.com"
-                      hint="Dùng để gửi xác nhận đơn hàng."
-                      error={errors.email?.message}
-                      {...register('email')}
+                    <SavedAddressPicker
+                      addresses={addresses ?? []}
+                      value={selectedAddressId}
+                      onChange={applyAddress}
                     />
-                  </div>
-                </div>
-              </section>
 
-              <section>
-                <h2 className="mb-4 text-base">Địa chỉ giao hàng</h2>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <AddressFields />
-
-                  <div className="sm:col-span-3">
-                    <Input
-                      label="Số nhà, tên đường"
-                      required
-                      placeholder="123 Nguyễn Văn Cừ"
-                      error={errors.street?.message}
-                      {...register('street')}
-                    />
-                  </div>
-
-                  <div className="sm:col-span-3">
-                    <Textarea
-                      label="Ghi chú (tuỳ chọn)"
-                      rows={3}
-                      placeholder="Giao giờ hành chính, gọi trước khi đến…"
-                      error={errors.note?.message}
-                      {...register('note')}
-                    />
-                  </div>
-                </div>
-              </section>
-
-              <section>
-                <PaymentMethodPicker
-                  value={paymentMethod}
-                  onChange={(method: PaymentMethod) =>
-                    setValue('paymentMethod', method, { shouldValidate: true })
-                  }
-                />
-              </section>
-            </div>
-
-            <aside className="space-y-5">
-              <div className="rounded-xl border border-line p-4">
-                {/* "mặt hàng" = số dòng, khác với "sản phẩm" = tổng số lượng ở bảng tổng kết */}
-                <h2 className="mb-3 text-base">Đơn hàng ({items.length} mặt hàng)</h2>
-                <ul className="space-y-3">
-                  {items.map((item) => (
-                    <li key={item.productId} className="flex gap-3 text-sm">
-                      <img
-                        src={item.image}
-                        alt=""
-                        aria-hidden="true"
-                        loading="lazy"
-                        className="size-12 shrink-0 rounded-lg object-cover"
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Input
+                        label="Họ và tên"
+                        required
+                        placeholder="Nguyễn Văn A"
+                        error={errors.fullName?.message}
+                        {...register('fullName')}
                       />
-                      <span className="min-w-0 flex-1">
-                        <span className="line-clamp-1 font-medium">{item.name}</span>
-                        <span className="text-xs text-ink-muted">
-                          {item.quantity} × {formatVND(item.price)}
-                        </span>
-                      </span>
-                      <span className="shrink-0 font-semibold">
-                        {formatVND(item.price * item.quantity)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                      <Input
+                        label="Số điện thoại"
+                        required
+                        inputMode="tel"
+                        placeholder="0901234567"
+                        error={errors.phone?.message}
+                        {...register('phone')}
+                      />
+                      <div className="sm:col-span-2">
+                        <Input
+                          label="Email"
+                          required
+                          type="email"
+                          placeholder="ban@email.com"
+                          hint="Dùng để gửi xác nhận đơn hàng."
+                          error={errors.email?.message}
+                          {...register('email')}
+                        />
+                      </div>
+                    </div>
+                  </section>
 
-              <CartSummaryBox title="Thanh toán">
-                {error && !hasMappedFieldError && (
-                  <p role="alert" className="mb-3 text-sm text-danger">
-                    {error.message}
-                  </p>
-                )}
-                {blockingIssues.length > 0 && (
-                  <p role="alert" className="mb-3 text-sm text-danger">
-                    Một số sản phẩm không còn đủ hàng. Vui lòng quay lại giỏ hàng để cập nhật.
-                  </p>
-                )}
-                <Button
-                  type="submit"
-                  size="lg"
-                  fullWidth
-                  isLoading={isPending}
-                  disabled={blockingIssues.length > 0}
-                >
-                  Đặt hàng
-                </Button>
-                <p className="mt-3 text-center text-xs text-ink-muted">
-                  Bằng việc đặt hàng, bạn đồng ý với điều khoản của cửa hàng.
-                </p>
-              </CartSummaryBox>
-            </aside>
-          </form>
-        </FormProvider>
+                  <section>
+                    <h2 className="mb-4 text-base">Địa chỉ giao hàng</h2>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <AddressFields />
+
+                      <div className="sm:col-span-3">
+                        <Input
+                          label="Số nhà, tên đường"
+                          required
+                          placeholder="123 Nguyễn Văn Cừ"
+                          error={errors.street?.message}
+                          {...register('street')}
+                        />
+                      </div>
+
+                      <div className="sm:col-span-3">
+                        <Textarea
+                          label="Ghi chú (tuỳ chọn)"
+                          rows={3}
+                          placeholder="Giao giờ hành chính, gọi trước khi đến…"
+                          error={errors.note?.message}
+                          {...register('note')}
+                        />
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <PaymentMethodPicker
+                      value={paymentMethod}
+                      onChange={(method: PaymentMethod) =>
+                        setValue('paymentMethod', method, { shouldValidate: true })
+                      }
+                    />
+                  </section>
+                </div>
+
+                <aside className="space-y-5">
+                  <div className="rounded-xl border border-line p-4">
+                    {/* "mặt hàng" = số dòng, khác với "sản phẩm" = tổng số lượng ở bảng tổng kết */}
+                    <h2 className="mb-3 text-base">Đơn hàng ({items.length} mặt hàng)</h2>
+                    <ul className="space-y-3">
+                      {items.map((item) => (
+                        <li key={item.productId} className="flex gap-3 text-sm">
+                          <img
+                            src={item.image}
+                            alt=""
+                            aria-hidden="true"
+                            loading="lazy"
+                            className="size-12 shrink-0 rounded-lg object-cover"
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="line-clamp-1 font-medium">{item.name}</span>
+                            <span className="text-xs text-ink-muted">
+                              {item.quantity} × {formatVND(item.price)}
+                            </span>
+                          </span>
+                          <span className="shrink-0 font-semibold">
+                            {formatVND(item.price * item.quantity)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <CartSummaryBox title="Thanh toán">
+                    {error && !hasMappedFieldError && (
+                      <p role="alert" className="mb-3 text-sm text-danger">
+                        {error.message}
+                      </p>
+                    )}
+                    {blockingIssues.length > 0 && (
+                      <p role="alert" className="mb-3 text-sm text-danger">
+                        Một số sản phẩm không còn đủ hàng. Vui lòng quay lại giỏ hàng để cập nhật.
+                      </p>
+                    )}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      fullWidth
+                      isLoading={isPending}
+                      disabled={blockingIssues.length > 0}
+                    >
+                      Đặt hàng
+                    </Button>
+                    <p className="mt-3 text-center text-xs text-ink-muted">
+                      Bằng việc đặt hàng, bạn đồng ý với điều khoản của cửa hàng.
+                    </p>
+                  </CartSummaryBox>
+                </aside>
+              </form>
+            </FormProvider>
+          </>
+        )}
       </div>
     </>
   )

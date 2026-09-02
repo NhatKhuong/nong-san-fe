@@ -1,6 +1,6 @@
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from '@/lib/constants'
 import { client } from './client'
-import type { CartIssue, CartItem, CreateOrderPayload, Order } from '@/types'
+import type { CartIssue, CartItem, CreateOrderPayload, Order, PurchaseRequest } from '@/types'
 
 /**
  * Thân dòng hàng đúng như `CartItemRequest` của backend — **đúng bốn trường**.
@@ -108,5 +108,51 @@ export async function getMyOrders(): Promise<Order[]> {
  */
 export async function getOrderByCode(code: string): Promise<Order> {
   const { data } = await client.get<Order>(`/orders/${encodeURIComponent(code)}`)
+  return data
+}
+
+/**
+ * Nộp yêu cầu đặt hàng **bất đồng bộ** — `POST /orders/async`, trả **202** ngay
+ * lập tức. Body y hệt `createOrder()`; đơn thật được dựng sau đó qua Kafka,
+ * client theo dõi kết quả bằng `getPurchaseRequestStatus()`.
+ *
+ * `idempotencyKey` **bắt buộc** (header `Idempotency-Key`) và phải **giữ
+ * nguyên** khi phát lại cùng một lần bấm "Đặt hàng" (mất mạng, timeout, double
+ * click) — server trả về đúng `requestId`/`status` của lần đầu, không tạo yêu
+ * cầu mới. Một lượt đặt hàng MỚI (bấm "Thử lại" sau khi thấy `FAILED`) phải
+ * dùng khoá mới — việc sinh/giữ khoá là trách nhiệm của nơi gọi hàm này
+ * (`CheckoutPage`), không phải của hàm này.
+ *
+ * Thiếu header → `400`. Body sai quy tắc nghiệp vụ → `422`, cùng bảng lỗi với
+ * `createOrder()`.
+ */
+export async function createOrderAsync(
+  payload: CreateOrderPayload,
+  idempotencyKey: string,
+): Promise<PurchaseRequest> {
+  const { data } = await client.post<PurchaseRequest>(
+    '/orders/async',
+    {
+      items: payload.items.map(toCartItemRequest),
+      shipping: payload.shipping,
+      paymentMethod: payload.paymentMethod,
+      couponCode: payload.couponCode,
+    },
+    { headers: { 'Idempotency-Key': idempotencyKey } },
+  )
+  return data
+}
+
+/**
+ * Tra trạng thái một yêu cầu đặt hàng bất đồng bộ — `GET /orders/requests/{requestId}`,
+ * dùng để polling sau `createOrderAsync()`.
+ *
+ * **Công khai có chủ ý**: `requestId` là token sinh ngẫu nhiên an toàn mật mã,
+ * không đoán được — cùng mô hình với `getOrderByCode`. Không tồn tại → `404`.
+ */
+export async function getPurchaseRequestStatus(requestId: string): Promise<PurchaseRequest> {
+  const { data } = await client.get<PurchaseRequest>(
+    `/orders/requests/${encodeURIComponent(requestId)}`,
+  )
   return data
 }

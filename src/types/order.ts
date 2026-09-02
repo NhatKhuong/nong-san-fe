@@ -59,3 +59,23 @@ export interface CreateOrderPayload {
   paymentMethod: PaymentMethod
   couponCode: string | null
 }
+
+/** Trạng thái của một yêu cầu đặt hàng bất đồng bộ (`POST /orders/async`). */
+export type PurchaseRequestStatus = 'PENDING' | 'SUCCESS' | 'FAILED'
+
+/**
+ * Kết quả `POST /orders/async` (202) và `GET /orders/requests/{requestId}` —
+ * một yêu cầu mua hàng đang (hoặc đã) được xử lý bất đồng bộ qua Kafka.
+ *
+ * `orderCode` chỉ có giá trị khi `status === 'SUCCESS'`; `failureCode` và
+ * `failureMessage` chỉ có giá trị khi `status === 'FAILED'`. `failureMessage`
+ * đã là tiếng Việt do backend sinh sẵn — hiển thị thẳng cho người dùng, không
+ * tự dịch hay soạn lại (API_CONTRACT.md §B.6a).
+ */
+export interface PurchaseRequest {
+  requestId: string
+  status: PurchaseRequestStatus
+  orderCode: string | null
+  failureCode: string | null
+  failureMessage: string | null
+}
